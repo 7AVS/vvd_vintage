@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VVD Vintage Curves - What We Need</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .slide {
+            width: 100%;
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 40px 50px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 750px;
+            page-break-after: always;
+        }
+        h1 {
+            color: #003366;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #003366;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #003366;
+            font-size: 1.3em;
+            margin: 30px 0 15px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #003366;
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .highlight {
+            background: #e8f4fc;
+            padding: 15px;
+            border-left: 4px solid #003366;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+        }
+        .tag-yes { background: #d4edda; color: #155724; }
+        .tag-no { background: #f8d7da; color: #721c24; }
+        .tag-tbd { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 1: Campaign Inventory -->
+<div class="slide">
+    <h1>VVD Vintage Curves - Campaign Inventory</h1>
+
+    <p style="margin-bottom: 20px;"><strong>Goal:</strong> Build vintage curve dashboards for 6 VVD campaigns with dropdowns for segments, channels, and cohorts.</p>
+
+    <table>
+        <tr>
+            <th>Campaign</th>
+            <th>Primary Metric</th>
+            <th>Secondary Metric</th>
+            <th>Type</th>
+            <th>Window</th>
+            <th>Cohorts</th>
+        </tr>
+        <tr>
+            <td><strong>VCN</strong><br><small>Contextual Notification</small></td>
+            <td>Acquisition<br><small>(Card Issued)</small></td>
+            <td>Usage</td>
+            <td>Batch</td>
+            <td>30 days</td>
+            <td>Monthly</td>
+        </tr>
+        <tr>
+            <td><strong>VDA</strong><br><small>Seasonal Acquisition</small></td>
+            <td>Acquisition<br><small>(Card Issued)</small></td>
+            <td>Activation, Usage</td>
+            <td>Batch</td>
+            <td>90 days</td>
+            <td>Seasonal (2x/yr)</td>
+        </tr>
+        <tr>
+            <td><strong>VDT</strong><br><small>Activation Trigger</small></td>
+            <td>Activation<br><small>(Card Activated)</small></td>
+            <td>-</td>
+            <td>Trigger</td>
+            <td>30 days</td>
+            <td>Weekly (group monthly)</td>
+        </tr>
+        <tr>
+            <td><strong>VUI</strong><br><small>Usage Trigger</small></td>
+            <td>Usage<br><small>(Purchase Made)</small></td>
+            <td>-</td>
+            <td>Trigger</td>
+            <td>30 days</td>
+            <td>Trigger</td>
+        </tr>
+        <tr>
+            <td><strong>VUT</strong><br><small>Tokenization Usage</small></td>
+            <td>Tokenization<br><small>(Added to Wallet)</small></td>
+            <td>Usage</td>
+            <td>Trigger</td>
+            <td>30 days</td>
+            <td>Trigger</td>
+        </tr>
+        <tr>
+            <td><strong>VAW</strong><br><small>Add To Wallet</small></td>
+            <td>Tokenization<br><small>(Added to Wallet)</small></td>
+            <td>Usage</td>
+            <td>Batch</td>
+            <td>90 days</td>
+            <td>Batch</td>
+        </tr>
+    </table>
+
+    <h2>Dashboard Filters (Dropdowns)</h2>
+    <table>
+        <tr>
+            <th>Filter</th>
+            <th>Description</th>
+            <th>Available</th>
+        </tr>
+        <tr>
+            <td><strong>Campaign</strong></td>
+            <td>Select which campaign (VCN, VDA, VDT, VUI, VUT, VAW)</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>Test/Control</strong></td>
+            <td>Compare Test (TG4) vs Control groups</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>Cohort</strong></td>
+            <td>Select deployment wave (by month)</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>Channel</strong></td>
+            <td>Filter by delivery channel (Email, Push, OLB, etc.)</td>
+            <td><span class="tag tag-tbd">TBD</span></td>
+        </tr>
+        <tr>
+            <td><strong>Segment</strong></td>
+            <td>Filter by client segment (RPT_GRP_CD)</td>
+            <td><span class="tag tag-tbd">TBD</span></td>
+        </tr>
+        <tr>
+            <td><strong>Measurement Window</strong></td>
+            <td>Adjust days to measure (default: 30/90)</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+    </table>
+
+    <div class="footer">Page 1 of 2</div>
+</div>
+
+<!-- SLIDE 2: What Curves We Need -->
+<div class="slide">
+    <h1>VVD Vintage Curves - What to Build</h1>
+
+    <h2>Curves Required per Campaign</h2>
+    <table>
+        <tr>
+            <th>Campaign</th>
+            <th>Curve 1 (Primary)</th>
+            <th>Curve 2</th>
+            <th>Curve 3</th>
+            <th>Test vs Control</th>
+        </tr>
+        <tr>
+            <td><strong>VCN</strong></td>
+            <td>Acquisition</td>
+            <td>Usage</td>
+            <td>-</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>VDA</strong></td>
+            <td>Acquisition</td>
+            <td>Activation</td>
+            <td>Usage</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>VDT</strong></td>
+            <td>Activation</td>
+            <td>-</td>
+            <td>-</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>VUI</strong></td>
+            <td>Usage</td>
+            <td>-</td>
+            <td>-</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>VUT</strong></td>
+            <td>Tokenization</td>
+            <td>Usage</td>
+            <td>-</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+        <tr>
+            <td><strong>VAW</strong></td>
+            <td>Tokenization</td>
+            <td>Usage</td>
+            <td>-</td>
+            <td><span class="tag tag-yes">Yes</span></td>
+        </tr>
+    </table>
+
+    <h2>Summary: Total Curves to Build</h2>
+    <table>
+        <tr>
+            <th>Metric Type</th>
+            <th>Campaigns Using It</th>
+            <th>Curves Needed</th>
+        </tr>
+        <tr>
+            <td><strong>Acquisition</strong></td>
+            <td>VCN, VDA</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td><strong>Activation</strong></td>
+            <td>VDA, VDT</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td><strong>Usage</strong></td>
+            <td>VCN, VDA, VUI, VUT, VAW</td>
+            <td>5</td>
+        </tr>
+        <tr>
+            <td><strong>Tokenization</strong></td>
+            <td>VUT, VAW</td>
+            <td>2</td>
+        </tr>
+        <tr style="background: #e8f4fc; font-weight: bold;">
+            <td><strong>TOTAL</strong></td>
+            <td></td>
+            <td><strong>11 curves</strong></td>
+        </tr>
+    </table>
+
+    <div class="highlight">
+        <strong>Next Step:</strong> Discuss how to calculate each metric type (Acquisition, Activation, Usage, Tokenization) and build the vintage curves.
+    </div>
+
+    <div class="footer">Page 2 of 2</div>
+</div>
+
+</body>
+</html>

@@ -30,10 +30,15 @@ TEST_GROUP_CODE = "TG4"
 CONFIDENCE_LEVEL = 0.95
 
 PATHS = {
-    "tactic": "/user/427966379/tactic.parquet",
+    # Tactic - Source Hive table
+    "tactic_table": "prod_yg80_pcbsharedzone.tsz_00150_cc_dtzta_t_tactic_evnt_hist",
+
+    # Success tables - Hive paths
     "visa_dr_crd": "/prod/sz/tsz/00050/data/DDWTA_VISA_DR_CRD/PartitionColumn=Latest/CAPTR_DT=",
     "pos_txn": "/prod/sz/tsz/00050/data/DDWTA_T_PT_OF_SALE_TXN/SNAP_DT=",
-    "token": "/user/427966379/token.parquet",
+
+    # Token - EDW (requires EDW.cursor())
+    "token_source": "EDW",  # Flag to use EDW query instead of parquet
 }
 
 CAMPAIGN_CONFIG = {
@@ -82,7 +87,6 @@ CAMPAIGN_CONFIG = {
         "campaign_name": "VVD Tokenization Usage Campaign",
         "success_type": "TOKENIZATION",
         "success_source": "EDW",
-        "success_table_path": PATHS["token"],
         "success_date_field": "TXN_DT",
         "filters": None,
     },
@@ -90,7 +94,6 @@ CAMPAIGN_CONFIG = {
         "campaign_name": "VVD Add To Wallet Contextual Notification",
         "success_type": "TOKENIZATION",
         "success_source": "EDW",
-        "success_table_path": PATHS["token"],
         "success_date_field": "TXN_DT",
         "filters": None,
     },
@@ -106,23 +109,101 @@ def get_config(mne):
 # =============================================================================
 
 def load_tactic(spark, mne):
-    tactic = spark.read.parquet(PATHS["tactic"])
+    """
+    Load tactic data from source Hive table.
+
+    Source: prod_yg80_pcbsharedzone.tsz_00150_cc_dtzta_t_tactic_evnt_hist
+    """
+    # Load from source Hive table
+    tactic = spark.table(PATHS["tactic_table"])
+
+    # Filter by MNE prefix (tactic_id starts with MNE code)
     tactic = tactic.filter(
-        (F.col("MNE") == mne) &
-        (F.year(F.col("TREATMT_STRT_DT")).isin(YEARS_TO_INCLUDE))
+        (F.col("tactic_id").startswith(mne)) &
+        (F.year(F.col("treatmt_strt_dt")).isin(YEARS_TO_INCLUDE))
     )
+
+    # Select and rename columns to match expected format
+    tactic = tactic.select(
+        F.col("tactic_evnt_id").alias("CLNT_NO"),  # Client identifier
+        F.col("tactic_id").alias("TACTIC_ID"),
+        F.col("treatmt_strt_dt").alias("TREATMT_STRT_DT"),
+        F.col("treatmt_end_dt").alias("TREATMT_END_DT"),
+        F.col("tst_grp_cd").alias("TST_GRP_CD"),
+        F.col("rpt_grp_cd").alias("RPT_GRP_CD"),
+        F.col("treatmt_mn").alias("TREATMT_MN"),
+        F.col("tactic_cell_cd").alias("TACTIC_CELL_CD"),
+        F.col("strtgy_src_cd").alias("STRTGY_SRC_CD"),
+        F.col("addnl_decisn_data1").alias("ADDNL_DECISN_DATA1"),
+        F.col("addnl_decisn_data2").alias("ADDNL_DECISN_DATA2"),
+        F.col("addnl_decisn_data3").alias("ADDNL_DECISN_DATA3"),
+    )
+
+    # Add derived columns
+    tactic = tactic.withColumn("MNE", F.lit(mne))
     tactic = tactic.withColumn("WINDOW_DAYS", F.datediff(F.col("TREATMT_END_DT"), F.col("TREATMT_STRT_DT")))
     tactic = tactic.withColumn("GROUP", F.when(F.col("TST_GRP_CD") == TEST_GROUP_CODE, "TEST").otherwise("CONTROL"))
     tactic = tactic.withColumn("COHORT", F.date_format(F.col("TREATMT_STRT_DT"), "yyyy-MM"))
+
     return tactic
 
 
+def load_token_from_edw():
+    """
+    Load token/provisioning data from EDW using EDW.cursor().
+
+    Source tables:
+    - DDWV05.CLNT_CRD_POS_LOG
+    - DL_DECMAN.TOKEN_LIST
+
+    Returns: pandas DataFrame with CLNT_NO and TXN_DT
+    """
+    query = """
+    SELECT DISTINCT
+        CAST(SUBSTR(B.CLNT_CRD_NO, 7, 9) AS INTEGER) AS CLNT_NO,
+        B.TXN_DT
+    FROM DDWV05.CLNT_CRD_POS_LOG AS B
+    INNER JOIN DL_DECMAN.TOKEN_LIST C
+        ON B.TOKN_REQSTR_ID = C.TOKEN_ID
+    WHERE B.AMT1 = 0
+        AND SUBSTR(B.CLNT_CRD_NO, 1, 5) = '45190'
+        AND SUBSTR(B.VISA_DR_CRD_NO, 1, 5) = '45199'
+        AND SUBSTR(B.TOKN_REQSTR_ID, 1, 1) > '0'
+        AND B.POS_ENTR_MODE_CD_NON_EMV = '000'
+        AND B.SRVC_CD = 36
+        AND C.TOKEN_WALLET_IND = 'Y'
+    """
+
+    # EDW.cursor() is available in Lumina environment
+    cursor = EDW.cursor()
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+    cursor.close()
+
+    df = pd.DataFrame(rows, columns=columns)
+    return df
+
+
 def load_success_table(spark, config):
+    """
+    Load success table based on config.
+
+    For HIVE sources: reads from parquet paths
+    For EDW sources: uses EDW.cursor() and converts to Spark DataFrame
+    """
     years_str = [str(y) for y in YEARS_TO_INCLUDE]
 
+    # Handle EDW source (Token/Provisioning)
     if config["success_source"] == "EDW":
-        return spark.read.parquet(config["success_table_path"])
+        print("    Loading token data from EDW...")
+        token_pdf = load_token_from_edw()
+        print(f"    Retrieved {len(token_pdf):,} token records from EDW")
+        # Convert pandas to Spark DataFrame
+        df = spark.createDataFrame(token_pdf)
+        return df
 
+    # Handle HIVE sources
     paths = [f"{config['success_table_path']}{year}*" for year in years_str]
     df = spark.read.parquet(*paths)
 

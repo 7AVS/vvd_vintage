@@ -3,15 +3,10 @@ Vintage Analysis Runner
 =======================
 
 Copy this into a Jupyter notebook cell to run the analysis.
-
-Usage:
-    1. Upload config.py and vintage_pipeline.py to your Lumina environment
-    2. Copy this code into a notebook cell
-    3. Run!
 """
 
 # =============================================================================
-# SETUP - Run this cell first
+# SETUP
 # =============================================================================
 
 from pyspark.sql import SparkSession
@@ -31,46 +26,24 @@ list_campaigns()
 
 
 # =============================================================================
-# OPTION 1: Run a single campaign
+# RUN ANALYSIS
 # =============================================================================
 
-# Uncomment to run:
-# results = run_vintage_analysis(spark, "VCN")
+# Single campaign
+results = run_vintage_analysis(spark, "VCN")
 
-
-# =============================================================================
-# OPTION 2: Run all campaigns
-# =============================================================================
-
-# Uncomment to run:
+# Or all campaigns:
 # all_results = run_all_campaigns(spark)
 
-
-# =============================================================================
-# OPTION 3: Run specific campaigns
-# =============================================================================
-
-# Uncomment to run:
+# Or specific campaigns:
 # results = run_all_campaigns(spark, mnes=["VCN", "VDT", "VUI"])
-
-
-# =============================================================================
-# OPTION 4: Run without saving (just view plots)
-# =============================================================================
-
-# Uncomment to run:
-# results = run_vintage_analysis(spark, "VCN", save_outputs=False)
 
 
 # =============================================================================
 # ACCESS RESULTS
 # =============================================================================
 
-# After running, you can access:
-# results["vintage_df"]  - Full vintage data (pandas DataFrame)
-# results["summary_df"]  - Summary table (pandas DataFrame)
-# results["paths"]       - Output file paths
-
-# Example:
-# df = results["vintage_df"]
-# df.head()
+# After running, access data like this:
+# vintage_data = results["vintage_df"]
+# summary_data = results["summary_df"]
+# vintage_data.head()

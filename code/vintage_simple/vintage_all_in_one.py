@@ -482,6 +482,70 @@ def run_all_campaigns(spark, mnes=None, show_plots=True):
 
 
 # =============================================================================
+# CSV EXPORT (for dashboard generation)
+# =============================================================================
+
+def export_to_csv(results, output_path="vintage_data.csv"):
+    """
+    Export vintage results to CSV for dashboard generation.
+
+    This uses Pandas to save locally (works in Jupyter).
+    For HDFS, use export_to_hdfs() instead.
+
+    Args:
+        results: Dictionary from run_all_campaigns()
+        output_path: Local path to save CSV
+    """
+    all_data = []
+
+    for mne, result in results.items():
+        if mne.startswith("_") or result is None:
+            continue
+        df = result["vintage_df"].copy()
+        df["MNE"] = mne
+        all_data.append(df)
+
+    if not all_data:
+        print("No data to export")
+        return
+
+    combined = pd.concat(all_data, ignore_index=True)
+    combined.to_csv(output_path, index=False)
+    print(f"Exported {len(combined)} rows to {output_path}")
+    print(f"Campaigns: {', '.join([m for m in results.keys() if not m.startswith('_')])}")
+    return output_path
+
+
+def export_to_hdfs(results, spark, hdfs_path="/user/YOUR_USER/vintage_data"):
+    """
+    Export vintage results to HDFS as parquet.
+
+    Args:
+        results: Dictionary from run_all_campaigns()
+        spark: SparkSession
+        hdfs_path: HDFS path to save parquet
+    """
+    all_data = []
+
+    for mne, result in results.items():
+        if mne.startswith("_") or result is None:
+            continue
+        df = result["vintage_df"].copy()
+        df["MNE"] = mne
+        all_data.append(df)
+
+    if not all_data:
+        print("No data to export")
+        return
+
+    combined = pd.concat(all_data, ignore_index=True)
+    spark_df = spark.createDataFrame(combined)
+    spark_df.write.mode("overwrite").parquet(hdfs_path)
+    print(f"Exported to HDFS: {hdfs_path}")
+    return hdfs_path
+
+
+# =============================================================================
 # SETUP SPARK & RUN
 # =============================================================================
 
@@ -492,3 +556,9 @@ print("Available campaigns:", ALL_MNES)
 print("\nTo run:")
 print("  results = run_vintage_analysis(spark, 'VCN')")
 print("  results = run_all_campaigns(spark)")
+print("\nTo export:")
+print("  export_to_csv(results, 'vintage_data.csv')  # Local")
+print("  export_to_hdfs(results, spark, '/user/YOU/vintage')  # HDFS")
+print("\nTo generate dashboard:")
+print("  from vintage_dashboard import generate_dashboard")
+print("  generate_dashboard(results, 'vvd_vintage_dashboard.html')")

@@ -3,7 +3,11 @@ VVD Vintage Curve Analysis - All In One
 ========================================
 
 Copy this entire file into a Jupyter notebook cell and run.
-No imports needed - everything is self-contained.
+Everything is self-contained - no file imports needed.
+
+For HDFS/Yarn environments (Lumina):
+- Plots display inline in Jupyter
+- Data returned as DataFrames (save manually if needed)
 """
 
 from pyspark.sql import SparkSession
@@ -13,6 +17,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from scipy import stats
+
+# For inline plots in Jupyter
+%matplotlib inline
 
 # =============================================================================
 # CONFIGURATION
@@ -27,7 +34,6 @@ PATHS = {
     "visa_dr_crd": "/prod/sz/tsz/00050/data/DDWTA_VISA_DR_CRD/PartitionColumn=Latest/CAPTR_DT=",
     "pos_txn": "/prod/sz/tsz/00050/data/DDWTA_T_PT_OF_SALE_TXN/SNAP_DT=",
     "token": "/user/427966379/token.parquet",
-    "output": "/user/427966379"
 }
 
 CAMPAIGN_CONFIG = {
@@ -293,10 +299,11 @@ def generate_summary(lift_df, mne):
     return final[cols].sort_values("COHORT")
 
 # =============================================================================
-# PLOTTING
+# PLOTTING - Displays inline in Jupyter
 # =============================================================================
 
-def plot_vintage(vintage_df, mne, config, save_path=None):
+def plot_vintage(vintage_df, mne, config):
+    """Plot vintage curves - all cohorts on one chart."""
     if vintage_df.empty:
         print(f"No data to plot for {mne}")
         return
@@ -327,19 +334,65 @@ def plot_vintage(vintage_df, mne, config, save_path=None):
     ax.set_xlim(0, None)
     ax.set_ylim(0, None)
     plt.tight_layout()
-
-    if save_path:
-        plt.savefig(save_path, dpi=100, bbox_inches='tight')
-        print(f"Plot saved: {save_path}")
     plt.show()
-    plt.close()
+
+
+def plot_grid(vintage_df, mne, config):
+    """Plot grid view - one subplot per cohort."""
+    cohorts = sorted(vintage_df["COHORT"].unique())
+    n_cohorts = len(cohorts)
+
+    if n_cohorts == 0 or n_cohorts > 12:
+        print(f"Skipping grid plot: {n_cohorts} cohorts")
+        return
+
+    n_cols = min(3, n_cohorts)
+    n_rows = (n_cohorts + n_cols - 1) // n_cols
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(min(5*n_cols, 15), min(4*n_rows, 12)), squeeze=False)
+
+    for idx, cohort in enumerate(cohorts):
+        ax = axes[idx // n_cols, idx % n_cols]
+        data = vintage_df[vintage_df["COHORT"] == cohort]
+
+        if data.empty:
+            continue
+
+        final = data[data["DAY"] == data["DAY"].max()].iloc[0]
+
+        ax.plot(data["DAY"], data["TEST_RATE"], '-o', color='#2E86AB',
+                label=f'Test (n={int(final["TEST_CLIENTS"]):,})')
+        ax.plot(data["DAY"], data["CTRL_RATE"], '-s', color='#A23B72',
+                label=f'Control (n={int(final["CTRL_CLIENTS"]):,})')
+
+        ax.annotate(f'Lift: {final["ABS_LIFT"]:.2f}pp\n[{final["CI_LOWER"]:.2f}, {final["CI_UPPER"]:.2f}]',
+                    xy=(0.95, 0.05), xycoords='axes fraction', fontsize=8, ha='right', va='bottom',
+                    bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+        ax.set_title(f'Cohort: {cohort}', fontsize=10)
+        ax.set_xlabel("Days", fontsize=9)
+        ax.set_ylabel("Rate (%)", fontsize=9)
+        ax.legend(fontsize=7, loc='upper left')
+        ax.grid(True, alpha=0.3)
+
+    for idx in range(n_cohorts, n_rows * n_cols):
+        axes[idx // n_cols, idx % n_cols].set_visible(False)
+
+    fig.suptitle(f"{mne} - {config['campaign_name']} | {config['success_type']}", fontsize=13, y=1.02)
+    plt.tight_layout()
+    plt.show()
 
 # =============================================================================
 # MAIN RUNNER
 # =============================================================================
 
-def run_vintage_analysis(spark, mne, save_outputs=True, verbose=True):
-    """Run vintage analysis for a campaign."""
+def run_vintage_analysis(spark, mne, show_plots=True, verbose=True):
+    """
+    Run vintage analysis for a campaign.
+
+    Returns dict with vintage_df and summary_df (pandas DataFrames).
+    Plots display inline in Jupyter.
+    """
     def log(msg):
         if verbose:
             print(msg)
@@ -388,30 +441,21 @@ def run_vintage_analysis(spark, mne, save_outputs=True, verbose=True):
     summary_df = generate_summary(vintage_df, mne)
     print(summary_df.to_string(index=False))
 
-    output_paths = {}
-    if save_outputs:
-        log("\n[7] Saving outputs...")
-        vintage_df["MNE"] = mne
-        csv_path = f"{PATHS['output']}/{mne}_vintage_full.csv"
-        summary_path = f"{PATHS['output']}/{mne}_vintage_summary.csv"
-        plot_path = f"{PATHS['output']}/{mne}_vintage_plot.png"
-        vintage_df.to_csv(csv_path, index=False)
-        summary_df.to_csv(summary_path, index=False)
-        output_paths = {"csv": csv_path, "summary": summary_path, "plot": plot_path}
-        log(f"    CSV: {csv_path}")
-
-    log("\n[8] Plotting...")
-    plot_vintage(vintage_df, mne, config, output_paths.get("plot"))
+    if show_plots:
+        log("\n[7] Plotting...")
+        plot_vintage(vintage_df, mne, config)
+        plot_grid(vintage_df, mne, config)
 
     success_df.unpersist()
+
     log(f"\n{'='*60}")
     log(f"COMPLETE: {mne}")
     log(f"{'='*60}")
 
-    return {"vintage_df": vintage_df, "summary_df": summary_df, "paths": output_paths}
+    return {"vintage_df": vintage_df, "summary_df": summary_df}
 
 
-def run_all_campaigns(spark, mnes=None):
+def run_all_campaigns(spark, mnes=None, show_plots=True):
     """Run vintage analysis for all campaigns."""
     mnes = mnes or ALL_MNES
     results = {}
@@ -419,7 +463,7 @@ def run_all_campaigns(spark, mnes=None):
 
     for mne in mnes:
         try:
-            result = run_vintage_analysis(spark, mne)
+            result = run_vintage_analysis(spark, mne, show_plots=show_plots)
             if result:
                 results[mne] = result
                 all_summaries.append(result["summary_df"])
@@ -432,27 +476,19 @@ def run_all_campaigns(spark, mnes=None):
         print("ALL CAMPAIGNS SUMMARY")
         print(f"{'='*60}")
         print(combined.to_string(index=False))
+        results["_combined_summary"] = combined
 
     return results
 
 
 # =============================================================================
-# RUN - Uncomment to execute
+# SETUP SPARK & RUN
 # =============================================================================
 
 # Get or create Spark session
 spark = SparkSession.builder.appName("VVD Vintage").getOrCreate()
 
-# Show available campaigns
 print("Available campaigns:", ALL_MNES)
-
-# Run single campaign - uncomment one:
-# results = run_vintage_analysis(spark, "VCN")
-# results = run_vintage_analysis(spark, "VDA")
-# results = run_vintage_analysis(spark, "VDT")
-# results = run_vintage_analysis(spark, "VUI")
-# results = run_vintage_analysis(spark, "VUT")
-# results = run_vintage_analysis(spark, "VAW")
-
-# Run all campaigns:
-# results = run_all_campaigns(spark)
+print("\nTo run:")
+print("  results = run_vintage_analysis(spark, 'VCN')")
+print("  results = run_all_campaigns(spark)")

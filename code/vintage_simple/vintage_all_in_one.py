@@ -30,10 +30,11 @@ TEST_GROUP_CODE = "TG4"
 CONFIDENCE_LEVEL = 0.95
 
 PATHS = {
-    # Tactic - Source Hive table
-    "tactic_table": "prod_yg80_pcbsharedzone.tsz_00150_cc_dtzta_t_tactic_evnt_hist",
+    # Tactic - Parquet path with EVNT_STRT_DT partition
+    "tactic_base_path": "/prod/sz/tsz/00150/cc/DTZTA_T_TACTIC_EVNT_HIST/",
+    "tactic_partition_pattern": "EVNT_STRT_DT=",  # Partition pattern prefix
 
-    # Success tables - Hive paths
+    # Success tables - Hive paths (partition handled via path glob)
     "visa_dr_crd": "/prod/sz/tsz/00050/data/DDWTA_VISA_DR_CRD/PartitionColumn=Latest/CAPTR_DT=",
     "pos_txn": "/prod/sz/tsz/00050/data/DDWTA_T_PT_OF_SALE_TXN/SNAP_DT=",
 
@@ -110,40 +111,57 @@ def get_config(mne):
 
 def load_tactic(spark, mne):
     """
-    Load tactic data from source Hive table.
+    Load tactic data from parquet with partition pruning.
 
-    Source: prod_yg80_pcbsharedzone.tsz_00150_cc_dtzta_t_tactic_evnt_hist
+    Source: /prod/sz/tsz/00150/cc/DTZTA_T_TACTIC_EVNT_HIST/
+    Partition: EVNT_STRT_DT={year}*
+
+    Key field transformations:
+    - MNE: extracted from TACTIC_ID positions 8-10 (substring(8,3))
+    - CLNT_NO: TACTIC_EVNT_ID trimmed with leading zeros removed
+    - TST_GRP_CD: trimmed to remove whitespace
     """
-    # Load from source Hive table
-    tactic = spark.table(PATHS["tactic_table"])
+    years = [str(y) for y in YEARS_TO_INCLUDE]
+    base_path = PATHS["tactic_base_path"]
+    paths = [f"{base_path}EVNT_STRT_DT={year}*" for year in years]
 
-    # Filter by MNE prefix (tactic_id starts with MNE code)
-    tactic = tactic.filter(
-        (F.col("tactic_id").startswith(mne)) &
-        (F.year(F.col("treatmt_strt_dt")).isin(YEARS_TO_INCLUDE))
-    )
+    print(f"    Loading tactic from partitions: {years}")
+
+    # Load with basePath for partition column preservation
+    tactic = spark.read.option("basePath", base_path) \
+        .parquet(*paths) \
+        .filter(F.substring(F.col("TACTIC_ID"), 8, 3) == mne)
+
+    # Add derived columns with correct field transformations
+    tactic = tactic \
+        .withColumn("MNE", F.substring(F.col("TACTIC_ID"), 8, 3)) \
+        .withColumn("CLNT_NO", F.regexp_replace(F.trim(F.col("TACTIC_EVNT_ID")), "^0+", "")) \
+        .withColumn("TST_GRP_CD", F.trim(F.col("TST_GRP_CD")))
 
     # Select and rename columns to match expected format
     tactic = tactic.select(
-        F.col("tactic_evnt_id").alias("CLNT_NO"),  # Client identifier
-        F.col("tactic_id").alias("TACTIC_ID"),
-        F.col("treatmt_strt_dt").alias("TREATMT_STRT_DT"),
-        F.col("treatmt_end_dt").alias("TREATMT_END_DT"),
-        F.col("tst_grp_cd").alias("TST_GRP_CD"),
-        F.col("rpt_grp_cd").alias("RPT_GRP_CD"),
-        F.col("treatmt_mn").alias("TREATMT_MN"),
-        F.col("tactic_cell_cd").alias("TACTIC_CELL_CD"),
-        F.col("strtgy_src_cd").alias("STRTGY_SRC_CD"),
-        F.col("addnl_decisn_data1").alias("ADDNL_DECISN_DATA1"),
-        F.col("addnl_decisn_data2").alias("ADDNL_DECISN_DATA2"),
-        F.col("addnl_decisn_data3").alias("ADDNL_DECISN_DATA3"),
+        F.col("CLNT_NO"),
+        F.col("TACTIC_ID"),
+        F.col("TREATMT_STRT_DT"),
+        F.col("TREATMT_END_DT"),
+        F.col("TST_GRP_CD"),
+        F.col("RPT_GRP_CD"),
+        F.col("TREATMT_MN"),
+        F.col("TACTIC_CELL_CD"),
+        F.col("STRTGY_SRC_CD"),
+        F.col("ADDNL_DECISN_DATA1"),
+        F.col("ADDNL_DECISN_DATA2"),
+        F.col("ADDNL_DECISN_DATA3"),
+        F.col("MNE"),
     )
 
     # Add derived columns
-    tactic = tactic.withColumn("MNE", F.lit(mne))
     tactic = tactic.withColumn("WINDOW_DAYS", F.datediff(F.col("TREATMT_END_DT"), F.col("TREATMT_STRT_DT")))
     tactic = tactic.withColumn("GROUP", F.when(F.col("TST_GRP_CD") == TEST_GROUP_CODE, "TEST").otherwise("CONTROL"))
     tactic = tactic.withColumn("COHORT", F.date_format(F.col("TREATMT_STRT_DT"), "yyyy-MM"))
+
+    # Remove duplicates
+    tactic = tactic.distinct()
 
     return tactic
 
@@ -203,8 +221,9 @@ def load_success_table(spark, config):
         df = spark.createDataFrame(token_pdf)
         return df
 
-    # Handle HIVE sources
+    # Handle HIVE sources - partition filtering via path glob
     paths = [f"{config['success_table_path']}{year}*" for year in years_str]
+    print(f"    Loading from partitions: {years_str}")
     df = spark.read.parquet(*paths)
 
     filters = config.get("filters")

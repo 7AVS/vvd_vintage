@@ -671,21 +671,35 @@ def generate_sample_dashboard(output_path="sample_dashboard.html"):
 if __name__ == "__main__":
     import os
 
-    # Find CSV in source folder
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    source_dir = os.path.join(script_dir, "..", "..", "source")
 
-    print(f"Looking for CSV in: {os.path.abspath(source_dir)}")
-
-    csv_files = [f for f in os.listdir(source_dir) if f.endswith('.csv')]
+    # Look for CSV in current folder first, then source folder
+    csv_files = [f for f in os.listdir(script_dir) if f.endswith('.csv')]
 
     if not csv_files:
-        print("ERROR: No CSV file found in source folder!")
-        print(f"Put your vintage_data.csv in: {os.path.abspath(source_dir)}")
+        # Try source folder at different levels
+        for source_path in [
+            os.path.join(script_dir, "..", "..", "source"),
+            os.path.join(script_dir, "..", "source"),
+            os.path.join(script_dir, "source"),
+        ]:
+            if os.path.exists(source_path):
+                csv_files = [os.path.join(source_path, f) for f in os.listdir(source_path) if f.endswith('.csv')]
+                if csv_files:
+                    break
+
+    if not csv_files:
+        print("ERROR: No CSV file found!")
+        print("Put your CSV file in the same folder as this script.")
         exit(1)
 
-    csv_path = os.path.join(source_dir, csv_files[0])
-    print(f"Found: {csv_path}")
+    # Get full path
+    if os.path.dirname(csv_files[0]):
+        csv_path = csv_files[0]
+    else:
+        csv_path = os.path.join(script_dir, csv_files[0])
+
+    print(f"Found CSV: {csv_path}")
 
     output_path = os.path.join(script_dir, "vvd_vintage_dashboard.html")
     generate_dashboard_from_csv(csv_path, output_path)

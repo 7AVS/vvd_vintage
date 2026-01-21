@@ -1,28 +1,34 @@
 # =============================================================================
 # TACTIC EVENT HISTORY - Flexible Fields Diagnostic
 # =============================================================================
-# Purpose: Investigate the addnl_decisn_data1/2/3 fields and other metadata
-#          fields in the tactic_evnt_hist table for VVD campaigns
+# Purpose: Investigate the addnl_decisn_data1/2/3 fields and Layer 1 metadata
+#          in tactic_evnt_hist for VVD campaigns
 #
-# Goal: Understand what experiment metadata is available so we can leverage
-#       it for vintage curve building without hardcoding
+# IMPORTANT: Uses partition filtering - UPDATE PARTITION CONFIG BELOW
 # =============================================================================
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
     col, count, countDistinct, lit, length,
-    when, trim, lower, substring
+    when, trim, lower, substring, min as spark_min, max as spark_max
 )
 
 # -----------------------------------------------------------------------------
-# CONFIGURATION
+# CONFIGURATION - UPDATE THESE VALUES
 # -----------------------------------------------------------------------------
 
-# Tactic Event History table
-TACTIC_TABLE = "prod_yg80_pcbsharedzone.tsz_00150_cc_dtzta_t_tactic_evnt_hist"
+# Option 1: Use Hive table with partition filter
+USE_HIVE = True
+HIVE_TABLE = "prod_yg80_pcbsharedzone.tsz_00150_cc_dtzta_t_tactic_evnt_hist"
 
-# Alternative: If Hive table doesn't work, try parquet path
-# TACTIC_PATH = "/prod/yg80/..."  # Update if needed
+# Partition column and filter
+PARTITION_COLUMN = "evnt_strt_dt"  # Confirmed partition column
+PARTITION_START = "2025-01-01"        # Filter: >= this date
+PARTITION_END = "2026-01-31"          # Filter: <= this date
+
+# Option 2: If Hive doesn't work, use direct parquet path
+# USE_HIVE = False
+# PARQUET_PATH = "/prod/yg80/.../partitionCol=value"  # UPDATE with actual path
 
 # VVD campaign prefixes
 VVD_PREFIXES = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
@@ -38,226 +44,239 @@ spark = SparkSession.builder \
 
 print("=" * 80)
 print("TACTIC EVENT HISTORY - FLEXIBLE FIELDS DIAGNOSTIC")
+print(f"Partition filter: {PARTITION_COLUMN} BETWEEN {PARTITION_START} AND {PARTITION_END}")
 print("=" * 80)
 
 # -----------------------------------------------------------------------------
-# STEP 1: LOAD DATA
+# STEP 1: LOAD DATA WITH PARTITION FILTER
 # -----------------------------------------------------------------------------
 
-print("\n[1] Loading Tactic Event History data...")
+print("\n[1] Loading data with partition filter...")
 
 try:
-    df = spark.table(TACTIC_TABLE)
-    print(f"    Loaded from Hive table: {TACTIC_TABLE}")
+    if USE_HIVE:
+        print(f"    Source: {HIVE_TABLE}")
+
+        # Load with partition predicate pushdown
+        df_raw = spark.table(HIVE_TABLE)
+
+        # Apply partition filter
+        df = df_raw.filter(
+            (col(PARTITION_COLUMN) >= PARTITION_START) &
+            (col(PARTITION_COLUMN) <= PARTITION_END)
+        )
+
+        record_count = df.count()
+        print(f"    Records after partition filter: {record_count:,}")
+    else:
+        print(f"    Source: {PARQUET_PATH}")
+        df = spark.read.parquet(PARQUET_PATH)
+        record_count = df.count()
+        print(f"    Records: {record_count:,}")
+
 except Exception as e:
-    print(f"    ERROR loading Hive table: {e}")
-    print("    Try updating TACTIC_PATH and using spark.read.parquet()")
+    print(f"    ERROR: {e}")
+    print("\n    Check that:")
+    print(f"    1. Table exists: {HIVE_TABLE}")
+    print(f"    2. Partition column is correct: {PARTITION_COLUMN}")
+    print(f"    3. You have access to this table")
     raise
 
-# Get record count (sample if very large)
-total_count = df.count()
-print(f"    Total records: {total_count:,}")
-
 # -----------------------------------------------------------------------------
-# STEP 2: FILTER FOR VVD CAMPAIGNS
+# STEP 2: CHECK SCHEMA
 # -----------------------------------------------------------------------------
 
-print("\n[2] Filtering for VVD campaigns...")
+print("\n[2] Checking schema for key fields...")
 
-# Build filter for VVD prefixes
+layer1_fields = [
+    "tactic_id", "tactic_evnt_id",
+    "rpt_grp_cd", "tst_grp_cd", "treatmt_mn",
+    "treatmt_strt_dt", "treatmt_end_dt",
+    "tactic_cell_cd"
+]
+
+flexible_fields = ["addnl_decisn_data1", "addnl_decisn_data2", "addnl_decisn_data3"]
+
+all_key_fields = layer1_fields + flexible_fields
+existing = [f for f in all_key_fields if f in df.columns]
+missing = [f for f in all_key_fields if f not in df.columns]
+
+print(f"    Found: {existing}")
+if missing:
+    print(f"    MISSING: {missing}")
+
+# -----------------------------------------------------------------------------
+# STEP 3: FILTER FOR VVD CAMPAIGNS
+# -----------------------------------------------------------------------------
+
+print("\n[3] Filtering for VVD campaigns...")
+
 vvd_filter = None
 for prefix in VVD_PREFIXES:
     condition = col("tactic_id").startswith(prefix)
-    if vvd_filter is None:
-        vvd_filter = condition
-    else:
-        vvd_filter = vvd_filter | condition
+    vvd_filter = condition if vvd_filter is None else (vvd_filter | condition)
 
 df_vvd = df.filter(vvd_filter)
 vvd_count = df_vvd.count()
-print(f"    VVD records found: {vvd_count:,}")
+print(f"    VVD records: {vvd_count:,}")
 
 if vvd_count == 0:
     print("\n    WARNING: No VVD records found!")
-    print("    Checking what tactic_id values exist...")
-    df.select("tactic_id").distinct().orderBy("tactic_id").show(100, truncate=False)
+    print("    Sample tactic_id values in this partition:")
+    df.select("tactic_id").distinct().orderBy("tactic_id").show(50, truncate=False)
+
+    print("\n    Records starting with 'V':")
+    df_v = df.filter(col("tactic_id").startswith("V"))
+    print(f"    Count: {df_v.count():,}")
+    df_v.select("tactic_id").distinct().show(30, truncate=False)
 
 # -----------------------------------------------------------------------------
-# STEP 3: EXAMINE LAYER 1 KEY FIELDS
-# -----------------------------------------------------------------------------
-
-print("\n[3] Layer 1 Key Fields Analysis...")
-
-layer1_fields = [
-    "tactic_id",
-    "rpt_grp_cd",       # Report Group Code - segment
-    "tst_grp_cd",       # Test Group Code - test vs control
-    "treatmt_mn",       # Treatment Mnemonic
-    "treatmt_strt_dt",  # Treatment Start Date
-    "treatmt_end_dt",   # Treatment End Date
-    "tactic_cell_cd",   # Tactic Cell Code
-]
-
-existing_l1 = [f for f in layer1_fields if f in df.columns]
-print(f"    Layer 1 fields found: {existing_l1}")
-
-# Show distinct values for each
-for field in existing_l1:
-    if field != "treatmt_strt_dt" and field != "treatmt_end_dt":
-        print(f"\n    --- {field} ---")
-        df_vvd.groupBy(field).agg(
-            count("*").alias("count")
-        ).orderBy(col("count").desc()).show(20, truncate=False)
-
-# -----------------------------------------------------------------------------
-# STEP 4: FLEXIBLE FIELDS (addnl_decisn_data1/2/3) ANALYSIS
+# STEP 4: FLEXIBLE FIELDS ANALYSIS (addnl_decisn_data1/2/3)
 # -----------------------------------------------------------------------------
 
 print("\n[4] Analyzing FLEXIBLE FIELDS (addnl_decisn_data1/2/3)...")
 
-flexible_fields = ["addnl_decisn_data1", "addnl_decisn_data2", "addnl_decisn_data3"]
 existing_flex = [f for f in flexible_fields if f in df.columns]
-
-print(f"    Flexible fields found: {existing_flex}")
+print(f"    Fields found: {existing_flex}")
 
 for field in existing_flex:
     print(f"\n    === {field} ===")
 
-    # Stats
-    stats = df_vvd.select(
-        count("*").alias("total"),
-        count(when(col(field).isNotNull(), 1)).alias("not_null"),
-        count(when(trim(col(field)) != "", 1)).alias("not_empty"),
-        countDistinct(field).alias("distinct")
-    ).collect()[0]
+    if vvd_count > 0:
+        stats = df_vvd.agg(
+            count("*").alias("total"),
+            count(when(col(field).isNotNull(), 1)).alias("not_null"),
+            count(when(
+                (col(field).isNotNull()) &
+                (trim(col(field)) != ""), 1
+            )).alias("not_empty"),
+            countDistinct(field).alias("distinct")
+        ).collect()[0]
 
-    print(f"    NOT NULL:  {stats['not_null']:,} / {stats['total']:,}")
-    print(f"    NOT EMPTY: {stats['not_empty']:,}")
-    print(f"    Distinct:  {stats['distinct']:,}")
+        print(f"    Total:     {stats['total']:,}")
+        print(f"    NOT NULL:  {stats['not_null']:,}")
+        print(f"    NOT EMPTY: {stats['not_empty']:,}")
+        print(f"    Distinct:  {stats['distinct']:,}")
 
-    # Check if JSON-like
-    json_check = df_vvd.filter(col(field).isNotNull()).select(
-        count(when(col(field).contains("{"), 1)).alias("has_brace"),
-        count(when(col(field).contains("Experiment"), 1)).alias("has_experiment"),
-        count(when(col(field).contains("Test"), 1)).alias("has_test")
-    ).collect()[0]
+        # Check for JSON-like content
+        if stats['not_null'] > 0:
+            json_check = df_vvd.filter(col(field).isNotNull()).agg(
+                count(when(col(field).contains("{"), 1)).alias("has_brace"),
+                count(when(col(field).contains("Experiment"), 1)).alias("has_experiment"),
+                count(when(col(field).contains("Test"), 1)).alias("has_test")
+            ).collect()[0]
 
-    print(f"    Contains '{{':         {json_check['has_brace']:,}")
-    print(f"    Contains 'Experiment': {json_check['has_experiment']:,}")
-    print(f"    Contains 'Test':       {json_check['has_test']:,}")
+            print(f"    Contains '{{':         {json_check['has_brace']:,}")
+            print(f"    Contains 'Experiment': {json_check['has_experiment']:,}")
+            print(f"    Contains 'Test':       {json_check['has_test']:,}")
 
-    # Sample values
-    print(f"\n    Sample {field} values:")
-    df_vvd.filter(
-        (col(field).isNotNull()) &
-        (trim(col(field)) != "")
-    ).select(
-        "tactic_id",
-        field
-    ).distinct().show(15, truncate=100)
+        # Sample values
+        print(f"\n    Sample {field} values:")
+        df_vvd.filter(
+            (col(field).isNotNull()) &
+            (trim(col(field)) != "")
+        ).select("tactic_id", field).distinct().show(15, truncate=100)
 
 # -----------------------------------------------------------------------------
-# STEP 5: TEST GROUP ANALYSIS
+# STEP 5: LAYER 1 KEY FIELDS ANALYSIS
 # -----------------------------------------------------------------------------
 
-print("\n[5] Test Group (tst_grp_cd) Analysis...")
+print("\n[5] Layer 1 Key Fields Analysis...")
 
-if "tst_grp_cd" in df.columns:
-    print("\n    Test Group codes by campaign:")
+if vvd_count > 0:
+
+    # Test Group (tst_grp_cd)
+    if "tst_grp_cd" in df.columns:
+        print("\n    --- tst_grp_cd (Test vs Control) ---")
+        df_vvd.groupBy("tst_grp_cd").agg(
+            count("*").alias("count")
+        ).orderBy(col("count").desc()).show(20)
+
+    # Report Group (rpt_grp_cd)
+    if "rpt_grp_cd" in df.columns:
+        print("\n    --- rpt_grp_cd (Segments) ---")
+        df_vvd.groupBy("rpt_grp_cd").agg(
+            count("*").alias("count")
+        ).orderBy(col("count").desc()).show(20)
+
+    # Treatment Mnemonic
+    if "treatmt_mn" in df.columns:
+        print("\n    --- treatmt_mn (Treatment) ---")
+        df_vvd.groupBy("treatmt_mn").agg(
+            count("*").alias("count")
+        ).orderBy(col("count").desc()).show(20)
+
+# -----------------------------------------------------------------------------
+# STEP 6: BREAKDOWN BY CAMPAIGN
+# -----------------------------------------------------------------------------
+
+print("\n[6] Breakdown by VVD campaign...")
+
+if vvd_count > 0:
+    agg_cols = [count("*").alias("total")]
+
+    for field in existing_flex:
+        agg_cols.append(
+            count(when(col(field).isNotNull(), 1)).alias(f"{field[:10]}_filled")
+        )
+
+    if "tst_grp_cd" in df.columns:
+        agg_cols.append(countDistinct("tst_grp_cd").alias("tst_grps"))
+    if "rpt_grp_cd" in df.columns:
+        agg_cols.append(countDistinct("rpt_grp_cd").alias("rpt_grps"))
+
+    df_vvd.withColumn(
+        "campaign", substring("tactic_id", 1, 3)
+    ).groupBy("campaign").agg(*agg_cols).orderBy("campaign").show()
+
+# -----------------------------------------------------------------------------
+# STEP 7: CROSS-TAB: CAMPAIGN x TEST GROUP
+# -----------------------------------------------------------------------------
+
+print("\n[7] Campaign x Test Group cross-tab...")
+
+if vvd_count > 0 and "tst_grp_cd" in df.columns:
     df_vvd.withColumn(
         "campaign", substring("tactic_id", 1, 3)
     ).groupBy("campaign", "tst_grp_cd").agg(
         count("*").alias("count")
     ).orderBy("campaign", "tst_grp_cd").show(50)
 
-    # Which is Test vs Control?
-    print("\n    Is TG4 always the Test group? Check distribution:")
-    df_vvd.groupBy("tst_grp_cd").agg(
-        count("*").alias("total"),
-        countDistinct("tactic_evnt_id").alias("unique_clients")
-    ).orderBy("tst_grp_cd").show()
-
 # -----------------------------------------------------------------------------
-# STEP 6: REPORT GROUP (SEGMENT) ANALYSIS
+# STEP 8: DATE RANGES
 # -----------------------------------------------------------------------------
 
-print("\n[6] Report Group (rpt_grp_cd) Analysis - SEGMENTS...")
+print("\n[8] Treatment date ranges by campaign...")
 
-if "rpt_grp_cd" in df.columns:
-    print("\n    Report Group codes by campaign:")
-    df_vvd.withColumn(
-        "campaign", substring("tactic_id", 1, 3)
-    ).groupBy("campaign", "rpt_grp_cd").agg(
-        count("*").alias("count")
-    ).orderBy("campaign", "rpt_grp_cd").show(50)
-
-# -----------------------------------------------------------------------------
-# STEP 7: CHANNEL ANALYSIS
-# -----------------------------------------------------------------------------
-
-print("\n[7] Channel Analysis...")
-
-# Check for channel-related fields
-channel_fields = [f for f in df.columns if 'chnl' in f.lower() or 'channel' in f.lower()]
-print(f"    Channel-related fields: {channel_fields}")
-
-for field in channel_fields[:3]:  # First 3 channel fields
-    print(f"\n    --- {field} by campaign ---")
-    df_vvd.withColumn(
-        "campaign", substring("tactic_id", 1, 3)
-    ).groupBy("campaign", field).agg(
-        count("*").alias("count")
-    ).orderBy("campaign", field).show(30)
-
-# -----------------------------------------------------------------------------
-# STEP 8: DATE RANGE ANALYSIS
-# -----------------------------------------------------------------------------
-
-print("\n[8] Treatment Date Ranges...")
-
-if "treatmt_strt_dt" in df.columns:
+if vvd_count > 0 and "treatmt_strt_dt" in df.columns:
     df_vvd.withColumn(
         "campaign", substring("tactic_id", 1, 3)
     ).groupBy("campaign").agg(
         count("*").alias("records"),
-        col("treatmt_strt_dt").cast("string").alias("min_start"),  # workaround
-        col("treatmt_strt_dt").cast("string").alias("max_start")
-    ).show()
-
-    # Better approach - use SQL
-    df_vvd.createOrReplaceTempView("vvd_tactic")
-    spark.sql("""
-        SELECT
-            SUBSTRING(tactic_id, 1, 3) as campaign,
-            COUNT(*) as records,
-            MIN(treatmt_strt_dt) as earliest_treatment,
-            MAX(treatmt_strt_dt) as latest_treatment
-        FROM vvd_tactic
-        GROUP BY SUBSTRING(tactic_id, 1, 3)
-        ORDER BY campaign
-    """).show()
+        spark_min("treatmt_strt_dt").alias("earliest"),
+        spark_max("treatmt_strt_dt").alias("latest")
+    ).orderBy("campaign").show()
 
 # -----------------------------------------------------------------------------
-# STEP 9: FULL SAMPLE WITH ALL KEY FIELDS
+# STEP 9: SAMPLE RECORDS
 # -----------------------------------------------------------------------------
 
-print("\n[9] Full sample records...")
-print("=" * 80)
+print("\n[9] Sample complete records...")
 
-sample_fields = [
-    "tactic_id", "tactic_evnt_id", "rpt_grp_cd", "tst_grp_cd",
-    "treatmt_mn", "treatmt_strt_dt",
-    "addnl_decisn_data1", "addnl_decisn_data2"
-]
-sample_fields = [f for f in sample_fields if f in df.columns]
+if vvd_count > 0:
+    sample_cols = [c for c in [
+        "tactic_id", "tactic_evnt_id", "tst_grp_cd", "rpt_grp_cd",
+        "treatmt_mn", "treatmt_strt_dt",
+        "addnl_decisn_data1", "addnl_decisn_data2"
+    ] if c in df.columns]
 
-df_vvd.select(sample_fields).show(10, truncate=50)
+    df_vvd.select(sample_cols).show(10, truncate=50)
 
 # -----------------------------------------------------------------------------
-# STEP 10: SCHEMA REFERENCE
+# STEP 10: SCHEMA
 # -----------------------------------------------------------------------------
 
-print("\n[10] Full schema for reference:")
+print("\n[10] Full schema:")
 print("=" * 80)
 df.printSchema()
 
@@ -265,8 +284,9 @@ print("\n" + "=" * 80)
 print("DIAGNOSTIC COMPLETE")
 print("=" * 80)
 print("""
-NEXT STEPS:
-1. If addnl_decisn_data fields contain useful metadata -> parse them
-2. If treatmt_adnl_dtl (ODS) has JSON experiment info -> parse it
-3. If neither has structured data -> need to hardcode from design docs
+KEY FINDINGS TO LOOK FOR:
+1. Are addnl_decisn_data fields populated with experiment metadata?
+2. What tst_grp_cd values exist? (Which is Test vs Control?)
+3. What rpt_grp_cd values exist? (Segment codes)
+4. Is there any JSON structure in the flexible fields?
 """)

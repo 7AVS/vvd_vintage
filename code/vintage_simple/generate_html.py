@@ -6,12 +6,19 @@ import pandas as pd
 import json
 import os
 
-# Find CSV file in current directory
-csv_files = [f for f in os.listdir('.') if f.endswith('.csv')]
+# Look for CSV in source folder (relative to this script)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+source_dir = os.path.join(script_dir, "..", "..", "source")
+
+# Check source folder first, then current folder
+if os.path.exists(source_dir):
+    csv_files = [os.path.join(source_dir, f) for f in os.listdir(source_dir) if f.endswith('.csv')]
+else:
+    csv_files = [f for f in os.listdir('.') if f.endswith('.csv')]
 
 if not csv_files:
-    print("ERROR: No CSV file found in current folder!")
-    print("Put your vintage_data.csv file in this folder and run again.")
+    print("ERROR: No CSV file found!")
+    print(f"Put your vintage_data.csv in: {os.path.abspath(source_dir)}")
     exit(1)
 
 csv_file = csv_files[0]

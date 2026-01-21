@@ -46,6 +46,7 @@ This saves to: `/user/427966379/vintage_data.csv`
 1. Go to **Hue** → **File Browser**
 2. Navigate to `/user/427966379/vintage_data.csv`
 3. Download the CSV to your local computer
+4. Put the CSV in: `Vvd/source/` folder
 
 ---
 

@@ -44,6 +44,7 @@ data/
 .env
 *.pem
 credentials.json
+context/
 
 # Images
 image/

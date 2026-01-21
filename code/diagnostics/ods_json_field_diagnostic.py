@@ -21,9 +21,10 @@ from pyspark.sql.functions import (
 HIVE_DATABASE = "prod_x610_crm"
 HIVE_TABLE = "ods_mr_hist"
 
-# Partition filter
+# Partition filter (date range to capture older campaigns)
 PARTITION_COLUMN = "effectdate"
-PARTITION_DATE = "2026-01-20"  # UPDATE THIS to latest available date
+PARTITION_START = "2024-01-01"
+PARTITION_END = "2026-12-31"
 
 # VVD campaign mnemonics (use prod_mn field to filter)
 VVD_MNEMONICS = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
@@ -40,7 +41,7 @@ spark = SparkSession.builder \
 print("=" * 80)
 print("ODS MR HIST - JSON FIELD DIAGNOSTIC")
 print(f"Table: {HIVE_DATABASE}.{HIVE_TABLE}")
-print(f"Partition filter: {PARTITION_COLUMN} = {PARTITION_DATE}")
+print(f"Partition filter: {PARTITION_COLUMN} BETWEEN {PARTITION_START} AND {PARTITION_END}")
 print("=" * 80)
 
 # -----------------------------------------------------------------------------
@@ -49,10 +50,13 @@ print("=" * 80)
 
 print("\n[1] Loading ODS MR HIST data...")
 print(f"    Table: {HIVE_DATABASE}.{HIVE_TABLE}")
-print(f"    Filter: {PARTITION_COLUMN} = '{PARTITION_DATE}'")
+print(f"    Filter: {PARTITION_COLUMN} BETWEEN '{PARTITION_START}' AND '{PARTITION_END}'")
 
 df = spark.table(f"{HIVE_DATABASE}.{HIVE_TABLE}") \
-    .filter(col(PARTITION_COLUMN) == PARTITION_DATE)
+    .filter(
+        (col(PARTITION_COLUMN) >= PARTITION_START) &
+        (col(PARTITION_COLUMN) <= PARTITION_END)
+    )
 
 record_count = df.count()
 print(f"    Records: {record_count:,}")

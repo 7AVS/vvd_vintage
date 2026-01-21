@@ -10,7 +10,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
     col, count, countDistinct, lit, length,
-    when, trim, lower, substring, min as spark_min, max as spark_max
+    when, trim, lower, substring, min as spark_min, max as spark_max, expr
 )
 
 # -----------------------------------------------------------------------------
@@ -25,8 +25,8 @@ PARTITION_COLUMN = "evnt_strt_dt"
 PARTITION_START = "2024-01-01"  # Filter: >= this date (widened to capture older campaigns)
 PARTITION_END = "2026-12-31"    # Filter: <= this date
 
-# VVD campaign prefixes
-VVD_PREFIXES = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
+# VVD campaign mnemonics (last 3 characters of tactic_id)
+VVD_MNEMONICS = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
 
 # -----------------------------------------------------------------------------
 # INITIALIZE SPARK
@@ -86,26 +86,25 @@ if missing:
 # STEP 3: FILTER FOR VVD CAMPAIGNS
 # -----------------------------------------------------------------------------
 
-print("\n[3] Filtering for VVD campaigns...")
+print("\n[3] Filtering for VVD campaigns (last 3 chars of tactic_id)...")
 
+# First show sample tactic_id values to understand the format
+print("\n    Sample tactic_id values:")
+df.select("tactic_id").distinct().orderBy("tactic_id").show(30, truncate=False)
+
+# Filter by last 3 characters using endswith
 vvd_filter = None
-for prefix in VVD_PREFIXES:
-    condition = col("tactic_id").startswith(prefix)
+for mnemonic in VVD_MNEMONICS:
+    condition = col("tactic_id").endswith(mnemonic)
     vvd_filter = condition if vvd_filter is None else (vvd_filter | condition)
 
 df_vvd = df.filter(vvd_filter)
 vvd_count = df_vvd.count()
-print(f"    VVD records: {vvd_count:,}")
+print(f"\n    VVD records (filtered by last 3 chars): {vvd_count:,}")
 
 if vvd_count == 0:
     print("\n    WARNING: No VVD records found!")
-    print("    Sample tactic_id values in this partition:")
-    df.select("tactic_id").distinct().orderBy("tactic_id").show(50, truncate=False)
-
-    print("\n    Records starting with 'V':")
-    df_v = df.filter(col("tactic_id").startswith("V"))
-    print(f"    Count: {df_v.count():,}")
-    df_v.select("tactic_id").distinct().show(30, truncate=False)
+    print("    Check the tactic_id format above - mnemonics might be in different position")
 
 # -----------------------------------------------------------------------------
 # STEP 4: FLEXIBLE FIELDS ANALYSIS (addnl_decisn_data1/2/3)
@@ -203,7 +202,7 @@ if vvd_count > 0:
         agg_cols.append(countDistinct("rpt_grp_cd").alias("rpt_grps"))
 
     df_vvd.withColumn(
-        "campaign", substring("tactic_id", 1, 3)
+        "campaign", expr("right(tactic_id, 3)")
     ).groupBy("campaign").agg(*agg_cols).orderBy("campaign").show()
 
 # -----------------------------------------------------------------------------
@@ -214,7 +213,7 @@ print("\n[7] Campaign x Test Group cross-tab...")
 
 if vvd_count > 0 and "tst_grp_cd" in df.columns:
     df_vvd.withColumn(
-        "campaign", substring("tactic_id", 1, 3)
+        "campaign", expr("right(tactic_id, 3)")
     ).groupBy("campaign", "tst_grp_cd").agg(
         count("*").alias("count")
     ).orderBy("campaign", "tst_grp_cd").show(50)
@@ -227,7 +226,7 @@ print("\n[8] Treatment date ranges by campaign...")
 
 if vvd_count > 0 and "treatmt_strt_dt" in df.columns:
     df_vvd.withColumn(
-        "campaign", substring("tactic_id", 1, 3)
+        "campaign", expr("right(tactic_id, 3)")
     ).groupBy("campaign").agg(
         count("*").alias("records"),
         spark_min("treatmt_strt_dt").alias("earliest"),

@@ -1,8 +1,8 @@
 # =============================================================================
-# ODS MR HIST - JSON Field Diagnostic
+# ODS HIST - JSON Field Diagnostic (Alternative ODS table)
 # =============================================================================
-# Purpose: Investigate what's in the TREATMT_ADNL_DTL (JSON) field
-#          and the TREATMT_DTL (150-byte) fields for VVD campaigns
+# Purpose: Investigate the ODS_HIST table (different from ODS_MR_HIST)
+#          Looking for experiment metadata fields
 #
 # IMPORTANT: Uses partition filtering on effectdate
 # =============================================================================
@@ -17,9 +17,9 @@ from pyspark.sql.functions import (
 # CONFIGURATION - UPDATE THESE VALUES
 # -----------------------------------------------------------------------------
 
-# ODS MR HIST - Hive table
+# ODS HIST - Hive table (the OTHER ODS table)
 HIVE_DATABASE = "prod_x610_crm"
-HIVE_TABLE = "ods_mr_hist"
+HIVE_TABLE = "ods_hist"
 
 # Partition filter - NARROW RANGE for one deployment
 PARTITION_COLUMN = "effectdate"
@@ -39,7 +39,7 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 print("=" * 80)
-print("ODS MR HIST - JSON FIELD DIAGNOSTIC")
+print("ODS HIST - JSON FIELD DIAGNOSTIC")
 print(f"Table: {HIVE_DATABASE}.{HIVE_TABLE}")
 print(f"Partition filter: {PARTITION_COLUMN} BETWEEN {PARTITION_START} AND {PARTITION_END}")
 print("=" * 80)
@@ -48,7 +48,7 @@ print("=" * 80)
 # STEP 1: LOAD DATA FROM HIVE TABLE WITH PARTITION FILTER
 # -----------------------------------------------------------------------------
 
-print("\n[1] Loading ODS MR HIST data...")
+print("\n[1] Loading ODS HIST data...")
 print(f"    Table: {HIVE_DATABASE}.{HIVE_TABLE}")
 print(f"    Filter: {PARTITION_COLUMN} BETWEEN '{PARTITION_START}' AND '{PARTITION_END}'")
 

@@ -616,14 +616,20 @@ def export_to_csv(results, output_path="vintage_data.csv"):
     return output_path
 
 
-def export_to_hdfs(results, spark, hdfs_path="/user/YOUR_USER/vintage_data"):
+def export_to_hdfs_csv(results, spark, hdfs_path="/user/427966379/vintage_data.csv"):
     """
-    Export vintage results to HDFS as parquet.
+    Export vintage results to HDFS as CSV.
+
+    This is the primary export for YARN/Spark environments.
+    Creates a single CSV file with header in your HDFS/Hue directory.
 
     Args:
         results: Dictionary from run_all_campaigns()
         spark: SparkSession
-        hdfs_path: HDFS path to save parquet
+        hdfs_path: HDFS path to save CSV (e.g., "/user/your_id/vintage_data.csv")
+
+    Usage:
+        export_to_hdfs_csv(results, spark, "/user/ab12345/vintage_data.csv")
     """
     all_data = []
 
@@ -640,8 +646,18 @@ def export_to_hdfs(results, spark, hdfs_path="/user/YOUR_USER/vintage_data"):
 
     combined = pd.concat(all_data, ignore_index=True)
     spark_df = spark.createDataFrame(combined)
-    spark_df.write.mode("overwrite").parquet(hdfs_path)
-    print(f"Exported to HDFS: {hdfs_path}")
+
+    # Write as single CSV file with header
+    spark_df.coalesce(1) \
+        .write \
+        .mode("overwrite") \
+        .option("header", "true") \
+        .csv(hdfs_path)
+
+    print(f"Exported CSV to HDFS: {hdfs_path}")
+    print(f"Rows: {len(combined):,}")
+    print(f"Campaigns: {', '.join([m for m in results.keys() if not m.startswith('_')])}")
+    print(f"\nTo download: Go to Hue > File Browser > {hdfs_path}")
     return hdfs_path
 
 
@@ -656,9 +672,5 @@ print("Available campaigns:", ALL_MNES)
 print("\nTo run:")
 print("  results = run_vintage_analysis(spark, 'VCN')")
 print("  results = run_all_campaigns(spark)")
-print("\nTo export:")
-print("  export_to_csv(results, 'vintage_data.csv')  # Local")
-print("  export_to_hdfs(results, spark, '/user/YOU/vintage')  # HDFS")
-print("\nTo generate dashboard:")
-print("  from vintage_dashboard import generate_dashboard")
-print("  generate_dashboard(results, 'vvd_vintage_dashboard.html')")
+print("\nTo export to HDFS (use this for YARN/Spark):")
+print("  export_to_hdfs_csv(results, spark)  # saves to /user/427966379/vintage_data.csv")

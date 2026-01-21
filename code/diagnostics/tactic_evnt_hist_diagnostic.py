@@ -60,10 +60,15 @@ record_count = df.count()
 print(f"    Records: {record_count:,}")
 
 # -----------------------------------------------------------------------------
-# STEP 2: CHECK SCHEMA
+# STEP 2: CHECK SCHEMA - SHOW ACTUAL COLUMNS FIRST
 # -----------------------------------------------------------------------------
 
-print("\n[2] Checking schema for key fields...")
+print("\n[2] Checking schema...")
+print("\n    ACTUAL COLUMNS IN TABLE:")
+for c in df.columns:
+    print(f"      - {c}")
+
+print("\n    Checking for expected key fields...")
 
 layer1_fields = [
     "tactic_id", "tactic_evnt_id",

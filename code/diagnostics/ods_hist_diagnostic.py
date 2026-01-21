@@ -1,56 +1,53 @@
 # =============================================================================
-# ODS HIST - JSON Field Diagnostic (Alternative ODS table)
+# ODS HIST - JSON Field Diagnostic
 # =============================================================================
-# Purpose: Investigate the ODS_HIST table (different from ODS_MR_HIST)
-#          Looking for experiment metadata fields
-#
-# IMPORTANT: Uses partition filtering on effectdate
+# Purpose: Investigate the ODS_HIST table for experiment metadata
+#          Focus on the large varchar fields:
+#          - TREATMT_ADNL_DTL (varchar 8000) - JSON field
+#          - TREATMT_DTL (varchar 4000) - Treatment detail
 # =============================================================================
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
-    col, count, countDistinct, lit, length,
-    when, trim, lower, substring
+    col, count, countDistinct, lit, length, avg, max as spark_max,
+    when, trim, lower, substring, get_json_object, expr
 )
 
 # -----------------------------------------------------------------------------
-# CONFIGURATION - UPDATE THESE VALUES
+# CONFIGURATION
 # -----------------------------------------------------------------------------
 
-# ODS HIST - Hive table (the OTHER ODS table)
 HIVE_DATABASE = "prod_x610_crm"
 HIVE_TABLE = "ods_hist"
 
-# Partition filter - NARROW RANGE for one deployment
+# Partition filter
 PARTITION_COLUMN = "effectdate"
-PARTITION_START = "2025-10-01"  # Adjust based on known deployment
-PARTITION_END = "2025-12-31"    # Narrow window
+PARTITION_START = "2025-10-01"
+PARTITION_END = "2025-12-31"
 
-# Focus on ONE campaign for diagnostic (change as needed)
-VVD_MNEMONICS = ['VDA']  # VDA = Black Friday / Cyber Monday
+# Campaign filter
+VVD_MNEMONICS = ['VDA']
 
 # -----------------------------------------------------------------------------
 # INITIALIZE SPARK
 # -----------------------------------------------------------------------------
 
 spark = SparkSession.builder \
-    .appName("ODS JSON Field Diagnostic") \
+    .appName("ODS HIST JSON Diagnostic") \
     .enableHiveSupport() \
     .getOrCreate()
 
 print("=" * 80)
 print("ODS HIST - JSON FIELD DIAGNOSTIC")
 print(f"Table: {HIVE_DATABASE}.{HIVE_TABLE}")
-print(f"Partition filter: {PARTITION_COLUMN} BETWEEN {PARTITION_START} AND {PARTITION_END}")
+print(f"Filter: {PARTITION_COLUMN} BETWEEN '{PARTITION_START}' AND '{PARTITION_END}'")
 print("=" * 80)
 
 # -----------------------------------------------------------------------------
-# STEP 1: LOAD DATA FROM HIVE TABLE WITH PARTITION FILTER
+# STEP 1: LOAD DATA
 # -----------------------------------------------------------------------------
 
-print("\n[1] Loading ODS HIST data...")
-print(f"    Table: {HIVE_DATABASE}.{HIVE_TABLE}")
-print(f"    Filter: {PARTITION_COLUMN} BETWEEN '{PARTITION_START}' AND '{PARTITION_END}'")
+print("\n[1] Loading data...")
 
 df = spark.table(f"{HIVE_DATABASE}.{HIVE_TABLE}") \
     .filter(
@@ -62,164 +59,205 @@ record_count = df.count()
 print(f"    Records: {record_count:,}")
 
 # -----------------------------------------------------------------------------
-# STEP 2: CHECK SCHEMA - SHOW ACTUAL COLUMNS FIRST
+# STEP 2: SHOW ACTUAL SCHEMA
 # -----------------------------------------------------------------------------
 
-print("\n[2] Checking schema...")
-print("\n    ACTUAL COLUMNS IN TABLE:")
+print("\n[2] Actual columns in table:")
 for c in df.columns:
     print(f"      - {c}")
 
-# Key fields we're looking for (UPPERCASE based on Hive)
-key_fields = [
-    "PROD_MN",            # Campaign mnemonic (VCN, VDA, etc.)
-    "TACTIC_ID",
-    "CLNT_ID",
-    "CHNL_CD",
-    "TREATMT_ADNL_DTL",   # THE JSON FIELD - main interest
-    "TREATMT_DTL",        # 150 byte field
-    "TREATMT_DTL_EN",
-    "TREATMT_DTL_FR",
-    "OFFR_STRT_DT",
-    "OFFR_END_DT"
-]
+# Identify the JSON field name (could be uppercase or lowercase)
+json_field = None
+dtl_field = None
+prod_field = None
 
-print("\n    Checking for expected key fields...")
-existing = [f for f in key_fields if f in df.columns]
-missing = [f for f in key_fields if f not in df.columns]
+for c in df.columns:
+    if c.upper() == "TREATMT_ADNL_DTL":
+        json_field = c
+    if c.upper() == "TREATMT_DTL":
+        dtl_field = c
+    if c.upper() == "PROD_MN":
+        prod_field = c
 
-print(f"    Found: {existing}")
-if missing:
-    print(f"    MISSING: {missing}")
+print(f"\n    JSON field found as: {json_field}")
+print(f"    DTL field found as: {dtl_field}")
+print(f"    PROD_MN field found as: {prod_field}")
 
 # -----------------------------------------------------------------------------
-# STEP 3: FILTER FOR VVD CAMPAIGNS USING PROD_MN
+# STEP 3: FILTER FOR VVD
 # -----------------------------------------------------------------------------
 
-print("\n[3] Filtering for VVD campaigns using PROD_MN...")
+print("\n[3] Filtering for VVD campaigns...")
 
-# First check what PROD_MN values exist
-print("\n    All distinct PROD_MN values in partition:")
-df.select("PROD_MN").distinct().orderBy("PROD_MN").show(100, truncate=False)
+if prod_field:
+    print(f"\n    Distinct {prod_field} values:")
+    df.select(prod_field).distinct().orderBy(prod_field).show(100, truncate=False)
 
-# Filter using PROD_MN (the mnemonic field)
-df_vvd = df.filter(col("PROD_MN").isin(VVD_MNEMONICS))
-vvd_count = df_vvd.count()
-print(f"\n    VVD records (filtered by PROD_MN): {vvd_count:,}")
-
-if vvd_count == 0:
-    print("\n    WARNING: No VVD records found with mnemonics:", VVD_MNEMONICS)
-    print("    Check the PROD_MN values above - mnemonics might be different")
+    df_vvd = df.filter(col(prod_field).isin(VVD_MNEMONICS))
+    vvd_count = df_vvd.count()
+    print(f"\n    VVD records: {vvd_count:,}")
+else:
+    print("    WARNING: PROD_MN field not found!")
+    vvd_count = 0
+    df_vvd = df.limit(0)
 
 # -----------------------------------------------------------------------------
-# STEP 4: JSON FIELD (TREATMT_ADNL_DTL) ANALYSIS
+# STEP 4: JSON FIELD ANALYSIS (TREATMT_ADNL_DTL - varchar 8000)
 # -----------------------------------------------------------------------------
 
-print("\n[4] Analyzing TREATMT_ADNL_DTL (JSON field)...")
+print("\n[4] Analyzing JSON field (TREATMT_ADNL_DTL - varchar 8000)...")
 
-if "TREATMT_ADNL_DTL" in df.columns and vvd_count > 0:
+if json_field and vvd_count > 0:
 
+    # Basic stats
     json_stats = df_vvd.agg(
-        count("*").alias("total_records"),
-        count(when(col("TREATMT_ADNL_DTL").isNotNull(), 1)).alias("json_not_null"),
+        count("*").alias("total"),
+        count(when(col(json_field).isNotNull(), 1)).alias("not_null"),
         count(when(
-            (col("TREATMT_ADNL_DTL").isNotNull()) &
-            (trim(col("TREATMT_ADNL_DTL")) != ""), 1
-        )).alias("json_not_empty"),
-        countDistinct("TREATMT_ADNL_DTL").alias("distinct_values")
+            (col(json_field).isNotNull()) &
+            (trim(col(json_field)) != ""), 1
+        )).alias("not_empty"),
+        countDistinct(json_field).alias("distinct")
     ).collect()[0]
 
-    print(f"    Total VVD records:    {json_stats['total_records']:,}")
-    print(f"    JSON NOT NULL:        {json_stats['json_not_null']:,}")
-    print(f"    JSON NOT EMPTY:       {json_stats['json_not_empty']:,}")
-    print(f"    Distinct values:      {json_stats['distinct_values']:,}")
+    print(f"    Total records:     {json_stats['total']:,}")
+    print(f"    NOT NULL:          {json_stats['not_null']:,}")
+    print(f"    NOT EMPTY:         {json_stats['not_empty']:,}")
+    print(f"    Distinct values:   {json_stats['distinct']:,}")
 
-    # Sample values
-    print("\n    Sample JSON values:")
+    # Field length analysis (how much of 8000 chars is used?)
+    if json_stats['not_empty'] > 0:
+        len_stats = df_vvd.filter(
+            (col(json_field).isNotNull()) &
+            (trim(col(json_field)) != "")
+        ).agg(
+            avg(length(col(json_field))).alias("avg_len"),
+            spark_max(length(col(json_field))).alias("max_len")
+        ).collect()[0]
+
+        print(f"\n    Average length:    {len_stats['avg_len']:.0f} chars")
+        print(f"    Max length:        {len_stats['max_len']} chars (out of 8000)")
+
+    # Check for JSON markers
+    print("\n    Checking for JSON structure...")
+
+    markers = df_vvd.filter(col(json_field).isNotNull()).agg(
+        count(when(col(json_field).contains("{"), 1)).alias("has_brace"),
+        count(when(col(json_field).contains("["), 1)).alias("has_bracket"),
+        count(when(col(json_field).contains("Experiments"), 1)).alias("has_Experiments"),
+        count(when(col(json_field).contains("type"), 1)).alias("has_type"),
+        count(when(col(json_field).contains("Test"), 1)).alias("has_Test"),
+        count(when(col(json_field).contains("Control"), 1)).alias("has_Control"),
+        count(when(col(json_field).contains("metric"), 1)).alias("has_metric")
+    ).collect()[0]
+
+    print(f"    Contains '{{':           {markers['has_brace']:,}")
+    print(f"    Contains '[':            {markers['has_bracket']:,}")
+    print(f"    Contains 'Experiments':  {markers['has_Experiments']:,}")
+    print(f"    Contains 'type':         {markers['has_type']:,}")
+    print(f"    Contains 'Test':         {markers['has_Test']:,}")
+    print(f"    Contains 'Control':      {markers['has_Control']:,}")
+    print(f"    Contains 'metric':       {markers['has_metric']:,}")
+
+    # Show sample JSON content
+    print("\n    Sample JSON content (first 20 non-empty):")
     print("    " + "-" * 70)
 
     df_vvd.filter(
-        (col("TREATMT_ADNL_DTL").isNotNull()) &
-        (trim(col("TREATMT_ADNL_DTL")) != "")
-    ).select(
-        "TACTIC_ID",
-        "TREATMT_ADNL_DTL"
-    ).distinct().show(20, truncate=False)
+        (col(json_field).isNotNull()) &
+        (trim(col(json_field)) != "")
+    ).select(json_field).distinct().show(20, truncate=False)
 
-    # Check for expected JSON structure
-    print("\n    Checking for JSON structure markers...")
+    # If it looks like JSON, try to extract keys
+    if markers['has_brace'] > 0:
+        print("\n    Attempting to parse as JSON...")
+        print("    Trying to extract common keys: 'Experiments', 'type', 'test_group'")
 
-    df_json_markers = df_vvd.filter(col("TREATMT_ADNL_DTL").isNotNull()).agg(
-        count("*").alias("total"),
-        count(when(col("TREATMT_ADNL_DTL").contains("{"), 1)).alias("has_brace"),
-        count(when(col("TREATMT_ADNL_DTL").contains("Experiments"), 1)).alias("has_Experiments"),
-        count(when(col("TREATMT_ADNL_DTL").contains("type"), 1)).alias("has_type"),
-        count(when(col("TREATMT_ADNL_DTL").contains("Test"), 1)).alias("has_Test"),
-        count(when(col("TREATMT_ADNL_DTL").contains("Control"), 1)).alias("has_Control")
-    ).collect()[0]
+        try:
+            df_vvd.filter(col(json_field).contains("{")).select(
+                col(json_field),
+                get_json_object(col(json_field), "$.Experiments").alias("Experiments"),
+                get_json_object(col(json_field), "$.type").alias("type"),
+                get_json_object(col(json_field), "$.test_group").alias("test_group")
+            ).filter(
+                col("Experiments").isNotNull() |
+                col("type").isNotNull() |
+                col("test_group").isNotNull()
+            ).show(10, truncate=False)
+        except Exception as e:
+            print(f"    JSON parsing failed: {e}")
 
-    print(f"    Contains '{{':           {df_json_markers['has_brace']:,}")
-    print(f"    Contains 'Experiments':  {df_json_markers['has_Experiments']:,}")
-    print(f"    Contains 'type':         {df_json_markers['has_type']:,}")
-    print(f"    Contains 'Test':         {df_json_markers['has_Test']:,}")
-    print(f"    Contains 'Control':      {df_json_markers['has_Control']:,}")
-
-elif "TREATMT_ADNL_DTL" not in df.columns:
-    print("    ERROR: TREATMT_ADNL_DTL field not found!")
-    print("    Available columns:", df.columns)
+elif not json_field:
+    print("    ERROR: TREATMT_ADNL_DTL field not found in table!")
 
 # -----------------------------------------------------------------------------
-# STEP 5: 150-BYTE FIELD (TREATMT_DTL) ANALYSIS
+# STEP 5: TREATMENT DETAIL FIELD (TREATMT_DTL - varchar 4000)
 # -----------------------------------------------------------------------------
 
-print("\n[5] Analyzing TREATMT_DTL (150-byte field)...")
+print("\n[5] Analyzing TREATMT_DTL field (varchar 4000)...")
 
-if "TREATMT_DTL" in df.columns and vvd_count > 0:
+if dtl_field and vvd_count > 0:
 
     dtl_stats = df_vvd.agg(
-        count(when(col("TREATMT_DTL").isNotNull(), 1)).alias("not_null"),
+        count(when(col(dtl_field).isNotNull(), 1)).alias("not_null"),
         count(when(
-            (col("TREATMT_DTL").isNotNull()) &
-            (trim(col("TREATMT_DTL")) != ""), 1
+            (col(dtl_field).isNotNull()) &
+            (trim(col(dtl_field)) != ""), 1
         )).alias("not_empty"),
-        countDistinct("TREATMT_DTL").alias("distinct")
+        countDistinct(dtl_field).alias("distinct")
     ).collect()[0]
 
-    print(f"    NOT NULL:  {dtl_stats['not_null']:,}")
-    print(f"    NOT EMPTY: {dtl_stats['not_empty']:,}")
-    print(f"    Distinct:  {dtl_stats['distinct']:,}")
+    print(f"    NOT NULL:          {dtl_stats['not_null']:,}")
+    print(f"    NOT EMPTY:         {dtl_stats['not_empty']:,}")
+    print(f"    Distinct values:   {dtl_stats['distinct']:,}")
 
-    print("\n    Distinct TREATMT_DTL values:")
-    df_vvd.filter(col("TREATMT_DTL").isNotNull()).select(
-        "TREATMT_DTL"
-    ).distinct().show(30, truncate=False)
+    if dtl_stats['not_empty'] > 0:
+        len_stats = df_vvd.filter(
+            (col(dtl_field).isNotNull()) &
+            (trim(col(dtl_field)) != "")
+        ).agg(
+            avg(length(col(dtl_field))).alias("avg_len"),
+            spark_max(length(col(dtl_field))).alias("max_len")
+        ).collect()[0]
+
+        print(f"    Average length:    {len_stats['avg_len']:.0f} chars")
+        print(f"    Max length:        {len_stats['max_len']} chars (out of 4000)")
+
+    print("\n    Sample TREATMT_DTL values:")
+    df_vvd.filter(col(dtl_field).isNotNull()).select(
+        dtl_field
+    ).distinct().show(20, truncate=False)
 
 # -----------------------------------------------------------------------------
-# STEP 6: BREAKDOWN BY CAMPAIGN
+# STEP 6: COMBINED VIEW - All treatment fields
 # -----------------------------------------------------------------------------
 
-print("\n[6] Field population by campaign (PROD_MN)...")
+print("\n[6] Combined view of treatment fields...")
 
 if vvd_count > 0:
-    df_vvd.groupBy("PROD_MN").agg(
-        count("*").alias("total"),
-        count(when(col("TREATMT_ADNL_DTL").isNotNull(), 1)).alias("json_filled"),
-        count(when(col("TREATMT_DTL").isNotNull(), 1)).alias("dtl_filled")
-    ).orderBy("PROD_MN").show()
+    sample_cols = []
+    for c in [prod_field, "TACTIC_ID", "tactic_id", json_field, dtl_field]:
+        if c and c in df.columns:
+            sample_cols.append(c)
+
+    if sample_cols:
+        df_vvd.select(sample_cols).show(10, truncate=100)
 
 # -----------------------------------------------------------------------------
-# STEP 7: SAMPLE RECORDS
+# STEP 7: SCHEMA PRINTOUT
 # -----------------------------------------------------------------------------
 
-print("\n[7] Sample complete records...")
-
-if vvd_count > 0:
-    sample_cols = [c for c in ["PROD_MN", "TACTIC_ID", "CLNT_ID", "CHNL_CD",
-                                "TREATMT_ADNL_DTL", "TREATMT_DTL",
-                                "OFFR_STRT_DT"] if c in df.columns]
-
-    df_vvd.select(sample_cols).show(5, truncate=False)
+print("\n[7] Full schema for reference:")
+df.printSchema()
 
 print("\n" + "=" * 80)
 print("DIAGNOSTIC COMPLETE")
 print("=" * 80)
+print("""
+WHAT TO LOOK FOR:
+1. Is TREATMT_ADNL_DTL populated? (not_empty > 0)
+2. Does it contain JSON? (has_brace > 0)
+3. What keys are in the JSON? (Experiments, type, Test, Control)
+4. How much of the 8000 char capacity is used?
+5. Is TREATMT_DTL (4000 char) also useful?
+""")

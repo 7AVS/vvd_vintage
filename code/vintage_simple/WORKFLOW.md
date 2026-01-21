@@ -52,23 +52,12 @@ This saves to: `/user/427966379/vintage_data.csv`
 
 ## Step 4: Generate Dashboard Locally (VS Code)
 
-On your local machine, run:
-
-```python
-from vintage_dashboard import generate_dashboard_from_csv
-
-generate_dashboard_from_csv(
-    "C:/path/to/vintage_data.csv",      # where you saved the CSV
-    "vvd_vintage_dashboard.html"         # output HTML file
-)
-```
-
-Or from command line:
-
 ```bash
-cd /mnt/c/Users/andre/New_projects/Vintage/Vvd/code/vintage_simple
-python -c "from vintage_dashboard import generate_dashboard_from_csv; generate_dashboard_from_csv('vintage_data.csv', 'vvd_vintage_dashboard.html')"
+cd C:\Users\andre\New_projects\Vintage\Vvd\code\vintage_simple
+python vintage_dashboard.py
 ```
+
+This reads CSV from `Vvd/source/` and creates `vvd_vintage_dashboard.html`.
 
 ---
 

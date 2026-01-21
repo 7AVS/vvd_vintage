@@ -669,5 +669,26 @@ def generate_sample_dashboard(output_path="sample_dashboard.html"):
 
 
 if __name__ == "__main__":
-    # Generate sample for testing
-    generate_sample_dashboard()
+    import os
+
+    # Find CSV in source folder
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    source_dir = os.path.join(script_dir, "..", "..", "source")
+
+    print(f"Looking for CSV in: {os.path.abspath(source_dir)}")
+
+    csv_files = [f for f in os.listdir(source_dir) if f.endswith('.csv')]
+
+    if not csv_files:
+        print("ERROR: No CSV file found in source folder!")
+        print(f"Put your vintage_data.csv in: {os.path.abspath(source_dir)}")
+        exit(1)
+
+    csv_path = os.path.join(source_dir, csv_files[0])
+    print(f"Found: {csv_path}")
+
+    output_path = os.path.join(script_dir, "vvd_vintage_dashboard.html")
+    generate_dashboard_from_csv(csv_path, output_path)
+
+    print(f"\nDONE! Open this file in your browser:")
+    print(f"  {output_path}")

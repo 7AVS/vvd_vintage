@@ -17,17 +17,13 @@ from pyspark.sql.functions import (
 # CONFIGURATION - UPDATE THESE VALUES
 # -----------------------------------------------------------------------------
 
-# ODS MR HIST - Query via Hive table (recommended for correct schema)
-USE_HIVE_TABLE = True
+# ODS MR HIST - Hive table
 HIVE_DATABASE = "prod_x610_crm"
 HIVE_TABLE = "ods_mr_hist"
 
 # Partition filter
 PARTITION_COLUMN = "effectdate"
 PARTITION_DATE = "2026-01-20"  # UPDATE THIS to latest available date
-
-# Fallback: Direct parquet path (if Hive doesn't work)
-ODS_PATH = f"/prod/01347/app/LS20/data/SparkJobData/effectDate={PARTITION_DATE}"
 
 # VVD campaign mnemonics (use prod_mn field to filter)
 VVD_MNEMONICS = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
@@ -52,33 +48,14 @@ print("=" * 80)
 # -----------------------------------------------------------------------------
 
 print("\n[1] Loading ODS MR HIST data...")
+print(f"    Table: {HIVE_DATABASE}.{HIVE_TABLE}")
+print(f"    Filter: {PARTITION_COLUMN} = '{PARTITION_DATE}'")
 
-try:
-    if USE_HIVE_TABLE:
-        print(f"    Using Hive table: {HIVE_DATABASE}.{HIVE_TABLE}")
+df = spark.table(f"{HIVE_DATABASE}.{HIVE_TABLE}") \
+    .filter(col(PARTITION_COLUMN) == PARTITION_DATE)
 
-        # Query Hive table with partition filter
-        df = spark.table(f"{HIVE_DATABASE}.{HIVE_TABLE}") \
-            .filter(col(PARTITION_COLUMN) == PARTITION_DATE)
-
-        record_count = df.count()
-        print(f"    Records in partition: {record_count:,}")
-    else:
-        print(f"    Using direct path: {ODS_PATH}")
-        df = spark.read.parquet(ODS_PATH)
-        record_count = df.count()
-        print(f"    Records: {record_count:,}")
-
-except Exception as e:
-    print(f"    ERROR with Hive table: {e}")
-    print("\n    Falling back to direct parquet path...")
-    try:
-        df = spark.read.parquet(ODS_PATH)
-        record_count = df.count()
-        print(f"    Records from parquet: {record_count:,}")
-    except Exception as e2:
-        print(f"    ERROR with parquet path: {e2}")
-        raise
+record_count = df.count()
+print(f"    Records: {record_count:,}")
 
 # -----------------------------------------------------------------------------
 # STEP 2: CHECK SCHEMA - What fields exist?

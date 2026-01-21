@@ -17,18 +17,13 @@ from pyspark.sql.functions import (
 # CONFIGURATION - UPDATE THESE VALUES
 # -----------------------------------------------------------------------------
 
-# Option 1: Use Hive table with partition filter
-USE_HIVE = True
+# Tactic Event History - Hive table
 HIVE_TABLE = "prod_yg80_pcbsharedzone.tsz_00150_cc_dtzta_t_tactic_evnt_hist"
 
 # Partition column and filter
-PARTITION_COLUMN = "evnt_strt_dt"  # Confirmed partition column
-PARTITION_START = "2025-01-01"        # Filter: >= this date
-PARTITION_END = "2026-01-31"          # Filter: <= this date
-
-# Option 2: If Hive doesn't work, use direct parquet path
-# USE_HIVE = False
-# PARQUET_PATH = "/prod/yg80/.../partitionCol=value"  # UPDATE with actual path
+PARTITION_COLUMN = "evnt_strt_dt"
+PARTITION_START = "2024-01-01"  # Filter: >= this date (widened to capture older campaigns)
+PARTITION_END = "2026-12-31"    # Filter: <= this date
 
 # VVD campaign prefixes
 VVD_PREFIXES = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
@@ -52,35 +47,17 @@ print("=" * 80)
 # -----------------------------------------------------------------------------
 
 print("\n[1] Loading data with partition filter...")
+print(f"    Table: {HIVE_TABLE}")
+print(f"    Filter: {PARTITION_COLUMN} BETWEEN '{PARTITION_START}' AND '{PARTITION_END}'")
 
-try:
-    if USE_HIVE:
-        print(f"    Source: {HIVE_TABLE}")
+df = spark.table(HIVE_TABLE) \
+    .filter(
+        (col(PARTITION_COLUMN) >= PARTITION_START) &
+        (col(PARTITION_COLUMN) <= PARTITION_END)
+    )
 
-        # Load with partition predicate pushdown
-        df_raw = spark.table(HIVE_TABLE)
-
-        # Apply partition filter
-        df = df_raw.filter(
-            (col(PARTITION_COLUMN) >= PARTITION_START) &
-            (col(PARTITION_COLUMN) <= PARTITION_END)
-        )
-
-        record_count = df.count()
-        print(f"    Records after partition filter: {record_count:,}")
-    else:
-        print(f"    Source: {PARQUET_PATH}")
-        df = spark.read.parquet(PARQUET_PATH)
-        record_count = df.count()
-        print(f"    Records: {record_count:,}")
-
-except Exception as e:
-    print(f"    ERROR: {e}")
-    print("\n    Check that:")
-    print(f"    1. Table exists: {HIVE_TABLE}")
-    print(f"    2. Partition column is correct: {PARTITION_COLUMN}")
-    print(f"    3. You have access to this table")
-    raise
+record_count = df.count()
+print(f"    Records: {record_count:,}")
 
 # -----------------------------------------------------------------------------
 # STEP 2: CHECK SCHEMA

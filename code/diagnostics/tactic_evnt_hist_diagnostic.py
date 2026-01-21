@@ -11,7 +11,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
     col, count, countDistinct, lit, length,
-    when, isnotnull, trim, lower, substring
+    when, trim, lower, substring
 )
 
 # -----------------------------------------------------------------------------

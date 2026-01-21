@@ -3,19 +3,18 @@ VVD Vintage Dashboard Generator
 ===============================
 
 Takes vintage analysis output and generates an interactive HTML dashboard.
-Upload the HTML to SharePoint - no server needed.
 
-Usage:
-    # After running vintage analysis:
+For YARN/Spark Jupyter (can't save files locally):
     results = run_all_campaigns(spark)
+    display_dashboard(results)  # Renders directly in notebook
 
-    # Generate dashboard:
-    from vintage_dashboard import generate_dashboard
-    generate_dashboard(results, output_path="vvd_vintage_dashboard.html")
+For local environments:
+    generate_dashboard(results, "vvd_vintage_dashboard.html")
 """
 
 import pandas as pd
 import json
+from IPython.display import display, HTML
 
 def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title="VVD Vintage Curves"):
     """
@@ -409,6 +408,201 @@ updateChart();
     print(f"Dashboard generated: {output_path}")
     print(f"Campaigns included: {', '.join(campaigns)}")
     print(f"Total data points: {len(combined_df)}")
+
+
+def display_dashboard(results, title="VVD Vintage Curves"):
+    """
+    Display dashboard directly in Jupyter notebook - NO FILE SAVING.
+
+    This is the function to use on YARN/Spark Jupyter environments
+    where you cannot save files locally.
+
+    Args:
+        results: Dictionary from run_all_campaigns()
+        title: Dashboard title
+
+    Usage:
+        results = run_all_campaigns(spark)
+        display_dashboard(results)
+    """
+    # Collect all vintage data
+    all_data = []
+    campaigns = []
+
+    for mne, result in results.items():
+        if mne.startswith("_"):
+            continue
+        if result is None:
+            continue
+
+        df = result["vintage_df"].copy()
+        df["MNE"] = mne
+        all_data.append(df)
+        campaigns.append(mne)
+
+    if not all_data:
+        print("No data to display")
+        return
+
+    combined_df = pd.concat(all_data, ignore_index=True)
+
+    # Convert to JSON for embedding
+    data_json = combined_df.to_json(orient="records")
+    campaigns_json = json.dumps(sorted(campaigns))
+
+    html_content = f'''
+<div style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin: 10px 0;">
+    <div style="background: linear-gradient(135deg, #003366 0%, #004d99 100%); color: white; padding: 15px 20px;">
+        <h2 style="margin: 0; font-size: 1.3em;">{title}</h2>
+        <div style="opacity: 0.8; font-size: 0.85em;">Test vs Control Comparison</div>
+    </div>
+
+    <div style="background: white; padding: 15px 20px; border-bottom: 1px solid #ddd; display: flex; gap: 20px; flex-wrap: wrap;">
+        <div>
+            <label style="font-size: 0.8em; color: #666; display: block;">Campaign</label>
+            <select id="campaignSelect" onchange="updateDashboard()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 0.8em; color: #666; display: block;">Cohort</label>
+            <select id="cohortSelect" onchange="updateDashboard()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="all">All Cohorts</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="chartArea" style="padding: 20px; background: white;"></div>
+
+    <div style="padding: 20px; background: white;">
+        <h4 style="color: #003366; margin-bottom: 10px;">Summary - Final Day Metrics</h4>
+        <div style="overflow-x: auto;">
+            <table id="summaryTbl" style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+                <thead>
+                    <tr style="background: #003366; color: white;">
+                        <th style="padding: 8px; text-align: left;">Cohort</th>
+                        <th style="padding: 8px; text-align: left;">Window</th>
+                        <th style="padding: 8px; text-align: right;">Test N</th>
+                        <th style="padding: 8px; text-align: right;">Test Rate</th>
+                        <th style="padding: 8px; text-align: right;">Control N</th>
+                        <th style="padding: 8px; text-align: right;">Control Rate</th>
+                        <th style="padding: 8px; text-align: right;">Lift</th>
+                        <th style="padding: 8px; text-align: left;">95% CI</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+(function() {{
+    const data = {data_json};
+    const campaigns = {campaigns_json};
+
+    // Populate campaign dropdown
+    const campSel = document.getElementById('campaignSelect');
+    campaigns.forEach(c => {{
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        campSel.appendChild(opt);
+    }});
+
+    window.updateDashboard = function() {{
+        const mne = document.getElementById('campaignSelect').value;
+        const cohortFilter = document.getElementById('cohortSelect').value;
+
+        // Update cohort dropdown
+        const cohortSel = document.getElementById('cohortSelect');
+        const cohorts = [...new Set(data.filter(d => d.MNE === mne).map(d => d.COHORT))].sort();
+        cohortSel.innerHTML = '<option value="all">All Cohorts</option>';
+        cohorts.forEach(c => {{
+            const opt = document.createElement('option');
+            opt.value = c; opt.textContent = c;
+            cohortSel.appendChild(opt);
+        }});
+        if (cohortFilter !== 'all' && cohorts.includes(cohortFilter)) {{
+            cohortSel.value = cohortFilter;
+        }}
+
+        // Filter data
+        let filtered = data.filter(d => d.MNE === mne);
+        if (cohortFilter !== 'all') {{
+            filtered = filtered.filter(d => d.COHORT === cohortFilter);
+        }}
+
+        const uniqueCohorts = [...new Set(filtered.map(d => d.COHORT))].sort();
+        const colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#3B1F2B', '#95190C'];
+
+        // Build traces
+        const traces = [];
+        uniqueCohorts.forEach((cohort, i) => {{
+            const cData = filtered.filter(d => d.COHORT === cohort).sort((a,b) => a.DAY - b.DAY);
+            const color = colors[i % colors.length];
+
+            traces.push({{
+                x: cData.map(d => d.DAY),
+                y: cData.map(d => d.TEST_RATE),
+                name: cohort + ' Test',
+                mode: 'lines+markers',
+                line: {{ color: color, width: 2 }},
+                marker: {{ size: 4 }}
+            }});
+            traces.push({{
+                x: cData.map(d => d.DAY),
+                y: cData.map(d => d.CTRL_RATE),
+                name: cohort + ' Ctrl',
+                mode: 'lines+markers',
+                line: {{ color: color, width: 2, dash: 'dash' }},
+                marker: {{ size: 4, symbol: 'square' }}
+            }});
+        }});
+
+        Plotly.newPlot('chartArea', traces, {{
+            title: mne + ' Vintage Curves (solid=Test, dashed=Control)',
+            xaxis: {{ title: 'Days from Treatment' }},
+            yaxis: {{ title: 'Cumulative Rate (%)' }},
+            height: 450,
+            margin: {{ r: 120 }}
+        }});
+
+        // Update summary table
+        const tbody = document.getElementById('summaryBody');
+        tbody.innerHTML = '';
+        uniqueCohorts.forEach(cohort => {{
+            const cData = filtered.filter(d => d.COHORT === cohort);
+            const maxDay = Math.max(...cData.map(d => d.DAY));
+            const final = cData.find(d => d.DAY === maxDay);
+            if (!final) return;
+
+            const lift = final.ABS_LIFT || 0;
+            const ciLo = final.CI_LOWER || 0;
+            const ciHi = final.CI_UPPER || 0;
+
+            const row = document.createElement('tr');
+            row.style.borderBottom = '1px solid #eee';
+            row.innerHTML = `
+                <td style="padding:8px">${{cohort}}</td>
+                <td style="padding:8px">${{final.WINDOW_DAYS || maxDay}}d</td>
+                <td style="padding:8px;text-align:right">${{(final.TEST_CLIENTS||0).toLocaleString()}}</td>
+                <td style="padding:8px;text-align:right">${{(final.TEST_RATE||0).toFixed(2)}}%</td>
+                <td style="padding:8px;text-align:right">${{(final.CTRL_CLIENTS||0).toLocaleString()}}</td>
+                <td style="padding:8px;text-align:right">${{(final.CTRL_RATE||0).toFixed(2)}}%</td>
+                <td style="padding:8px;text-align:right;color:${{lift>0?'#28a745':'#dc3545'}};font-weight:bold">${{lift.toFixed(2)}}pp</td>
+                <td style="padding:8px">[${{ciLo.toFixed(2)}}, ${{ciHi.toFixed(2)}}]</td>
+            `;
+            tbody.appendChild(row);
+        }});
+    }};
+
+    updateDashboard();
+}})();
+</script>
+'''
+
+    display(HTML(html_content))
+    print(f"Dashboard displayed. Campaigns: {', '.join(campaigns)}")
 
 
 def generate_dashboard_from_csv(csv_path, output_path="vvd_vintage_dashboard.html", title="VVD Vintage Curves"):

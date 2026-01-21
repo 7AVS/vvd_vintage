@@ -44,19 +44,48 @@ print(f"Filter: {PARTITION_COLUMN} BETWEEN '{PARTITION_START}' AND '{PARTITION_E
 print("=" * 80)
 
 # -----------------------------------------------------------------------------
-# STEP 1: LOAD DATA
+# STEP 1: LOAD DATA - BYPASS HIVE TABLE, READ PARQUET DIRECTLY
 # -----------------------------------------------------------------------------
 
 print("\n[1] Loading data...")
 
-df = spark.table(f"{HIVE_DATABASE}.{HIVE_TABLE}") \
-    .filter(
-        (col(PARTITION_COLUMN) >= PARTITION_START) &
-        (col(PARTITION_COLUMN) <= PARTITION_END)
-    )
+# The Hive table has backup folders causing conflicts
+# So we read the parquet files directly from a specific partition
+# Path format: /prod/01347/app/ls20/data/sparkjobdata/effectDate=YYYY-MM-DD
 
-record_count = df.count()
-print(f"    Records: {record_count:,}")
+# Try reading directly from parquet path with specific partition
+PARQUET_BASE_PATH = "/prod/01347/app/ls20/data/sparkjobdata"
+
+# Read a specific partition to avoid the backup folder issue
+# Using a single recent date first to test
+TEST_PARTITION = "2025-11-01"  # Adjust if needed
+PARQUET_PATH = f"{PARQUET_BASE_PATH}/effectDate={TEST_PARTITION}"
+
+print(f"    Reading directly from: {PARQUET_PATH}")
+print(f"    (Bypassing Hive table due to backup folder conflicts)")
+
+try:
+    df = spark.read.parquet(PARQUET_PATH)
+    record_count = df.count()
+    print(f"    Records: {record_count:,}")
+except Exception as e:
+    print(f"    ERROR reading parquet: {e}")
+    print("\n    Trying alternative: list available partitions...")
+
+    # Try to list what effectDate partitions exist (excluding odsbackup)
+    try:
+        import subprocess
+        result = subprocess.run(
+            ['hdfs', 'dfs', '-ls', PARQUET_BASE_PATH],
+            capture_output=True, text=True, timeout=30
+        )
+        print("\n    Available directories:")
+        for line in result.stdout.split('\n'):
+            if 'effectDate=' in line and 'odsbackup' not in line:
+                print(f"      {line.split()[-1] if line.split() else ''}")
+    except:
+        pass
+    raise
 
 # -----------------------------------------------------------------------------
 # STEP 2: SHOW ACTUAL SCHEMA

@@ -17,13 +17,20 @@ from pyspark.sql.functions import (
 # CONFIGURATION - UPDATE THESE VALUES
 # -----------------------------------------------------------------------------
 
-# ODS MR HIST - Use specific partition date
-# Format: /prod/01347/app/LS20/data/SparkJobData/effectDate=YYYY-MM-DD
+# ODS MR HIST - Query via Hive table (recommended for correct schema)
+USE_HIVE_TABLE = True
+HIVE_DATABASE = "prod_x610_crm"
+HIVE_TABLE = "ods_mr_hist"
+
+# Partition filter
+PARTITION_COLUMN = "effectdate"
 PARTITION_DATE = "2026-01-20"  # UPDATE THIS to latest available date
+
+# Fallback: Direct parquet path (if Hive doesn't work)
 ODS_PATH = f"/prod/01347/app/LS20/data/SparkJobData/effectDate={PARTITION_DATE}"
 
-# VVD campaign prefixes to filter for
-VVD_PREFIXES = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
+# VVD campaign mnemonics (use prod_mn field to filter)
+VVD_MNEMONICS = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
 
 # -----------------------------------------------------------------------------
 # INITIALIZE SPARK
@@ -31,36 +38,47 @@ VVD_PREFIXES = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
 
 spark = SparkSession.builder \
     .appName("ODS JSON Field Diagnostic") \
+    .enableHiveSupport() \
     .getOrCreate()
 
 print("=" * 80)
 print("ODS MR HIST - JSON FIELD DIAGNOSTIC")
-print(f"Partition: effectDate={PARTITION_DATE}")
+print(f"Table: {HIVE_DATABASE}.{HIVE_TABLE}")
+print(f"Partition filter: {PARTITION_COLUMN} = {PARTITION_DATE}")
 print("=" * 80)
 
 # -----------------------------------------------------------------------------
-# STEP 1: LOAD DATA FROM SPECIFIC PARTITION
+# STEP 1: LOAD DATA FROM HIVE TABLE WITH PARTITION FILTER
 # -----------------------------------------------------------------------------
 
-print("\n[1] Loading ODS MR HIST data from partition...")
-print(f"    Path: {ODS_PATH}")
+print("\n[1] Loading ODS MR HIST data...")
 
 try:
-    df = spark.read.parquet(ODS_PATH)
-    record_count = df.count()
-    print(f"    Records in partition: {record_count:,}")
+    if USE_HIVE_TABLE:
+        print(f"    Using Hive table: {HIVE_DATABASE}.{HIVE_TABLE}")
+
+        # Query Hive table with partition filter
+        df = spark.table(f"{HIVE_DATABASE}.{HIVE_TABLE}") \
+            .filter(col(PARTITION_COLUMN) == PARTITION_DATE)
+
+        record_count = df.count()
+        print(f"    Records in partition: {record_count:,}")
+    else:
+        print(f"    Using direct path: {ODS_PATH}")
+        df = spark.read.parquet(ODS_PATH)
+        record_count = df.count()
+        print(f"    Records: {record_count:,}")
+
 except Exception as e:
-    print(f"    ERROR: {e}")
-    print("\n    Trying to list available partitions...")
-    # Try to list what partitions exist
+    print(f"    ERROR with Hive table: {e}")
+    print("\n    Falling back to direct parquet path...")
     try:
-        import subprocess
-        result = subprocess.run(['hdfs', 'dfs', '-ls', '/prod/01347/app/LS20/data/SparkJobData/'],
-                                capture_output=True, text=True)
-        print(result.stdout[-2000:])  # Last 2000 chars
-    except:
-        print("    Could not list partitions. Check the path manually.")
-    raise
+        df = spark.read.parquet(ODS_PATH)
+        record_count = df.count()
+        print(f"    Records from parquet: {record_count:,}")
+    except Exception as e2:
+        print(f"    ERROR with parquet path: {e2}")
+        raise
 
 # -----------------------------------------------------------------------------
 # STEP 2: CHECK SCHEMA - What fields exist?
@@ -69,6 +87,7 @@ except Exception as e:
 print("\n[2] Checking schema for key fields...")
 
 key_fields = [
+    "prod_mn",            # Campaign mnemonic (VCN, VDA, etc.)
     "tactic_id",
     "clnt_id",
     "chnl_cd",
@@ -88,31 +107,23 @@ if missing:
     print(f"    MISSING: {missing}")
 
 # -----------------------------------------------------------------------------
-# STEP 3: FILTER FOR VVD CAMPAIGNS
+# STEP 3: FILTER FOR VVD CAMPAIGNS USING prod_mn
 # -----------------------------------------------------------------------------
 
-print("\n[3] Filtering for VVD campaigns...")
+print("\n[3] Filtering for VVD campaigns using prod_mn...")
 
-# Build filter for VVD prefixes
-vvd_filter = None
-for prefix in VVD_PREFIXES:
-    condition = col("tactic_id").startswith(prefix)
-    vvd_filter = condition if vvd_filter is None else (vvd_filter | condition)
+# First check what prod_mn values exist
+print("\n    All distinct prod_mn values in partition:")
+df.select("prod_mn").distinct().orderBy("prod_mn").show(100, truncate=False)
 
-df_vvd = df.filter(vvd_filter)
+# Filter using prod_mn (the mnemonic field)
+df_vvd = df.filter(col("prod_mn").isin(VVD_MNEMONICS))
 vvd_count = df_vvd.count()
-print(f"    VVD records: {vvd_count:,}")
+print(f"\n    VVD records (filtered by prod_mn): {vvd_count:,}")
 
 if vvd_count == 0:
-    print("\n    WARNING: No VVD records found with standard prefixes!")
-    print("    Showing sample tactic_id values from this partition:")
-    df.select("tactic_id").distinct().orderBy("tactic_id").show(50, truncate=False)
-
-    # Try broader search
-    print("\n    Trying broader search for 'V' prefix or 'VVD' anywhere...")
-    df_v = df.filter(col("tactic_id").startswith("V"))
-    print(f"    Records starting with 'V': {df_v.count():,}")
-    df_v.select("tactic_id").distinct().show(30, truncate=False)
+    print("\n    WARNING: No VVD records found with mnemonics:", VVD_MNEMONICS)
+    print("    Check the prod_mn values above - mnemonics might be different")
 
 # -----------------------------------------------------------------------------
 # STEP 4: JSON FIELD (treatmt_adnl_dtl) ANALYSIS
@@ -201,16 +212,14 @@ if "treatmt_dtl" in df.columns and vvd_count > 0:
 # STEP 6: BREAKDOWN BY CAMPAIGN
 # -----------------------------------------------------------------------------
 
-print("\n[6] Field population by campaign...")
+print("\n[6] Field population by campaign (prod_mn)...")
 
 if vvd_count > 0:
-    df_vvd.withColumn(
-        "campaign", substring("tactic_id", 1, 3)
-    ).groupBy("campaign").agg(
+    df_vvd.groupBy("prod_mn").agg(
         count("*").alias("total"),
         count(when(col("treatmt_adnl_dtl").isNotNull(), 1)).alias("json_filled"),
         count(when(col("treatmt_dtl").isNotNull(), 1)).alias("dtl_filled")
-    ).orderBy("campaign").show()
+    ).orderBy("prod_mn").show()
 
 # -----------------------------------------------------------------------------
 # STEP 7: SAMPLE RECORDS
@@ -219,7 +228,7 @@ if vvd_count > 0:
 print("\n[7] Sample complete records...")
 
 if vvd_count > 0:
-    sample_cols = [c for c in ["tactic_id", "clnt_id", "chnl_cd",
+    sample_cols = [c for c in ["prod_mn", "tactic_id", "clnt_id", "chnl_cd",
                                 "treatmt_adnl_dtl", "treatmt_dtl",
                                 "offr_strt_dt"] if c in df.columns]
 

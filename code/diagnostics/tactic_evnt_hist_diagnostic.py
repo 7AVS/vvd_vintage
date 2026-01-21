@@ -1,7 +1,7 @@
 # =============================================================================
 # TACTIC EVENT HISTORY - Flexible Fields Diagnostic
 # =============================================================================
-# Purpose: Investigate the addnl_decisn_data1/2/3 fields and Layer 1 metadata
+# Purpose: Investigate the ADDNL_DECISN_DATA1/2/3 fields and Layer 1 metadata
 #          in tactic_evnt_hist for VVD campaigns
 #
 # IMPORTANT: Uses partition filtering - UPDATE PARTITION CONFIG BELOW
@@ -71,13 +71,13 @@ for c in df.columns:
 print("\n    Checking for expected key fields...")
 
 layer1_fields = [
-    "tactic_id", "tactic_evnt_id",
-    "rpt_grp_cd", "tst_grp_cd", "treatmt_mn",
-    "treatmt_strt_dt", "treatmt_end_dt",
-    "tactic_cell_cd"
+    "TACTIC_ID", "TACTIC_EVNT_ID",
+    "RPT_GRP_CD", "TST_GRP_CD", "TREATMT_MN",
+    "TREATMT_STRT_DT", "TREATMT_END_DT",
+    "TACTIC_CELL_CD"
 ]
 
-flexible_fields = ["addnl_decisn_data1", "addnl_decisn_data2", "addnl_decisn_data3"]
+flexible_fields = ["ADDNL_DECISN_DATA1", "ADDNL_DECISN_DATA2", "ADDNL_DECISN_DATA3"]
 
 all_key_fields = layer1_fields + flexible_fields
 existing = [f for f in all_key_fields if f in df.columns]
@@ -91,16 +91,16 @@ if missing:
 # STEP 3: FILTER FOR VVD CAMPAIGNS
 # -----------------------------------------------------------------------------
 
-print("\n[3] Filtering for VVD campaigns (last 3 chars of tactic_id)...")
+print("\n[3] Filtering for VVD campaigns (last 3 chars of TACTIC_ID)...")
 
-# First show sample tactic_id values to understand the format
-print("\n    Sample tactic_id values:")
-df.select("tactic_id").distinct().orderBy("tactic_id").show(30, truncate=False)
+# First show sample TACTIC_ID values to understand the format
+print("\n    Sample TACTIC_ID values:")
+df.select("TACTIC_ID").distinct().orderBy("TACTIC_ID").show(50, truncate=False)
 
 # Filter by last 3 characters using endswith
 vvd_filter = None
 for mnemonic in VVD_MNEMONICS:
-    condition = col("tactic_id").endswith(mnemonic)
+    condition = col("TACTIC_ID").endswith(mnemonic)
     vvd_filter = condition if vvd_filter is None else (vvd_filter | condition)
 
 df_vvd = df.filter(vvd_filter)
@@ -109,13 +109,13 @@ print(f"\n    VVD records (filtered by last 3 chars): {vvd_count:,}")
 
 if vvd_count == 0:
     print("\n    WARNING: No VVD records found!")
-    print("    Check the tactic_id format above - mnemonics might be in different position")
+    print("    Check the TACTIC_ID format above - mnemonics might be in different position")
 
 # -----------------------------------------------------------------------------
-# STEP 4: FLEXIBLE FIELDS ANALYSIS (addnl_decisn_data1/2/3)
+# STEP 4: FLEXIBLE FIELDS ANALYSIS (ADDNL_DECISN_DATA1/2/3)
 # -----------------------------------------------------------------------------
 
-print("\n[4] Analyzing FLEXIBLE FIELDS (addnl_decisn_data1/2/3)...")
+print("\n[4] Analyzing FLEXIBLE FIELDS (ADDNL_DECISN_DATA1/2/3)...")
 
 existing_flex = [f for f in flexible_fields if f in df.columns]
 print(f"    Fields found: {existing_flex}")
@@ -166,24 +166,24 @@ print("\n[5] Layer 1 Key Fields Analysis...")
 
 if vvd_count > 0:
 
-    # Test Group (tst_grp_cd)
-    if "tst_grp_cd" in df.columns:
-        print("\n    --- tst_grp_cd (Test vs Control) ---")
-        df_vvd.groupBy("tst_grp_cd").agg(
+    # Test Group (TST_GRP_CD)
+    if "TST_GRP_CD" in df.columns:
+        print("\n    --- TST_GRP_CD (Test vs Control) ---")
+        df_vvd.groupBy("TST_GRP_CD").agg(
             count("*").alias("count")
         ).orderBy(col("count").desc()).show(20)
 
-    # Report Group (rpt_grp_cd)
-    if "rpt_grp_cd" in df.columns:
-        print("\n    --- rpt_grp_cd (Segments) ---")
-        df_vvd.groupBy("rpt_grp_cd").agg(
+    # Report Group (RPT_GRP_CD)
+    if "RPT_GRP_CD" in df.columns:
+        print("\n    --- RPT_GRP_CD (Segments) ---")
+        df_vvd.groupBy("RPT_GRP_CD").agg(
             count("*").alias("count")
         ).orderBy(col("count").desc()).show(20)
 
     # Treatment Mnemonic
-    if "treatmt_mn" in df.columns:
-        print("\n    --- treatmt_mn (Treatment) ---")
-        df_vvd.groupBy("treatmt_mn").agg(
+    if "TREATMT_MN" in df.columns:
+        print("\n    --- TREATMT_MN (Treatment) ---")
+        df_vvd.groupBy("TREATMT_MN").agg(
             count("*").alias("count")
         ).orderBy(col("count").desc()).show(20)
 
@@ -201,13 +201,13 @@ if vvd_count > 0:
             count(when(col(field).isNotNull(), 1)).alias(f"{field[:10]}_filled")
         )
 
-    if "tst_grp_cd" in df.columns:
-        agg_cols.append(countDistinct("tst_grp_cd").alias("tst_grps"))
-    if "rpt_grp_cd" in df.columns:
-        agg_cols.append(countDistinct("rpt_grp_cd").alias("rpt_grps"))
+    if "TST_GRP_CD" in df.columns:
+        agg_cols.append(countDistinct("TST_GRP_CD").alias("tst_grps"))
+    if "RPT_GRP_CD" in df.columns:
+        agg_cols.append(countDistinct("RPT_GRP_CD").alias("rpt_grps"))
 
     df_vvd.withColumn(
-        "campaign", expr("right(tactic_id, 3)")
+        "campaign", expr("right(TACTIC_ID, 3)")
     ).groupBy("campaign").agg(*agg_cols).orderBy("campaign").show()
 
 # -----------------------------------------------------------------------------
@@ -216,12 +216,12 @@ if vvd_count > 0:
 
 print("\n[7] Campaign x Test Group cross-tab...")
 
-if vvd_count > 0 and "tst_grp_cd" in df.columns:
+if vvd_count > 0 and "TST_GRP_CD" in df.columns:
     df_vvd.withColumn(
-        "campaign", expr("right(tactic_id, 3)")
-    ).groupBy("campaign", "tst_grp_cd").agg(
+        "campaign", expr("right(TACTIC_ID, 3)")
+    ).groupBy("campaign", "TST_GRP_CD").agg(
         count("*").alias("count")
-    ).orderBy("campaign", "tst_grp_cd").show(50)
+    ).orderBy("campaign", "TST_GRP_CD").show(50)
 
 # -----------------------------------------------------------------------------
 # STEP 8: DATE RANGES
@@ -229,13 +229,13 @@ if vvd_count > 0 and "tst_grp_cd" in df.columns:
 
 print("\n[8] Treatment date ranges by campaign...")
 
-if vvd_count > 0 and "treatmt_strt_dt" in df.columns:
+if vvd_count > 0 and "TREATMT_STRT_DT" in df.columns:
     df_vvd.withColumn(
-        "campaign", expr("right(tactic_id, 3)")
+        "campaign", expr("right(TACTIC_ID, 3)")
     ).groupBy("campaign").agg(
         count("*").alias("records"),
-        spark_min("treatmt_strt_dt").alias("earliest"),
-        spark_max("treatmt_strt_dt").alias("latest")
+        spark_min("TREATMT_STRT_DT").alias("earliest"),
+        spark_max("TREATMT_STRT_DT").alias("latest")
     ).orderBy("campaign").show()
 
 # -----------------------------------------------------------------------------
@@ -246,9 +246,9 @@ print("\n[9] Sample complete records...")
 
 if vvd_count > 0:
     sample_cols = [c for c in [
-        "tactic_id", "tactic_evnt_id", "tst_grp_cd", "rpt_grp_cd",
-        "treatmt_mn", "treatmt_strt_dt",
-        "addnl_decisn_data1", "addnl_decisn_data2"
+        "TACTIC_ID", "TACTIC_EVNT_ID", "TST_GRP_CD", "RPT_GRP_CD",
+        "TREATMT_MN", "TREATMT_STRT_DT",
+        "ADDNL_DECISN_DATA1", "ADDNL_DECISN_DATA2"
     ] if c in df.columns]
 
     df_vvd.select(sample_cols).show(10, truncate=50)
@@ -267,7 +267,7 @@ print("=" * 80)
 print("""
 KEY FINDINGS TO LOOK FOR:
 1. Are addnl_decisn_data fields populated with experiment metadata?
-2. What tst_grp_cd values exist? (Which is Test vs Control?)
-3. What rpt_grp_cd values exist? (Segment codes)
+2. What TST_GRP_CD values exist? (Which is Test vs Control?)
+3. What RPT_GRP_CD values exist? (Segment codes)
 4. Is there any JSON structure in the flexible fields?
 """)

@@ -39,8 +39,8 @@ html = f'''<!DOCTYPE html>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }}
-        .header {{ background: linear-gradient(135deg, #003366 0%, #004d99 100%); color: white; padding: 20px 40px; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #E7EEF1; }}
+        .header {{ background: linear-gradient(135deg, #003168 0%, #0051A5 100%); color: white; padding: 20px 40px; }}
         .header h1 {{ font-size: 1.5em; }}
         .controls {{ background: white; padding: 20px 40px; border-bottom: 1px solid #ddd; display: flex; gap: 30px; flex-wrap: wrap; }}
         .control-group {{ display: flex; flex-direction: column; gap: 5px; }}
@@ -49,13 +49,13 @@ html = f'''<!DOCTYPE html>
         .main {{ padding: 20px 40px; }}
         .chart-container {{ background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }}
         .summary-table {{ background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; overflow-x: auto; }}
-        .summary-table h3 {{ margin-bottom: 15px; color: #003366; }}
+        .summary-table h3 {{ margin-bottom: 15px; color: #003168; }}
         table {{ width: 100%; border-collapse: collapse; font-size: 0.9em; }}
         th, td {{ padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }}
-        th {{ background: #003366; color: white; }}
+        th {{ background: #003168; color: white; }}
         tr:hover {{ background: #f9f9f9; }}
-        .positive {{ color: #28a745; font-weight: bold; }}
-        .negative {{ color: #dc3545; }}
+        .positive {{ color: #0051A5; font-weight: bold; }}
+        .negative {{ color: #B58500; }}
     </style>
 </head>
 <body>
@@ -130,7 +130,8 @@ function updateChart() {{
     if (cohortFilter !== 'all') data = data.filter(d => d.COHORT === cohortFilter);
 
     const uniqueCohorts = [...new Set(data.map(d => d.COHORT))].sort();
-    const colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#3B1F2B', '#95190C', '#610345', '#044B7F'];
+    // RBC Brand Colors
+    const colors = ['#0051A5', '#FFC72C', '#0091DA', '#07AFBF', '#FCA311', '#C1B5E0', '#003168', '#B58500'];
 
     const traces = [];
     uniqueCohorts.forEach((cohort, i) => {{
@@ -174,7 +175,7 @@ function updateChart() {{
             <td>${{(final.TEST_RATE||0).toFixed(2)}}%</td>
             <td>${{(final.CTRL_CLIENTS||0).toLocaleString()}}</td>
             <td>${{(final.CTRL_RATE||0).toFixed(2)}}%</td>
-            <td class="${{lift > 0 ? 'positive' : 'negative'}}">${{lift.toFixed(2)}}pp</td>
+            <td style="color: ${{lift > 0 ? '#0051A5' : '#B58500'}}; font-weight: bold;">${{lift.toFixed(2)}}pp</td>
             <td>[${{ciLo.toFixed(2)}}, ${{ciHi.toFixed(2)}}]</td>
         `;
         tbody.appendChild(row);

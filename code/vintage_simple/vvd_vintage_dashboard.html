@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VVD Vintage Curves Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #E7EEF1; }
+        .header { background: linear-gradient(135deg, #003168 0%, #0051A5 100%); color: white; padding: 20px 40px; }
+        .header h1 { font-size: 1.5em; }
+        .controls { background: white; padding: 20px 40px; border-bottom: 1px solid #ddd; display: flex; gap: 30px; flex-wrap: wrap; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .control-group label { font-size: 0.85em; color: #666; font-weight: 600; }
+        .control-group select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 1em; min-width: 150px; }
+        .main { padding: 20px 40px; }
+        .chart-container { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .summary-table { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; overflow-x: auto; }
+        .summary-table h3 { margin-bottom: 15px; color: #003168; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #003168; color: white; }
+        tr:hover { background: #f9f9f9; }
+        .upload-section { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .upload-section h3 { color: #003168; margin-bottom: 15px; }
+        #csvFile { margin-bottom: 10px; }
+        .btn { background: #0051A5; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 1em; }
+        .btn:hover { background: #003168; }
+        .status { margin-top: 10px; padding: 10px; border-radius: 4px; display: none; }
+        .status.success { display: block; background: #d4edda; color: #155724; }
+        .status.error { display: block; background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>VVD Vintage Curves Dashboard</h1>
+    <div style="opacity: 0.8; font-size: 0.9em;">Test vs Control Comparison | RBC Marketing Analytics</div>
+</div>
+
+<div class="main">
+    <div class="upload-section">
+        <h3>Load Your Data</h3>
+        <p style="margin-bottom: 15px; color: #666;">Select your vintage_data.csv file exported from HDFS:</p>
+        <input type="file" id="csvFile" accept=".csv">
+        <button class="btn" onclick="loadCSV()">Load Data</button>
+        <div id="status" class="status"></div>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Campaign</label>
+            <select id="campaignSelect" onchange="updateChart()"></select>
+        </div>
+        <div class="control-group">
+            <label>Cohort</label>
+            <select id="cohortSelect" onchange="updateChart()">
+                <option value="all">All Cohorts</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <div id="vintageChart" style="height: 500px;"></div>
+    </div>
+
+    <div class="summary-table">
+        <h3>Summary - Final Day Metrics</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Cohort</th>
+                    <th>Window</th>
+                    <th>Test N</th>
+                    <th>Test Rate</th>
+                    <th>Control N</th>
+                    <th>Control Rate</th>
+                    <th>Lift (pp)</th>
+                    <th>95% CI</th>
+                </tr>
+            </thead>
+            <tbody id="summaryBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+let rawData = [];
+let campaigns = [];
+
+// RBC Brand Colors
+const colors = ['#0051A5', '#FFC72C', '#0091DA', '#07AFBF', '#FCA311', '#C1B5E0', '#003168', '#B58500'];
+
+function loadCSV() {
+    const fileInput = document.getElementById('csvFile');
+    const status = document.getElementById('status');
+
+    if (!fileInput.files.length) {
+        status.className = 'status error';
+        status.textContent = 'Please select a CSV file first.';
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const text = e.target.result;
+            rawData = parseCSV(text);
+            campaigns = [...new Set(rawData.map(d => d.MNE))].sort();
+
+            // Populate campaign dropdown
+            const campaignSelect = document.getElementById('campaignSelect');
+            campaignSelect.innerHTML = '';
+            campaigns.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                campaignSelect.appendChild(opt);
+            });
+
+            status.className = 'status success';
+            status.textContent = `Loaded ${rawData.length} rows. Campaigns: ${campaigns.join(', ')}`;
+
+            updateChart();
+        } catch (err) {
+            status.className = 'status error';
+            status.textContent = 'Error parsing CSV: ' + err.message;
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+
+    return lines.slice(1).map(line => {
+        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+        const obj = {};
+        headers.forEach((h, i) => {
+            const val = values[i];
+            // Try to parse as number
+            const num = parseFloat(val);
+            obj[h] = isNaN(num) ? val : num;
+        });
+        return obj;
+    });
+}
+
+function updateChart() {
+    if (!rawData.length) {
+        Plotly.newPlot('vintageChart', [], {
+            title: 'Load a CSV file to see the chart',
+            xaxis: { title: 'Days from Treatment' },
+            yaxis: { title: 'Cumulative Rate (%)' }
+        });
+        return;
+    }
+
+    const mne = document.getElementById('campaignSelect').value;
+    const cohortFilter = document.getElementById('cohortSelect').value;
+
+    // Update cohort dropdown
+    const cohortSelect = document.getElementById('cohortSelect');
+    const cohorts = [...new Set(rawData.filter(d => d.MNE === mne).map(d => d.COHORT))].sort();
+    cohortSelect.innerHTML = '<option value="all">All Cohorts</option>';
+    cohorts.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        cohortSelect.appendChild(opt);
+    });
+
+    let data = rawData.filter(d => d.MNE === mne);
+    if (cohortFilter !== 'all') {
+        data = data.filter(d => d.COHORT === cohortFilter);
+    }
+
+    const uniqueCohorts = [...new Set(data.map(d => d.COHORT))].sort();
+
+    const traces = [];
+    uniqueCohorts.forEach((cohort, i) => {
+        const cData = data.filter(d => d.COHORT === cohort).sort((a, b) => a.DAY - b.DAY);
+        const color = colors[i % colors.length];
+
+        traces.push({
+            x: cData.map(d => d.DAY),
+            y: cData.map(d => d.TEST_RATE),
+            name: cohort + ' Test',
+            mode: 'lines+markers',
+            line: { color: color, width: 2 },
+            marker: { size: 4 }
+        });
+        traces.push({
+            x: cData.map(d => d.DAY),
+            y: cData.map(d => d.CTRL_RATE),
+            name: cohort + ' Ctrl',
+            mode: 'lines+markers',
+            line: { color: color, width: 2, dash: 'dash' },
+            marker: { size: 4, symbol: 'square' }
+        });
+    });
+
+    Plotly.newPlot('vintageChart', traces, {
+        title: mne + ' - Vintage Curves (solid=Test, dashed=Control)',
+        xaxis: { title: 'Days from Treatment' },
+        yaxis: { title: 'Cumulative Rate (%)' },
+        legend: { x: 1.02, y: 1 },
+        margin: { r: 150 }
+    });
+
+    // Update summary table
+    const tbody = document.getElementById('summaryBody');
+    tbody.innerHTML = '';
+    uniqueCohorts.forEach(cohort => {
+        const cData = data.filter(d => d.COHORT === cohort);
+        const maxDay = Math.max(...cData.map(d => d.DAY));
+        const final = cData.find(d => d.DAY === maxDay);
+        if (!final) return;
+
+        const lift = final.ABS_LIFT || 0;
+        const ciLo = final.CI_LOWER || 0;
+        const ciHi = final.CI_UPPER || 0;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${cohort}</td>
+            <td>${final.WINDOW_DAYS || maxDay}d</td>
+            <td>${(final.TEST_CLIENTS||0).toLocaleString()}</td>
+            <td>${(final.TEST_RATE||0).toFixed(2)}%</td>
+            <td>${(final.CTRL_CLIENTS||0).toLocaleString()}</td>
+            <td>${(final.CTRL_RATE||0).toFixed(2)}%</td>
+            <td style="color: ${lift > 0 ? '#0051A5' : '#B58500'}; font-weight: bold;">${lift.toFixed(2)}pp</td>
+            <td>[${ciLo.toFixed(2)}, ${ciHi.toFixed(2)}]</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Initialize empty chart
+updateChart();
+</script>
+
+</body>
+</html>

@@ -21,13 +21,13 @@ from pyspark.sql.functions import (
 HIVE_DATABASE = "prod_x610_crm"
 HIVE_TABLE = "ods_mr_hist"
 
-# Partition filter (date range to capture older campaigns)
+# Partition filter - NARROW RANGE for one deployment
 PARTITION_COLUMN = "effectdate"
-PARTITION_START = "2024-01-01"
-PARTITION_END = "2026-12-31"
+PARTITION_START = "2025-10-01"  # Adjust based on known deployment
+PARTITION_END = "2025-12-31"    # Narrow window
 
-# VVD campaign mnemonics (use prod_mn field to filter)
-VVD_MNEMONICS = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
+# Focus on ONE campaign for diagnostic (change as needed)
+VVD_MNEMONICS = ['VDA']  # VDA = Black Friday / Cyber Monday
 
 # -----------------------------------------------------------------------------
 # INITIALIZE SPARK

@@ -20,13 +20,13 @@ from pyspark.sql.functions import (
 # Tactic Event History - Hive table
 HIVE_TABLE = "prod_yg80_pcbsharedzone.tsz_00150_cc_dtzta_t_tactic_evnt_hist"
 
-# Partition column and filter
+# Partition filter - NARROW RANGE for one deployment
 PARTITION_COLUMN = "evnt_strt_dt"
-PARTITION_START = "2024-01-01"  # Filter: >= this date (widened to capture older campaigns)
-PARTITION_END = "2026-12-31"    # Filter: <= this date
+PARTITION_START = "2025-10-01"  # Adjust based on known deployment
+PARTITION_END = "2025-12-31"    # Narrow window
 
-# VVD campaign mnemonics (last 3 characters of tactic_id)
-VVD_MNEMONICS = ['VCN', 'VDA', 'VDT', 'VUI', 'VUT', 'VAW']
+# Focus on ONE campaign for diagnostic (change as needed)
+VVD_MNEMONICS = ['VDA']  # VDA = Black Friday / Cyber Monday
 
 # -----------------------------------------------------------------------------
 # INITIALIZE SPARK

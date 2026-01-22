@@ -629,6 +629,87 @@ def build_channel_breakdown(success_df):
     return breakdown.orderBy("COHORT", "GROUP", "CHANNEL")
 
 
+def build_engagement_vintage(success_df, mne):
+    """Build vintage curves for engagement metrics (open, click, unsub, bounce).
+
+    Returns DataFrame with cumulative rates by COHORT, GROUP, DAY for each metric.
+    This allows the dashboard to show vintage curves for ANY metric, not just primary success.
+    """
+    columns = success_df.columns
+
+    # Check if we have engagement data
+    if "EMAIL_SENT" not in columns:
+        return None
+
+    # Calculate days to each engagement event
+    engagement_df = success_df.withColumn(
+        "DAYS_TO_OPEN",
+        F.when(F.col("EMAIL_OPENED") == 1,
+               F.datediff(F.col("EMAIL_OPENED_DT"), F.col("TREATMT_STRT_DT"))).otherwise(None)
+    ).withColumn(
+        "DAYS_TO_CLICK",
+        F.when(F.col("EMAIL_CLICKED") == 1,
+               F.datediff(F.col("EMAIL_CLICKED_DT"), F.col("TREATMT_STRT_DT"))).otherwise(None)
+    )
+
+    # Only include clients who were sent an email (TEST group with email channel)
+    email_sent_df = engagement_df.filter(F.col("EMAIL_SENT") == 1)
+
+    if email_sent_df.count() == 0:
+        return None
+
+    all_metrics = []
+
+    # Build vintage for OPEN rate
+    if "EMAIL_OPENED" in columns:
+        open_vintage = _build_metric_vintage(email_sent_df, "DAYS_TO_OPEN", "EMAIL_OPENED", "OPEN_RATE")
+        if open_vintage is not None:
+            all_metrics.append(open_vintage)
+
+    # Build vintage for CLICK rate
+    if "EMAIL_CLICKED" in columns:
+        click_vintage = _build_metric_vintage(email_sent_df, "DAYS_TO_CLICK", "EMAIL_CLICKED", "CLICK_RATE")
+        if click_vintage is not None:
+            all_metrics.append(click_vintage)
+
+    if not all_metrics:
+        return None
+
+    combined = pd.concat(all_metrics, ignore_index=True)
+    combined["MNE"] = mne
+    return combined
+
+
+def _build_metric_vintage(df, days_col, flag_col, metric_name):
+    """Helper to build vintage curve for a single metric."""
+    # Get totals by cohort, group
+    totals = df.groupBy("COHORT", "GROUP").agg(
+        F.count("*").alias("TOTAL_CLIENTS"),
+        F.expr("percentile_approx(WINDOW_DAYS, 0.5)").alias("WINDOW_DAYS")
+    )
+
+    # Get events by day
+    events = df.filter(F.col(flag_col) == 1).groupBy(
+        "COHORT", "GROUP", days_col
+    ).agg(F.count("*").alias("EVENTS_ON_DAY"))
+
+    # Join
+    vintage = events.join(totals, on=["COHORT", "GROUP"], how="left")
+    pdf = vintage.toPandas()
+
+    if pdf.empty:
+        return None
+
+    pdf = pdf.rename(columns={days_col: "DAY"})
+    pdf = pdf.sort_values(["COHORT", "GROUP", "DAY"])
+    pdf["CUMULATIVE_EVENTS"] = pdf.groupby(["COHORT", "GROUP"])["EVENTS_ON_DAY"].cumsum()
+    pdf["CUMULATIVE_RATE"] = pdf["CUMULATIVE_EVENTS"] / pdf["TOTAL_CLIENTS"] * 100
+    pdf["METRIC"] = metric_name
+
+    return pdf[["COHORT", "GROUP", "DAY", "WINDOW_DAYS", "TOTAL_CLIENTS",
+                "CUMULATIVE_EVENTS", "CUMULATIVE_RATE", "METRIC"]]
+
+
 def calculate_ci(test_succ, test_n, ctrl_succ, ctrl_n):
     """Calculate lift and confidence interval."""
     if test_n == 0 or ctrl_n == 0:
@@ -968,6 +1049,17 @@ def run_vintage_analysis(spark, mne, show_plots=True, verbose=True, include_enga
         success_df.unpersist()
         return None
 
+    # Build channel breakdown for dashboard
+    log("\n[Engine] Building channel breakdown...")
+    channel_breakdown_spark = build_channel_breakdown(success_df)
+    channel_breakdown_df = channel_breakdown_spark.toPandas()
+    channel_breakdown_df["MNE"] = mne
+    channel_breakdown_df["SUCCESS_RATE"] = (
+        channel_breakdown_df["SUCCESS_COUNT"] / channel_breakdown_df["CLIENT_COUNT"] * 100
+    ).round(2)
+    log(f"    Channel breakdown rows: {len(channel_breakdown_df)}")
+    print(channel_breakdown_df.to_string(index=False))
+
     # Generate summaries
     log("\n[Engine] Generating summaries...")
     summary_df = generate_summary(vintage_df, mne)
@@ -980,6 +1072,14 @@ def run_vintage_analysis(spark, mne, show_plots=True, verbose=True, include_enga
         if not engagement_summary_df.empty and len(engagement_summary_df.columns) > 2:
             log("\n[Layer 4] Engagement Summary:")
             print(engagement_summary_df.to_string(index=False))
+
+    # Build engagement vintage curves (open rate, click rate, etc. by cohort)
+    engagement_vintage_df = None
+    if include_engagement and "EMAIL_SENT" in success_df.columns:
+        log("\n[Engine] Building engagement vintage curves...")
+        engagement_vintage_df = build_engagement_vintage(success_df, mne)
+        if engagement_vintage_df is not None and not engagement_vintage_df.empty:
+            log(f"    Engagement vintage rows: {len(engagement_vintage_df)}")
 
     # Plotting
     if show_plots:
@@ -996,7 +1096,9 @@ def run_vintage_analysis(spark, mne, show_plots=True, verbose=True, include_enga
     return {
         "vintage_df": vintage_df,
         "summary_df": summary_df,
-        "engagement_summary_df": engagement_summary_df
+        "channel_breakdown_df": channel_breakdown_df,
+        "engagement_summary_df": engagement_summary_df,
+        "engagement_vintage_df": engagement_vintage_df,
     }
 
 
@@ -1006,6 +1108,8 @@ def run_all_campaigns(spark, mnes=None, show_plots=True, include_engagement=True
     results = {}
     all_summaries = []
     all_engagement = []
+    all_channel_breakdown = []
+    all_engagement_vintage = []
 
     for mne in mnes:
         try:
@@ -1015,6 +1119,10 @@ def run_all_campaigns(spark, mnes=None, show_plots=True, include_engagement=True
                 all_summaries.append(result["summary_df"])
                 if result.get("engagement_summary_df") is not None:
                     all_engagement.append(result["engagement_summary_df"])
+                if result.get("channel_breakdown_df") is not None:
+                    all_channel_breakdown.append(result["channel_breakdown_df"])
+                if result.get("engagement_vintage_df") is not None:
+                    all_engagement_vintage.append(result["engagement_vintage_df"])
         except Exception as e:
             print(f"ERROR {mne}: {str(e)}")
 
@@ -1033,6 +1141,22 @@ def run_all_campaigns(spark, mnes=None, show_plots=True, include_engagement=True
         print(f"{'='*60}")
         print(combined_eng.to_string(index=False))
         results["_combined_engagement"] = combined_eng
+
+    if all_channel_breakdown:
+        combined_channel = pd.concat(all_channel_breakdown, ignore_index=True)
+        print(f"\n{'='*60}")
+        print("ALL CAMPAIGNS - CHANNEL BREAKDOWN")
+        print(f"{'='*60}")
+        print(combined_channel.to_string(index=False))
+        results["_combined_channel_breakdown"] = combined_channel
+
+    if all_engagement_vintage:
+        combined_eng_vintage = pd.concat(all_engagement_vintage, ignore_index=True)
+        print(f"\n{'='*60}")
+        print("ALL CAMPAIGNS - ENGAGEMENT VINTAGE (Open/Click by Cohort)")
+        print(f"{'='*60}")
+        print(combined_eng_vintage.head(20).to_string(index=False))
+        results["_combined_engagement_vintage"] = combined_eng_vintage
 
     return results
 
@@ -1061,8 +1185,91 @@ def export_to_csv(results, output_path="vintage_data.csv"):
     return output_path
 
 
+def export_all_to_hdfs(results, spark, base_path="/user/427966379/vintage_output"):
+    """Export ALL vintage results to HDFS as separate CSV files.
+
+    Creates:
+    - {base_path}/vintage_curves.csv - Main vintage curves (primary success)
+    - {base_path}/channel_breakdown.csv - Channel distribution by cohort
+    - {base_path}/engagement_vintage.csv - Engagement metric curves (open, click rates)
+    - {base_path}/summary.csv - Final day summary per cohort
+    """
+    exported = []
+
+    # 1. Main vintage curves
+    all_vintage = []
+    for mne, result in results.items():
+        if mne.startswith("_") or result is None:
+            continue
+        df = result["vintage_df"].copy()
+        df["MNE"] = mne
+        all_vintage.append(df)
+
+    if all_vintage:
+        combined = pd.concat(all_vintage, ignore_index=True)
+        spark_df = spark.createDataFrame(combined)
+        path = f"{base_path}/vintage_curves.csv"
+        spark_df.coalesce(1).write.mode("overwrite").option("header", "true").csv(path)
+        print(f"Exported vintage_curves.csv: {len(combined):,} rows")
+        exported.append(path)
+
+    # 2. Channel breakdown
+    all_channel = []
+    for mne, result in results.items():
+        if mne.startswith("_") or result is None:
+            continue
+        if result.get("channel_breakdown_df") is not None:
+            all_channel.append(result["channel_breakdown_df"])
+
+    if all_channel:
+        combined = pd.concat(all_channel, ignore_index=True)
+        spark_df = spark.createDataFrame(combined)
+        path = f"{base_path}/channel_breakdown.csv"
+        spark_df.coalesce(1).write.mode("overwrite").option("header", "true").csv(path)
+        print(f"Exported channel_breakdown.csv: {len(combined):,} rows")
+        exported.append(path)
+
+    # 3. Engagement vintage (open rate, click rate curves by cohort)
+    all_eng_vintage = []
+    for mne, result in results.items():
+        if mne.startswith("_") or result is None:
+            continue
+        if result.get("engagement_vintage_df") is not None:
+            all_eng_vintage.append(result["engagement_vintage_df"])
+
+    if all_eng_vintage:
+        combined = pd.concat(all_eng_vintage, ignore_index=True)
+        spark_df = spark.createDataFrame(combined)
+        path = f"{base_path}/engagement_vintage.csv"
+        spark_df.coalesce(1).write.mode("overwrite").option("header", "true").csv(path)
+        print(f"Exported engagement_vintage.csv: {len(combined):,} rows")
+        exported.append(path)
+
+    # 4. Summary (final day per cohort)
+    all_summary = []
+    for mne, result in results.items():
+        if mne.startswith("_") or result is None:
+            continue
+        if result.get("summary_df") is not None:
+            all_summary.append(result["summary_df"])
+
+    if all_summary:
+        combined = pd.concat(all_summary, ignore_index=True)
+        spark_df = spark.createDataFrame(combined)
+        path = f"{base_path}/summary.csv"
+        spark_df.coalesce(1).write.mode("overwrite").option("header", "true").csv(path)
+        print(f"Exported summary.csv: {len(combined):,} rows")
+        exported.append(path)
+
+    print(f"\n{'='*60}")
+    print(f"EXPORT COMPLETE: {len(exported)} files to {base_path}/")
+    print(f"{'='*60}")
+
+    return exported
+
+
 def export_to_hdfs_csv(results, spark, hdfs_path="/user/427966379/vintage_data.csv"):
-    """Export vintage results to HDFS as CSV."""
+    """Export vintage results to HDFS as CSV (legacy - use export_all_to_hdfs instead)."""
     all_data = []
 
     for mne, result in results.items():
@@ -1098,13 +1305,19 @@ spark = SparkSession.builder.appName("Vintage Analysis").getOrCreate()
 
 print("""
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                     VINTAGE CURVE ANALYSIS ENGINE                             ║
+║                     VINTAGE AUTOMATION ENGINE                                 ║
 ║                                                                              ║
 ║  Architecture: SuperFact 4-Layer Framework                                   ║
 ║  - Layer 1: Experiment Metadata (tactic_evnt_hist)                           ║
 ║  - Layer 2: Campaign Metadata (CAMPAIGN_METADATA) [SWAP POINT]               ║
 ║  - Layer 3: Success Definitions (SUCCESS_DEFINITIONS) [SWAP POINT]           ║
 ║  - Layer 4: Client Journey (fulfillment, engagement, outcome)                ║
+║                                                                              ║
+║  Outputs:                                                                    ║
+║  - vintage_curves.csv: Primary success vintage by cohort                     ║
+║  - channel_breakdown.csv: Client distribution by channel                     ║
+║  - engagement_vintage.csv: Open/Click rate curves by cohort                  ║
+║  - summary.csv: Final day lift summary                                       ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -1120,6 +1333,9 @@ Usage:
   # Without engagement data (faster)
   results = run_vintage_analysis(spark, 'VCN', include_engagement=False)
 
-  # Export to HDFS
+  # Export ALL outputs to HDFS (4 files)
+  export_all_to_hdfs(results, spark)
+
+  # Legacy single file export
   export_to_hdfs_csv(results, spark)
 """)

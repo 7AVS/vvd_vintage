@@ -17,19 +17,25 @@ import pandas as pd
 import json
 from IPython.display import display, HTML
 
-def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title="VVD Vintage Curves"):
+def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title="Vintage Automation Dashboard"):
     """
     Generate interactive HTML dashboard from vintage analysis results.
 
     Args:
-        results: Dictionary from run_all_campaigns() or dict of {mne: {"vintage_df": df, "summary_df": df, "engagement_summary_df": df}}
+        results: Dictionary from run_all_campaigns() containing:
+            - vintage_df: Primary success vintage curves
+            - channel_breakdown_df: Client counts by channel
+            - engagement_vintage_df: Open/click rate curves by cohort
+            - engagement_summary_df: Overall engagement summary
         output_path: Where to save the HTML file
         title: Dashboard title
     """
 
-    # Collect all vintage data
-    all_data = []
-    all_engagement = []
+    # Collect all data types
+    all_vintage = []
+    all_channel = []
+    all_engagement_vintage = []
+    all_engagement_summary = []
     campaigns = []
 
     for mne, result in results.items():
@@ -38,31 +44,60 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
         if result is None:
             continue
 
-        df = result["vintage_df"].copy()
-        df["MNE"] = mne
-        all_data.append(df)
         campaigns.append(mne)
 
-        # Collect engagement data if available
-        if result.get("engagement_summary_df") is not None and not result["engagement_summary_df"].empty:
-            eng_df = result["engagement_summary_df"].copy()
-            all_engagement.append(eng_df)
+        # Primary success vintage
+        df = result["vintage_df"].copy()
+        df["MNE"] = mne
+        df["METRIC"] = "PRIMARY_SUCCESS"
+        all_vintage.append(df)
 
-    if not all_data:
+        # Channel breakdown
+        if result.get("channel_breakdown_df") is not None and not result["channel_breakdown_df"].empty:
+            all_channel.append(result["channel_breakdown_df"])
+
+        # Engagement vintage (open rate, click rate curves)
+        if result.get("engagement_vintage_df") is not None and not result["engagement_vintage_df"].empty:
+            all_engagement_vintage.append(result["engagement_vintage_df"])
+
+        # Engagement summary
+        if result.get("engagement_summary_df") is not None and not result["engagement_summary_df"].empty:
+            all_engagement_summary.append(result["engagement_summary_df"])
+
+    if not all_vintage:
         print("No data to generate dashboard")
         return
 
-    combined_df = pd.concat(all_data, ignore_index=True)
+    combined_vintage = pd.concat(all_vintage, ignore_index=True)
 
-    # Combine engagement data if available
+    # Combine channel breakdown
+    channel_json = "[]"
+    if all_channel:
+        combined_channel = pd.concat(all_channel, ignore_index=True)
+        channel_json = combined_channel.to_json(orient="records")
+
+    # Combine engagement vintage (for metric dropdown)
+    engagement_vintage_json = "[]"
+    if all_engagement_vintage:
+        combined_eng_vintage = pd.concat(all_engagement_vintage, ignore_index=True)
+        engagement_vintage_json = combined_eng_vintage.to_json(orient="records")
+
+    # Combine engagement summary
     engagement_json = "[]"
-    if all_engagement:
-        combined_eng = pd.concat(all_engagement, ignore_index=True)
+    if all_engagement_summary:
+        combined_eng = pd.concat(all_engagement_summary, ignore_index=True)
         engagement_json = combined_eng.to_json(orient="records")
 
     # Convert to JSON for embedding
-    data_json = combined_df.to_json(orient="records")
+    data_json = combined_vintage.to_json(orient="records")
     campaigns_json = json.dumps(sorted(campaigns))
+
+    # Log what we're including
+    print(f"Dashboard data:")
+    print(f"  - Vintage curves: {len(combined_vintage)} rows")
+    print(f"  - Channel breakdown: {len(all_channel)} campaigns")
+    print(f"  - Engagement vintage: {len(all_engagement_vintage)} campaigns")
+    print(f"  - Engagement summary: {len(all_engagement_summary)} campaigns")
 
     html_content = f'''<!DOCTYPE html>
 <html lang="en">
@@ -226,6 +261,14 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
         </select>
     </div>
     <div class="control-group">
+        <label>Metric</label>
+        <select id="metricSelect" onchange="updateChart()">
+            <option value="PRIMARY_SUCCESS">Primary Success</option>
+            <option value="OPEN_RATE">Open Rate</option>
+            <option value="CLICK_RATE">Click Rate</option>
+        </select>
+    </div>
+    <div class="control-group">
         <label>Channel</label>
         <select id="channelSelect" onchange="updateChart()">
             <option value="all">All Channels</option>
@@ -239,15 +282,9 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
             <!-- Populated by JS -->
         </select>
     </div>
-    <div class="control-group">
-        <label>Aggregation</label>
-        <select id="aggSelect" onchange="updateChart()">
-            <option value="none">By Deployment</option>
-            <option value="monthly">Monthly</option>
-        </select>
-    </div>
     <div class="tabs">
         <div class="tab active" onclick="switchTab('vintage')">Vintage Curves</div>
+        <div class="tab" onclick="switchTab('channel')">Channel Breakdown</div>
         <div class="tab" onclick="switchTab('engagement')">Engagement Funnel</div>
     </div>
 </div>
@@ -277,6 +314,30 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
                 </thead>
                 <tbody id="summaryBody">
                 </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Channel Breakdown View -->
+    <div id="channelView" class="hidden">
+        <div class="chart-container">
+            <h3 style="margin-bottom: 15px; color: #003366;">Channel Distribution by Cohort</h3>
+            <div id="channelChart" style="height: 400px;"></div>
+        </div>
+        <div class="summary-table">
+            <h3>Channel Breakdown - Client Counts</h3>
+            <table id="channelTable">
+                <thead>
+                    <tr>
+                        <th>Cohort</th>
+                        <th>Group</th>
+                        <th>Channel</th>
+                        <th>Clients</th>
+                        <th>Successes</th>
+                        <th>Success Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="channelBody"></tbody>
             </table>
         </div>
     </div>
@@ -320,12 +381,14 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
 </div>
 
 <div class="footer">
-    VVD Vintage Dashboard | Marketing Analytics | SuperFact Layer 4: Client Journey
+    Vintage Automation Dashboard | Marketing Analytics | SuperFact 4-Layer Framework
 </div>
 
 <script>
 // Embedded data
 const rawData = {data_json};
+const engagementVintageData = {engagement_vintage_json};
+const channelData = {channel_json};
 const engagementData = {engagement_json};
 const campaigns = {campaigns_json};
 
@@ -344,14 +407,90 @@ campaigns.forEach(c => {{
 // Tab switching
 function switchTab(tab) {{
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.tab:${{tab === 'vintage' ? 'first-child' : 'last-child'}}`).classList.add('active');
+    const tabs = document.querySelectorAll('.tab');
+    if (tab === 'vintage') tabs[0].classList.add('active');
+    else if (tab === 'channel') tabs[1].classList.add('active');
+    else tabs[2].classList.add('active');
 
     document.getElementById('vintageView').classList.toggle('hidden', tab !== 'vintage');
+    document.getElementById('channelView').classList.toggle('hidden', tab !== 'channel');
     document.getElementById('engagementView').classList.toggle('hidden', tab !== 'engagement');
 
     if (tab === 'engagement') {{
         updateEngagement();
     }}
+    if (tab === 'channel') {{
+        updateChannelBreakdown();
+    }}
+}}
+
+// Update channel breakdown view
+function updateChannelBreakdown() {{
+    const mne = document.getElementById('campaignSelect').value;
+    const cohortFilter = document.getElementById('cohortSelect').value;
+
+    let data = channelData.filter(d => d.MNE === mne);
+    if (cohortFilter !== 'all') {{
+        data = data.filter(d => d.COHORT === cohortFilter);
+    }}
+
+    if (data.length === 0) {{
+        document.getElementById('channelChart').innerHTML = '<p style="text-align:center;color:#666;padding:50px;">No channel data available</p>';
+        document.getElementById('channelBody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#666;">No data</td></tr>';
+        return;
+    }}
+
+    // Group by channel for chart
+    const channelGroups = {{}};
+    data.forEach(row => {{
+        const ch = row.CHANNEL || 'UNKNOWN';
+        if (!channelGroups[ch]) channelGroups[ch] = {{ TEST: 0, CONTROL: 0 }};
+        channelGroups[ch][row.GROUP] = (channelGroups[ch][row.GROUP] || 0) + row.CLIENT_COUNT;
+    }});
+
+    const channels = Object.keys(channelGroups).sort();
+    const testCounts = channels.map(c => channelGroups[c].TEST || 0);
+    const ctrlCounts = channels.map(c => channelGroups[c].CONTROL || 0);
+
+    const traces = [
+        {{
+            x: channels,
+            y: testCounts,
+            name: 'TEST',
+            type: 'bar',
+            marker: {{ color: '#2E86AB' }}
+        }},
+        {{
+            x: channels,
+            y: ctrlCounts,
+            name: 'CONTROL',
+            type: 'bar',
+            marker: {{ color: '#A23B72' }}
+        }}
+    ];
+
+    Plotly.newPlot('channelChart', traces, {{
+        title: mne + ' - Client Distribution by Channel',
+        barmode: 'group',
+        xaxis: {{ title: 'Channel' }},
+        yaxis: {{ title: 'Client Count' }}
+    }}, {{ responsive: true }});
+
+    // Update table
+    const tbody = document.getElementById('channelBody');
+    tbody.innerHTML = '';
+    data.sort((a, b) => a.COHORT.localeCompare(b.COHORT) || a.GROUP.localeCompare(b.GROUP)).forEach(row => {{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${{row.COHORT}}</td>
+            <td>${{row.GROUP}}</td>
+            <td>${{row.CHANNEL || 'UNKNOWN'}}</td>
+            <td>${{(row.CLIENT_COUNT || 0).toLocaleString()}}</td>
+            <td>${{(row.SUCCESS_COUNT || 0).toLocaleString()}}</td>
+            <td>${{(row.SUCCESS_RATE || 0).toFixed(2)}}%</td>
+        `;
+        tbody.appendChild(tr);
+    }});
 }}
 
 // Get unique channels for selected campaign
@@ -449,25 +588,29 @@ function updateChart() {{
     updateCohortDropdown();
 
     const mne = document.getElementById('campaignSelect').value;
+    const metric = document.getElementById('metricSelect').value;
     const channelFilter = document.getElementById('channelSelect').value;
     const cohortFilter = document.getElementById('cohortSelect').value;
-    const agg = document.getElementById('aggSelect').value;
 
-    // Filter data
-    let data = rawData.filter(d => d.MNE === mne);
+    // Select data source based on metric
+    let data;
+    let yAxisLabel;
+    let chartTitle;
 
-    // Filter by channel if selected
-    if (channelFilter !== 'all') {{
-        data = data.filter(d => (d.CHANNEL || 'ALL') === channelFilter);
+    if (metric === 'PRIMARY_SUCCESS') {{
+        // Use primary vintage data
+        data = rawData.filter(d => d.MNE === mne);
+        yAxisLabel = 'Cumulative Conversion Rate (%)';
+        chartTitle = mne + ' - Primary Success (Test: solid, Control: dashed)';
+    }} else {{
+        // Use engagement vintage data (OPEN_RATE, CLICK_RATE)
+        data = engagementVintageData.filter(d => d.MNE === mne && d.METRIC === metric);
+        yAxisLabel = metric === 'OPEN_RATE' ? 'Cumulative Open Rate (%)' : 'Cumulative Click Rate (%)';
+        chartTitle = mne + ' - ' + (metric === 'OPEN_RATE' ? 'Email Open Rate' : 'Email Click Rate') + ' by Cohort';
     }}
 
     if (cohortFilter !== 'all') {{
         data = data.filter(d => d.COHORT === cohortFilter);
-    }}
-
-    // Aggregate if needed
-    if (agg === 'monthly') {{
-        data = aggregateMonthly(data);
     }}
 
     // Get unique cohorts
@@ -477,37 +620,57 @@ function updateChart() {{
     const traces = [];
     const colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#3B1F2B', '#95190C', '#610345', '#044B7F', '#107E7D', '#FFD700'];
 
-    cohorts.forEach((cohort, i) => {{
-        const cohortData = data.filter(d => d.COHORT === cohort).sort((a, b) => a.DAY - b.DAY);
-        const color = colors[i % colors.length];
+    if (metric === 'PRIMARY_SUCCESS') {{
+        // Primary success: Test vs Control
+        cohorts.forEach((cohort, i) => {{
+            const cohortData = data.filter(d => d.COHORT === cohort).sort((a, b) => a.DAY - b.DAY);
+            const color = colors[i % colors.length];
 
-        // Test line
-        traces.push({{
-            x: cohortData.map(d => d.DAY),
-            y: cohortData.map(d => d.TEST_RATE),
-            name: cohort + ' Test',
-            mode: 'lines+markers',
-            line: {{ color: color, width: 2 }},
-            marker: {{ size: 4 }},
-            legendgroup: cohort
-        }});
+            // Test line
+            traces.push({{
+                x: cohortData.map(d => d.DAY),
+                y: cohortData.map(d => d.TEST_RATE),
+                name: cohort + ' Test',
+                mode: 'lines+markers',
+                line: {{ color: color, width: 2 }},
+                marker: {{ size: 4 }},
+                legendgroup: cohort
+            }});
 
-        // Control line (dashed)
-        traces.push({{
-            x: cohortData.map(d => d.DAY),
-            y: cohortData.map(d => d.CTRL_RATE),
-            name: cohort + ' Control',
-            mode: 'lines+markers',
-            line: {{ color: color, width: 2, dash: 'dash' }},
-            marker: {{ size: 4, symbol: 'square' }},
-            legendgroup: cohort
+            // Control line (dashed)
+            traces.push({{
+                x: cohortData.map(d => d.DAY),
+                y: cohortData.map(d => d.CTRL_RATE),
+                name: cohort + ' Control',
+                mode: 'lines+markers',
+                line: {{ color: color, width: 2, dash: 'dash' }},
+                marker: {{ size: 4, symbol: 'square' }},
+                legendgroup: cohort
+            }});
         }});
-    }});
+    }} else {{
+        // Engagement metrics: By group (TEST only for email metrics)
+        cohorts.forEach((cohort, i) => {{
+            const cohortData = data.filter(d => d.COHORT === cohort && d.GROUP === 'TEST').sort((a, b) => a.DAY - b.DAY);
+            const color = colors[i % colors.length];
+
+            if (cohortData.length > 0) {{
+                traces.push({{
+                    x: cohortData.map(d => d.DAY),
+                    y: cohortData.map(d => d.CUMULATIVE_RATE),
+                    name: cohort,
+                    mode: 'lines+markers',
+                    line: {{ color: color, width: 2 }},
+                    marker: {{ size: 4 }}
+                }});
+            }}
+        }});
+    }}
 
     const layout = {{
-        title: mne + ' - Vintage Curves (Test: solid, Control: dashed)',
+        title: chartTitle,
         xaxis: {{ title: 'Days from Treatment', rangemode: 'tozero' }},
-        yaxis: {{ title: 'Cumulative Conversion Rate (%)', rangemode: 'tozero' }},
+        yaxis: {{ title: yAxisLabel, rangemode: 'tozero' }},
         legend: {{ orientation: 'v', x: 1.02, y: 1 }},
         hovermode: 'closest',
         margin: {{ r: 150 }}
@@ -515,12 +678,22 @@ function updateChart() {{
 
     Plotly.newPlot('vintageChart', traces, layout, {{ responsive: true }});
 
-    // Update summary table
-    updateSummaryTable(data, cohorts);
+    // Update summary table (only for primary success)
+    if (metric === 'PRIMARY_SUCCESS') {{
+        updateSummaryTable(data, cohorts);
+    }} else {{
+        // Clear summary for engagement metrics
+        document.getElementById('summaryBody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:#666;">Summary available for Primary Success metric only</td></tr>';
+    }}
 
     // Also update engagement if on that tab
     if (!document.getElementById('engagementView').classList.contains('hidden')) {{
         updateEngagement();
+    }}
+
+    // Update channel breakdown if on that tab
+    if (!document.getElementById('channelView') || !document.getElementById('channelView').classList.contains('hidden')) {{
+        updateChannelBreakdown();
     }}
 }}
 
@@ -681,11 +854,12 @@ updateChart();
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(html_content)
 
-    print(f"Dashboard generated: {output_path}")
+    print(f"\nDashboard generated: {output_path}")
     print(f"Campaigns included: {', '.join(campaigns)}")
-    print(f"Total vintage data points: {len(combined_df)}")
-    if all_engagement:
-        print(f"Engagement data: {len(all_engagement)} campaigns")
+    print(f"Features:")
+    print(f"  - Metric dropdown: Primary Success, Open Rate, Click Rate")
+    print(f"  - Channel breakdown tab: {len(all_channel)} campaigns with data")
+    print(f"  - Engagement funnel tab: {len(all_engagement_summary)} campaigns with data")
 
 
 def display_dashboard(results, title="VVD Vintage Curves"):

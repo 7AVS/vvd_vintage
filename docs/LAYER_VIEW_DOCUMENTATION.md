@@ -54,7 +54,7 @@ A high-level view of the code organized by SuperFact Layer. Shows which code blo
 │  ║                                                                                    ║ │
 │  ║  Code:     load_fulfillment(), load_email_engagement(), load_success_outcome()     ║ │
 │  ║  Config:   PATHS["visa_dr_crd"], PATHS["pos_txn"], EDW queries                     ║ │
-│  ║  Fields:   FULFILLMENT_FLAG, EMAIL_SENT/OPENED/CLICKED, SUCCESS_FLAG               ║ │
+│  ║  Fields:   EMAIL_SENT/OPENED/CLICKED/UNSUBSCRIBED, SUCCESS_FLAG                    ║ │
 │  ║  Source:   Multiple (HIVE parquet + EDW Teradata)                                  ║ │
 │  ║  Swap:     → Unified Client Journey semantic layer                                 ║ │
 │  ╚═══════════════════════════════════════════════════════════════════════════════════╝ │
@@ -343,15 +343,18 @@ if filters.get("ISS_DT_NOT_NULL"):
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
 │  FULFILLMENT (load_fulfillment)                                            │
-│  ├── Source: DG6V01.TACTIC_EVNT_IP_AR_HIST (EDW/Teradata)                  │
-│  ├── Output: FULFILLMENT_FLAG, FULFILLMENT_DT, FULFILLMENT_AMT             │
-│  ├── Today: Direct EDW query                                               │
-│  └── Future: Unified Client Journey semantic layer                         │
+│  ├── Concept: "Was the contact actually delivered?"                        │
+│  ├── For EMAIL: Returns None - uses EMAIL_SENT as fulfillment indicator    │
+│  ├── For other channels: Would need channel-specific fulfillment source    │
+│  └── Future: Per-channel fulfillment tracking                              │
 │                                                                            │
 │  EMAIL ENGAGEMENT (load_email_engagement)                                  │
 │  ├── Source: DTZV01.VENDOR_FEEDBACK_MASTER + VENDOR_FEEDBACK_EVENT (EDW)   │
-│  ├── Output: EMAIL_SENT, EMAIL_OPENED, EMAIL_CLICKED, EMAIL_BOUNCED        │
+│  ├── Output: EMAIL_SENT, EMAIL_OPENED, EMAIL_CLICKED, EMAIL_UNSUBSCRIBED,  │
+│  │           EMAIL_BOUNCED (with corresponding _DT fields)                 │
 │  ├── Disposition codes: 1=sent, 2=opened, 3=clicked, 4=unsub, 5=bounce     │
+│  ├── Channel filter: Only for TACTIC_CELL_CD = 'EM' clients                │
+│  ├── Note: EMAIL_SENT serves as fulfillment for email channel              │
 │  ├── Today: Direct EDW query with pivot                                    │
 │  └── Future: Engagement semantic layer                                     │
 │                                                                            │
@@ -384,12 +387,12 @@ if filters.get("ISS_DT_NOT_NULL"):
         ▼                     ▼                     ▼
 ┌───────────────┐   ┌─────────────────┐   ┌───────────────────┐
 │ Fulfillment   │   │ Email Engagement│   │ Success Outcome   │
-│               │   │                 │   │                   │
-│ Was contact   │   │ Was email       │   │ Did they          │
-│ delivered?    │   │ sent/opened/    │   │ convert?          │
-│               │   │ clicked?        │   │                   │
-│ TACTIC_EVNT_  │   │ VENDOR_FEEDBACK │   │ VISA_DR_CRD       │
-│ IP_AR_HIST    │   │ _MASTER/_EVENT  │   │ POS_TXN / EDW     │
+│               │   │ (EM channel)    │   │                   │
+│ EMAIL: uses   │   │ sent/opened/    │   │ Did they          │
+│ EMAIL_SENT    │   │ clicked/unsub/  │   │ convert?          │
+│ Other: TBD    │   │ bounced         │   │                   │
+│               │   │ VENDOR_FEEDBACK │   │ VISA_DR_CRD       │
+│               │   │ _MASTER/_EVENT  │   │ POS_TXN / EDW     │
 └───────┬───────┘   └────────┬────────┘   └─────────┬─────────┘
         │                    │                      │
         └────────────────────┼──────────────────────┘
@@ -447,8 +450,7 @@ if filters.get("ISS_DT_NOT_NULL"):
 │  • COHORT - when they entered experiment                                   │
 │  • SUCCESS_FLAG - did they convert (0/1)                                   │
 │  • DAYS_TO_SUCCESS - how long it took                                      │
-│  • EMAIL_SENT/OPENED/CLICKED - engagement flags (optional)                 │
-│  • FULFILLMENT_FLAG - was contact delivered (optional)                     │
+│  • EMAIL_SENT/OPENED/CLICKED/UNSUBSCRIBED - engagement flags (optional)    │
 │                                                                            │
 │  They don't care WHERE this data comes from.                               │
 │  Whether it's hardcoded config or dynamic queries,                         │

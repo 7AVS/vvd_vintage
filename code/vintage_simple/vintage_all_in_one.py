@@ -283,60 +283,34 @@ def load_tactic(spark, mne):
 # LAYER 4: CLIENT JOURNEY - FULFILLMENT
 # =============================================================================
 # Verifies that the contact was actually delivered.
-# Answers: "Was the planned treatment actually sent to the client?"
+# For EMAIL channel: fulfillment = email was sent (disposition_cd=1 in VENDOR_FEEDBACK)
+# For other channels: would need separate fulfillment tracking
 #
-# Source: TACTIC_EVNT_IP_AR_HIST (Teradata via EDW)
+# NOTE: For email campaigns, we use EMAIL_SENT from load_email_engagement() as
+# the fulfillment indicator. This function returns None for email-only analysis.
 # =============================================================================
 
-def load_fulfillment(spark, tactic_ids):
+def load_fulfillment(spark, tactic_ids, channel="EMAIL"):
     """
     Layer 4: Load fulfillment data to verify contact delivery.
 
-    Checks if the planned treatment was actually delivered to the client.
+    For EMAIL channel: Returns None - use EMAIL_SENT from load_email_engagement()
+    For other channels: Would query channel-specific fulfillment source
 
-    Source: DG6V01.TACTIC_EVNT_IP_AR_HIST (Teradata via EDW)
-
-    Returns DataFrame with:
-    - CLNT_NO: Client number
-    - FULFILLMENT_FLAG: 1 if fulfilled, 0 otherwise
-    - FULFILLMENT_DT: Date of fulfillment
-    - FULFILLMENT_AMT: Amount (if applicable)
+    The concept of fulfillment varies by channel:
+    - EMAIL: email was sent (disposition_cd=1)
+    - MOBILE: banner was displayed
+    - ONB: offer was shown in online banking
+    - ONO: lead was delivered to advisory centre
     """
-    # Build tactic_id filter for query
-    tactic_id_pattern = tactic_ids[0][:7] + "%" if tactic_ids else "2025%"
-
-    query = f"""
-    SELECT DISTINCT
-        CAST(CLNT_NO AS VARCHAR(20)) AS CLNT_NO,
-        1 AS FULFILLMENT_FLAG,
-        ADDNL_DATA_DT AS FULFILLMENT_DT,
-        AMT AS FULFILLMENT_AMT
-    FROM DG6V01.TACTIC_EVNT_IP_AR_HIST
-    WHERE tactic_id LIKE '{tactic_id_pattern}'
-    """
-
-    print(f"    [Layer 4] Loading fulfillment data from EDW...")
-
-    try:
-        cursor = EDW.cursor()
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        columns = [desc[0] for desc in cursor.description]
-        cursor.close()
-
-        pdf = pd.DataFrame(rows, columns=columns)
-        pdf['CLNT_NO'] = pdf['CLNT_NO'].astype(str).str.strip().str.lstrip('0')
-
-        print(f"    [Layer 4] Retrieved {len(pdf):,} fulfillment records")
-
-        if pdf.empty:
-            return None
-
-        return spark.createDataFrame(pdf)
-
-    except Exception as e:
-        print(f"    [Layer 4] Fulfillment data not available: {str(e)}")
+    if channel == "EMAIL":
+        # For email, fulfillment = email sent, which is captured in load_email_engagement()
+        print(f"    [Layer 4] Email fulfillment: Using EMAIL_SENT from engagement data")
         return None
+
+    # Placeholder for future channel-specific fulfillment
+    print(f"    [Layer 4] Fulfillment for channel '{channel}' not yet implemented")
+    return None
 
 # =============================================================================
 # LAYER 4: CLIENT JOURNEY - EMAIL ENGAGEMENT
@@ -364,9 +338,10 @@ def load_email_engagement(spark, treatment_ids):
 
     Returns DataFrame with:
     - CLNT_NO, TREATMENT_ID
-    - EMAIL_SENT, EMAIL_SENT_DT
+    - EMAIL_SENT, EMAIL_SENT_DT (also serves as fulfillment for email channel)
     - EMAIL_OPENED, EMAIL_OPENED_DT
     - EMAIL_CLICKED, EMAIL_CLICKED_DT
+    - EMAIL_UNSUBSCRIBED, EMAIL_UNSUBSCRIBED_DT
     - EMAIL_BOUNCED, EMAIL_BOUNCED_DT
     """
     # Build treatment_id filter
@@ -380,11 +355,13 @@ def load_email_engagement(spark, treatment_ids):
         MAX(CASE WHEN disposition_cd = 1 THEN 1 ELSE 0 END) AS EMAIL_SENT,
         MAX(CASE WHEN disposition_cd = 2 THEN 1 ELSE 0 END) AS EMAIL_OPENED,
         MAX(CASE WHEN disposition_cd = 3 THEN 1 ELSE 0 END) AS EMAIL_CLICKED,
+        MAX(CASE WHEN disposition_cd = 4 THEN 1 ELSE 0 END) AS EMAIL_UNSUBSCRIBED,
         MAX(CASE WHEN disposition_cd = 5 THEN 1 ELSE 0 END) AS EMAIL_BOUNCED,
 
         MAX(CASE WHEN disposition_cd = 1 THEN CAST(disposition_dt_tm AS DATE) END) AS EMAIL_SENT_DT,
         MAX(CASE WHEN disposition_cd = 2 THEN CAST(disposition_dt_tm AS DATE) END) AS EMAIL_OPENED_DT,
         MAX(CASE WHEN disposition_cd = 3 THEN CAST(disposition_dt_tm AS DATE) END) AS EMAIL_CLICKED_DT,
+        MAX(CASE WHEN disposition_cd = 4 THEN CAST(disposition_dt_tm AS DATE) END) AS EMAIL_UNSUBSCRIBED_DT,
         MAX(CASE WHEN disposition_cd = 5 THEN CAST(disposition_dt_tm AS DATE) END) AS EMAIL_BOUNCED_DT
 
     FROM DTZV01.VENDOR_FEEDBACK_MASTER FEEDBACK_MASTER
@@ -579,6 +556,7 @@ def enrich_with_engagement(success_df, email_df, fulfillment_df):
             F.col("EMAIL_SENT"),
             F.col("EMAIL_OPENED"),
             F.col("EMAIL_CLICKED"),
+            F.col("EMAIL_UNSUBSCRIBED"),
             F.col("EMAIL_BOUNCED")
         )
         result = result.join(
@@ -588,7 +566,7 @@ def enrich_with_engagement(success_df, email_df, fulfillment_df):
         ).drop("EMAIL_CLNT_NO")
 
         # Fill nulls with 0
-        for col in ["EMAIL_SENT", "EMAIL_OPENED", "EMAIL_CLICKED", "EMAIL_BOUNCED"]:
+        for col in ["EMAIL_SENT", "EMAIL_OPENED", "EMAIL_CLICKED", "EMAIL_UNSUBSCRIBED", "EMAIL_BOUNCED"]:
             result = result.withColumn(col, F.coalesce(F.col(col), F.lit(0)))
 
     # Add fulfillment if available
@@ -721,8 +699,14 @@ def generate_summary(lift_df, mne):
 
 
 def generate_engagement_summary(success_df, mne):
-    """Generate email engagement and fulfillment summary."""
-    # Check if engagement columns exist
+    """Generate email engagement summary with funnel metrics.
+
+    Rates are calculated as:
+    - SEND_RATE: emails sent / total clients in experiment
+    - OPEN_RATE: emails opened / emails sent
+    - CLICK_RATE: emails clicked / emails sent
+    - UNSUB_RATE: unsubscribes / emails sent
+    """
     columns = success_df.columns
 
     summary_data = {"MNE": mne}
@@ -730,25 +714,32 @@ def generate_engagement_summary(success_df, mne):
     total = success_df.count()
     summary_data["TOTAL_CLIENTS"] = total
 
+    email_sent = 0
     if "EMAIL_SENT" in columns:
         email_sent = success_df.filter(F.col("EMAIL_SENT") == 1).count()
         summary_data["EMAIL_SENT"] = email_sent
-        summary_data["EMAIL_SENT_RATE"] = round(email_sent / total * 100, 2) if total > 0 else 0
+        summary_data["SEND_RATE"] = round(email_sent / total * 100, 2) if total > 0 else 0
 
+    # Rates below are calculated based on emails sent (the actual audience)
     if "EMAIL_OPENED" in columns:
         email_opened = success_df.filter(F.col("EMAIL_OPENED") == 1).count()
         summary_data["EMAIL_OPENED"] = email_opened
-        summary_data["EMAIL_OPEN_RATE"] = round(email_opened / total * 100, 2) if total > 0 else 0
+        summary_data["OPEN_RATE"] = round(email_opened / email_sent * 100, 2) if email_sent > 0 else 0
 
     if "EMAIL_CLICKED" in columns:
         email_clicked = success_df.filter(F.col("EMAIL_CLICKED") == 1).count()
         summary_data["EMAIL_CLICKED"] = email_clicked
-        summary_data["EMAIL_CLICK_RATE"] = round(email_clicked / total * 100, 2) if total > 0 else 0
+        summary_data["CLICK_RATE"] = round(email_clicked / email_sent * 100, 2) if email_sent > 0 else 0
 
-    if "FULFILLMENT_FLAG" in columns:
-        fulfilled = success_df.filter(F.col("FULFILLMENT_FLAG") == 1).count()
-        summary_data["FULFILLED"] = fulfilled
-        summary_data["FULFILLMENT_RATE"] = round(fulfilled / total * 100, 2) if total > 0 else 0
+    if "EMAIL_UNSUBSCRIBED" in columns:
+        email_unsub = success_df.filter(F.col("EMAIL_UNSUBSCRIBED") == 1).count()
+        summary_data["EMAIL_UNSUBSCRIBED"] = email_unsub
+        summary_data["UNSUB_RATE"] = round(email_unsub / email_sent * 100, 2) if email_sent > 0 else 0
+
+    if "EMAIL_BOUNCED" in columns:
+        email_bounced = success_df.filter(F.col("EMAIL_BOUNCED") == 1).count()
+        summary_data["EMAIL_BOUNCED"] = email_bounced
+        summary_data["BOUNCE_RATE"] = round(email_bounced / email_sent * 100, 2) if email_sent > 0 else 0
 
     return pd.DataFrame([summary_data])
 
@@ -890,17 +881,27 @@ def run_vintage_analysis(spark, mne, show_plots=True, verbose=True, include_enga
     # Layer 4: Load client journey data
     log("\n[Layer 4] Loading client journey data...")
 
-    # 4a: Fulfillment (optional)
+    channel = campaign.get("channel", "EMAIL")
+
+    # 4a: Fulfillment
+    # For EMAIL: fulfillment = email sent (captured in email engagement data)
+    # For other channels: would need channel-specific fulfillment source
     fulfillment_df = None
     if include_engagement:
-        fulfillment_df = load_fulfillment(spark, tactic_ids)
+        fulfillment_df = load_fulfillment(spark, tactic_ids, channel=channel)
 
-    # 4b: Email engagement (optional)
+    # 4b: Email engagement (only for email channel clients)
     email_df = None
-    if include_engagement and campaign.get("channel") == "EMAIL":
-        # For email engagement, we'd need treatment IDs - using tactic_ids as proxy
-        # In production, would need proper treatment ID mapping
-        email_df = load_email_engagement(spark, tactic_ids[:5] if tactic_ids else [])
+    if include_engagement and channel == "EMAIL":
+        # Filter tactic to only email channel clients (TACTIC_CELL_CD = 'EM')
+        email_clients = tactic_df.filter(F.col("TACTIC_CELL_CD") == "EM")
+        email_client_count = email_clients.count()
+        log(f"    [Layer 4] Email channel clients (TACTIC_CELL_CD=EM): {email_client_count:,}")
+
+        if email_client_count > 0:
+            # Get tactic IDs for email clients only
+            email_tactic_ids = [row.TACTIC_ID for row in email_clients.select("TACTIC_ID").distinct().collect()]
+            email_df = load_email_engagement(spark, email_tactic_ids[:5] if email_tactic_ids else [])
 
     # 4c: Success outcome
     log("\n[Layer 4] Loading success outcome...")
@@ -911,6 +912,8 @@ def run_vintage_analysis(spark, mne, show_plots=True, verbose=True, include_enga
     success_df = detect_success(tactic_df, success_table, config)
 
     # Enrich with engagement data if available
+    # Note: email_df only contains data for TACTIC_CELL_CD='EM' clients
+    # Non-email clients will have NULL/0 for email engagement columns
     if include_engagement and (email_df is not None or fulfillment_df is not None):
         log("[Engine] Enriching with engagement data...")
         success_df = enrich_with_engagement(success_df, email_df, fulfillment_df)

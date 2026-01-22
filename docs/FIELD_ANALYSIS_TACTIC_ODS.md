@@ -2,20 +2,65 @@
 
 Mapping of all available fields, what we're currently using, and what we should leverage.
 
+**Last Updated:** January 22, 2026
+
 ---
 
 ## Quick Summary
 
-| Need | Field | Source | Currently Using? |
-|------|-------|--------|------------------|
-| **Channel** | `chnl_cd` | ODS_MR_HIST | NO |
-| **Test Group** | `tst_grp_cd` | TACTIC_EVNT_HIST | YES (hardcoded TG4) |
-| **Segment** | `rpt_grp_cd` | TACTIC_EVNT_HIST | NO |
-| **Delivery Method** | `delvry_mthd_cd` | ODS_MR_HIST | NO |
-| **Offer Status** | `offr_sts_cd` | ODS_MR_HIST | NO |
-| **Fulfillment Code** | `?` | UNKNOWN | NO - Need to find |
-| **Client ID** | `tactic_evnt_id` / `clnt_id` | TACTIC / ODS | YES |
-| **Treatment Window** | `treatmt_strt_dt`, `treatmt_end_dt` | TACTIC_EVNT_HIST | YES |
+| Need | Field | Source | Status |
+|------|-------|--------|--------|
+| **Channel** | `TACTIC_CELL_CD` | TACTIC_EVNT_HIST | **CONFIRMED** - EM = Email |
+| **Test Group** | `TST_GRP_CD` | TACTIC_EVNT_HIST | Using (TG4 = Test) |
+| **Segment** | `RPT_GRP_CD` | TACTIC_EVNT_HIST | Available, not using yet |
+| **Client ID** | `TACTIC_EVNT_ID` | TACTIC_EVNT_HIST | Using |
+| **Treatment Window** | `TREATMT_STRT_DT`, `TREATMT_END_DT` | TACTIC_EVNT_HIST | Using |
+| **Fulfillment** | N/A | Email sent = fulfillment for email channel | Covered by email metrics |
+
+---
+
+## CONFIRMED: Channel Field
+
+**Field:** `TACTIC_CELL_CD`
+**Source:** TACTIC_EVNT_HIST
+
+| Code | Channel | Notes |
+|------|---------|-------|
+| **EM** | Email | Use this to filter email metrics |
+| IM | Internet/In-Market? | Other channel |
+| Others | TBD | Document as needed |
+
+**Usage:** Filter by `TACTIC_CELL_CD = 'EM'` when calculating email engagement metrics.
+
+**Also available in:** `ADDNL_DECISN_DATA1` (same value) and `Full_Channel` in `TACTIC_DECISN_VRB_INFO`
+
+---
+
+## CONFIRMED: Fulfillment Approach
+
+**Fulfillment = Contact was delivered (by channel)**
+
+For Email channel:
+- Fulfillment = Email was sent
+- Source: VENDOR_FEEDBACK (disposition_cd = 1)
+- **No separate fulfillment table needed for email**
+
+For other channels (future):
+- Each channel will have its own delivery confirmation source
+- Mobile, ONB, ONO - TBD when implemented
+
+---
+
+## Email Metrics Needed
+
+| Metric | Source | Disposition Code |
+|--------|--------|------------------|
+| Send Rate | VENDOR_FEEDBACK | 1 |
+| Open Rate | VENDOR_FEEDBACK | 2 |
+| Click Rate | VENDOR_FEEDBACK | 3 |
+| Unsubscribe Rate | VENDOR_FEEDBACK | 4 |
+
+**Important:** Only calculate for clients where `TACTIC_CELL_CD = 'EM'`
 
 ---
 

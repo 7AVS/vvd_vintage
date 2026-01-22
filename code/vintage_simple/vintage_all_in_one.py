@@ -591,16 +591,11 @@ def enrich_with_engagement(success_df, email_df, fulfillment_df):
 def build_vintage_data(success_df):
     """Build vintage curve data from success detection results.
 
-    Groups by COHORT, GROUP, and CHANNEL (TACTIC_CELL_CD) to allow
-    dashboard filtering by channel.
+    Groups by COHORT and GROUP for lift calculation.
+    Also builds channel breakdown separately for dashboard visibility.
+    (CONTROL has no real channel - only TEST clients have meaningful channel)
     """
-    # Add CHANNEL column from TACTIC_CELL_CD (coalesce nulls to 'ALL')
-    success_df = success_df.withColumn(
-        "CHANNEL",
-        F.coalesce(F.col("TACTIC_CELL_CD"), F.lit("ALL"))
-    )
-
-    group_cols = ["COHORT", "GROUP", "CHANNEL"]
+    group_cols = ["COHORT", "GROUP"]
 
     totals = success_df.groupBy(group_cols).agg(
         F.count("*").alias("TOTAL_CLIENTS"),
@@ -610,7 +605,28 @@ def build_vintage_data(success_df):
         group_cols + ["DAYS_TO_FIRST_SUCCESS"]
     ).agg(F.count("*").alias("SUCCESSES_ON_DAY"))
     vintage = successes.join(totals, on=group_cols, how="left")
-    return vintage.orderBy("COHORT", "CHANNEL", "GROUP", "DAYS_TO_FIRST_SUCCESS")
+    return vintage.orderBy("COHORT", "GROUP", "DAYS_TO_FIRST_SUCCESS")
+
+
+def build_channel_breakdown(success_df):
+    """Build channel breakdown for dashboard visibility.
+
+    Shows distribution of clients by channel (only meaningful for TEST group).
+    CONTROL group won't have real channels since they receive no contact.
+    """
+    # Trim channel values to handle trailing spaces
+    breakdown = success_df.withColumn(
+        "CHANNEL",
+        F.trim(F.coalesce(F.col("TACTIC_CELL_CD"), F.lit("UNKNOWN")))
+    )
+
+    # Count by cohort, group, channel
+    breakdown = breakdown.groupBy("COHORT", "GROUP", "CHANNEL").agg(
+        F.count("*").alias("CLIENT_COUNT"),
+        F.sum("SUCCESS_FLAG").alias("SUCCESS_COUNT")
+    )
+
+    return breakdown.orderBy("COHORT", "GROUP", "CHANNEL")
 
 
 def calculate_ci(test_succ, test_n, ctrl_succ, ctrl_n):
@@ -625,81 +641,68 @@ def calculate_ci(test_succ, test_n, ctrl_succ, ctrl_n):
 
 
 def prepare_vintage_table(vintage_spark_df):
-    """Prepare vintage table with cumulative rates and lift calculations.
-
-    Now includes CHANNEL for dashboard filtering.
-    """
+    """Prepare vintage table with cumulative rates and lift calculations."""
     pdf = vintage_spark_df.toPandas()
     if pdf.empty:
         return pdf
 
-    # Handle CHANNEL column (may not exist in older data)
-    has_channel = "CHANNEL" in pdf.columns
-    if not has_channel:
-        pdf["CHANNEL"] = "ALL"
-
-    group_cols = ["COHORT", "CHANNEL", "GROUP"]
-    pdf = pdf.sort_values(group_cols + ["DAYS_TO_FIRST_SUCCESS"])
-    pdf["CUMULATIVE_SUCCESSES"] = pdf.groupby(group_cols)["SUCCESSES_ON_DAY"].cumsum()
+    pdf = pdf.sort_values(["COHORT", "GROUP", "DAYS_TO_FIRST_SUCCESS"])
+    pdf["CUMULATIVE_SUCCESSES"] = pdf.groupby(["COHORT", "GROUP"])["SUCCESSES_ON_DAY"].cumsum()
     pdf["CUMULATIVE_RATE"] = pdf["CUMULATIVE_SUCCESSES"] / pdf["TOTAL_CLIENTS"] * 100
     pdf = pdf.rename(columns={"DAYS_TO_FIRST_SUCCESS": "DAY"})
 
-    # Get unique combinations
     cohorts = pdf["COHORT"].unique()
-    channels = pdf["CHANNEL"].unique()
     complete_rows = []
 
     for cohort in cohorts:
-        for channel in channels:
-            for group in ["TEST", "CONTROL"]:
-                data = pdf[(pdf["COHORT"] == cohort) & (pdf["CHANNEL"] == channel) & (pdf["GROUP"] == group)]
-                if data.empty:
-                    continue
-                total_clients = data["TOTAL_CLIENTS"].iloc[0]
-                window_days = int(data["WINDOW_DAYS"].iloc[0])
-                max_day = int(data["DAY"].max())
-                cum_successes = 0
-                for day in range(0, min(window_days + 1, max_day + 1)):
-                    day_data = data[data["DAY"] == day]
-                    if not day_data.empty:
-                        cum_successes = day_data["CUMULATIVE_SUCCESSES"].iloc[0]
-                    complete_rows.append({
-                        "COHORT": cohort, "CHANNEL": channel, "GROUP": group, "DAY": day,
-                        "WINDOW_DAYS": window_days, "TOTAL_CLIENTS": total_clients,
-                        "CUMULATIVE_SUCCESSES": cum_successes,
-                        "CUMULATIVE_RATE": cum_successes / total_clients * 100 if total_clients > 0 else 0
-                    })
+        for group in ["TEST", "CONTROL"]:
+            data = pdf[(pdf["COHORT"] == cohort) & (pdf["GROUP"] == group)]
+            if data.empty:
+                continue
+            total_clients = data["TOTAL_CLIENTS"].iloc[0]
+            window_days = int(data["WINDOW_DAYS"].iloc[0])
+            max_day = int(data["DAY"].max())
+            cum_successes = 0
+            for day in range(0, min(window_days + 1, max_day + 1)):
+                day_data = data[data["DAY"] == day]
+                if not day_data.empty:
+                    cum_successes = day_data["CUMULATIVE_SUCCESSES"].iloc[0]
+                complete_rows.append({
+                    "COHORT": cohort, "GROUP": group, "DAY": day,
+                    "WINDOW_DAYS": window_days, "TOTAL_CLIENTS": total_clients,
+                    "CUMULATIVE_SUCCESSES": cum_successes,
+                    "CUMULATIVE_RATE": cum_successes / total_clients * 100 if total_clients > 0 else 0
+                })
 
     complete_df = pd.DataFrame(complete_rows)
 
     lift_rows = []
     for cohort in cohorts:
-        for channel in channels:
-            cdata = complete_df[(complete_df["COHORT"] == cohort) & (complete_df["CHANNEL"] == channel)]
-            tdata = cdata[cdata["GROUP"] == "TEST"]
-            ctdata = cdata[cdata["GROUP"] == "CONTROL"]
-            if tdata.empty or ctdata.empty:
+        cdata = complete_df[complete_df["COHORT"] == cohort]
+        tdata = cdata[cdata["GROUP"] == "TEST"]
+        ctdata = cdata[cdata["GROUP"] == "CONTROL"]
+        if tdata.empty or ctdata.empty:
+            continue
+        window_days = int(tdata["WINDOW_DAYS"].iloc[0])
+        for day in tdata["DAY"].unique():
+            tr = tdata[tdata["DAY"] == day]
+            cr = ctdata[ctdata["DAY"] == day]
+            if tr.empty or cr.empty:
                 continue
-            window_days = int(tdata["WINDOW_DAYS"].iloc[0])
-            for day in tdata["DAY"].unique():
-                tr = tdata[tdata["DAY"] == day]
-                cr = ctdata[ctdata["DAY"] == day]
-                if tr.empty or cr.empty:
-                    continue
-                lift, ci_lo, ci_hi = calculate_ci(
-                    tr["CUMULATIVE_SUCCESSES"].iloc[0], tr["TOTAL_CLIENTS"].iloc[0],
-                    cr["CUMULATIVE_SUCCESSES"].iloc[0], cr["TOTAL_CLIENTS"].iloc[0]
-                )
-                lift_rows.append({
-                    "COHORT": cohort, "CHANNEL": channel, "DAY": day, "WINDOW_DAYS": window_days,
-                    "TEST_CLIENTS": tr["TOTAL_CLIENTS"].iloc[0],
-                    "TEST_SUCCESSES": tr["CUMULATIVE_SUCCESSES"].iloc[0],
-                    "TEST_RATE": tr["CUMULATIVE_RATE"].iloc[0],
-                    "CTRL_CLIENTS": cr["TOTAL_CLIENTS"].iloc[0],
-                    "CTRL_SUCCESSES": cr["CUMULATIVE_SUCCESSES"].iloc[0],
-                    "CTRL_RATE": cr["CUMULATIVE_RATE"].iloc[0],
-                    "ABS_LIFT": lift * 100, "CI_LOWER": ci_lo * 100, "CI_UPPER": ci_hi * 100
-                })
+            lift, ci_lo, ci_hi = calculate_ci(
+                tr["CUMULATIVE_SUCCESSES"].iloc[0], tr["TOTAL_CLIENTS"].iloc[0],
+                cr["CUMULATIVE_SUCCESSES"].iloc[0], cr["TOTAL_CLIENTS"].iloc[0]
+            )
+            lift_rows.append({
+                "COHORT": cohort, "DAY": day, "WINDOW_DAYS": window_days,
+                "TEST_CLIENTS": tr["TOTAL_CLIENTS"].iloc[0],
+                "TEST_SUCCESSES": tr["CUMULATIVE_SUCCESSES"].iloc[0],
+                "TEST_RATE": tr["CUMULATIVE_RATE"].iloc[0],
+                "CTRL_CLIENTS": cr["TOTAL_CLIENTS"].iloc[0],
+                "CTRL_SUCCESSES": cr["CUMULATIVE_SUCCESSES"].iloc[0],
+                "CTRL_RATE": cr["CUMULATIVE_RATE"].iloc[0],
+                "ABS_LIFT": lift * 100, "CI_LOWER": ci_lo * 100, "CI_UPPER": ci_hi * 100
+            })
 
     lift_df = pd.DataFrame(lift_rows)
     if not lift_df.empty:
@@ -711,23 +714,11 @@ def generate_summary(lift_df, mne):
     """Generate summary table for final day metrics."""
     if lift_df.empty:
         return pd.DataFrame()
-
-    # Group by COHORT and CHANNEL (if present) to get final day
-    group_cols = ["COHORT"]
-    if "CHANNEL" in lift_df.columns:
-        group_cols.append("CHANNEL")
-
-    final = lift_df.loc[lift_df.groupby(group_cols)["DAY"].idxmax()].copy()
+    final = lift_df.loc[lift_df.groupby("COHORT")["DAY"].idxmax()].copy()
     final["MNE"] = mne
-
-    # Build column list based on what's available
-    cols = ["MNE", "COHORT"]
-    if "CHANNEL" in lift_df.columns:
-        cols.append("CHANNEL")
-    cols.extend(["WINDOW_DAYS", "TEST_CLIENTS", "TEST_SUCCESSES", "TEST_RATE",
-                 "CTRL_CLIENTS", "CTRL_SUCCESSES", "CTRL_RATE", "ABS_LIFT", "CI_LOWER", "CI_UPPER", "SIGNIFICANT"])
-
-    return final[cols].sort_values(group_cols)
+    cols = ["MNE", "COHORT", "WINDOW_DAYS", "TEST_CLIENTS", "TEST_SUCCESSES", "TEST_RATE",
+            "CTRL_CLIENTS", "CTRL_SUCCESSES", "CTRL_RATE", "ABS_LIFT", "CI_LOWER", "CI_UPPER", "SIGNIFICANT"]
+    return final[cols].sort_values("COHORT")
 
 
 def generate_engagement_summary(success_df, mne):
@@ -915,8 +906,9 @@ def run_vintage_analysis(spark, mne, show_plots=True, verbose=True, include_enga
 
     # 4a: Check what channels exist in the tactic data
     # Channel comes from TACTIC_CELL_CD - NOT hardcoded
-    channel_counts = tactic_df.groupBy("TACTIC_CELL_CD").count().collect()
-    channels_in_data = {row["TACTIC_CELL_CD"]: row["count"] for row in channel_counts}
+    # Note: TACTIC_CELL_CD values may have trailing spaces, so we trim them
+    channel_counts = tactic_df.groupBy(F.trim(F.col("TACTIC_CELL_CD")).alias("CHANNEL_TRIMMED")).count().collect()
+    channels_in_data = {row["CHANNEL_TRIMMED"]: row["count"] for row in channel_counts}
     log(f"    [Layer 4] Channels in data: {channels_in_data}")
 
     # 4b: Fulfillment - for email, this is captured via EMAIL_SENT
@@ -929,8 +921,8 @@ def run_vintage_analysis(spark, mne, show_plots=True, verbose=True, include_enga
     # 4c: Email engagement (only for clients with TACTIC_CELL_CD = 'EM')
     email_df = None
     if include_engagement:
-        # Filter tactic to only email channel clients (TACTIC_CELL_CD = 'EM')
-        email_clients = tactic_df.filter(F.col("TACTIC_CELL_CD") == "EM")
+        # Filter tactic to only email channel clients (trim to handle spaces)
+        email_clients = tactic_df.filter(F.trim(F.col("TACTIC_CELL_CD")) == "EM")
         email_client_count = channels_in_data.get("EM", 0)
         log(f"    [Layer 4] Email channel clients (TACTIC_CELL_CD=EM): {email_client_count:,}")
 

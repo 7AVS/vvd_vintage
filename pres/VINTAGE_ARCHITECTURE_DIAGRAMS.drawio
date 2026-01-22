@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="page1-big-picture" name="1. Big Picture">
-        <mxGraphModel dx="2353" dy="1132" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#E7EEF1" math="0" shadow="0">
+        <mxGraphModel dx="874" dy="679" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#E7EEF1" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -110,7 +110,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="page2-virtuous-cycle" name="2. Virtuous Cycle - Success Library Growth">
-        <mxGraphModel dx="874" dy="679" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1200" background="#E7EEF1" math="0" shadow="0">
+        <mxGraphModel dx="1457" dy="1132" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1200" background="#E7EEF1" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -332,7 +332,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="page3-swap-points" name="3. Swap Points - What to What">
-        <mxGraphModel dx="1412" dy="679" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1400" background="#E7EEF1" math="0" shadow="0">
+        <mxGraphModel dx="874" dy="679" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1400" background="#E7EEF1" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -501,142 +501,175 @@
         </mxGraphModel>
     </diagram>
     <diagram id="page4-next-steps" name="4. Next Steps">
-        <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" background="#E7EEF1" math="0" shadow="0">
+        <mxGraphModel dx="2567" dy="1238" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" background="#E7EEF1" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
                 <mxCell id="title4" value="Vintage Automation - Next Steps" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" parent="1" vertex="1">
                     <mxGeometry x="300" y="20" width="800" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="subtitle4" value="Strategic roadmap and decisions to be made" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=2;fontColor=#003168;" parent="1" vertex="1">
+                <mxCell id="subtitle4" value="Immediate priorities and roadmap for full deployment" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=2;fontColor=#003168;" parent="1" vertex="1">
                     <mxGeometry x="400" y="65" width="600" height="25" as="geometry"/>
                 </mxCell>
-
-                <!-- 1. NEW COHORTS -->
-                <mxCell id="cohorts-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0091DA;strokeWidth=4;" parent="1" vertex="1">
-                    <mxGeometry x="50" y="110" width="420" height="250" as="geometry"/>
+                <mxCell id="imm-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FCA311;strokeWidth=4;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="110" width="420" height="320" as="geometry"/>
                 </mxCell>
-                <mxCell id="cohorts-header" value="1. Adding New Cohorts" style="text;html=1;strokeColor=none;fillColor=#0091DA;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                <mxCell id="imm-header" value="IMMEDIATE: Validate Engine" style="text;html=1;strokeColor=none;fillColor=#FCA311;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#003168;" parent="1" vertex="1">
                     <mxGeometry x="50" y="110" width="420" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="cohorts-subtitle" value="For existing campaigns already tracked" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#003168;" parent="1" vertex="1">
-                    <mxGeometry x="50" y="145" width="420" height="20" as="geometry"/>
+                <mxCell id="imm-1" value="☐ Run VCN on actual Spark environment" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="150" width="400" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="cohorts-content" value="&lt;b&gt;TRACK A (Official):&lt;/b&gt;&lt;br&gt;• Define refresh cadence with CIDM&lt;br&gt;• Automated pipeline to update Tableau&lt;br&gt;• New cohorts appear automatically&lt;br&gt;&lt;br&gt;&lt;b&gt;TRACK B (In-House):&lt;/b&gt;&lt;br&gt;• Re-run vintage_all_in_one.py&lt;br&gt;• New cohorts within YEARS_TO_INCLUDE&lt;br&gt;• Regenerate HTML dashboard&lt;br&gt;• Deploy updated file to SharePoint" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=15;spacingTop=5;" parent="1" vertex="1">
-                    <mxGeometry x="60" y="170" width="400" height="180" as="geometry"/>
+                <mxCell id="imm-1-sub" value="Test with real data, verify partition pruning works" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="175" width="400" height="20" as="geometry"/>
                 </mxCell>
-
-                <!-- 2. EXPAND METRICS -->
-                <mxCell id="metrics-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FCA311;strokeWidth=4;" parent="1" vertex="1">
-                    <mxGeometry x="490" y="110" width="420" height="250" as="geometry"/>
+                <mxCell id="imm-2" value="☐ Validate results against known baseline" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="205" width="400" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="metrics-header" value="2. Expand Metrics &amp; Comparisons" style="text;html=1;strokeColor=none;fillColor=#FCA311;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#003168;" parent="1" vertex="1">
+                <mxCell id="imm-2-sub" value="Compare VCN output to previous manual analysis" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="230" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="imm-3" value="☐ Research TST_GRP_CD values" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="260" width="400" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="imm-3-sub" value="Understand all test group meanings for A/B test support" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="285" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="imm-4" value="☐ Fix fulfillment code mapping" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="315" width="400" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="imm-4-sub" value="Get MNE → fulfillment code mappings from experts" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="340" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="imm-5" value="☐ Integrate channel breakdown into dashboard" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="370" width="400" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="imm-5-sub" value="Function exists, needs dashboard integration" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="395" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="tracka-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0051A5;strokeWidth=4;" parent="1" vertex="1">
+                    <mxGeometry x="490" y="110" width="420" height="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="tracka-header" value="TRACK A: Official Dashboard (CIDM)" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="490" y="110" width="420" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="metrics-subtitle" value="What else can we vintage?" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#003168;" parent="1" vertex="1">
-                    <mxGeometry x="490" y="145" width="420" height="20" as="geometry"/>
+                <mxCell id="ta-1" value="☐ Meet with CIDM team" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="150" width="400" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="metrics-content" value="&lt;b&gt;Success Metrics:&lt;/b&gt;&lt;br&gt;• Primary success (current)&lt;br&gt;• Secondary success (TBD)&lt;br&gt;• Tertiary success (TBD)&lt;br&gt;&lt;br&gt;&lt;b&gt;Engagement Metrics:&lt;/b&gt;&lt;br&gt;• Email open rate curves&lt;br&gt;• Click rate curves&lt;br&gt;• Unsubscribe rate curves&lt;br&gt;&lt;br&gt;&lt;b&gt;Segment Breakdowns:&lt;/b&gt;&lt;br&gt;• By channel, by segment, other comparisons&lt;br&gt;• Need to define what's valuable" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=15;spacingTop=5;" parent="1" vertex="1">
-                    <mxGeometry x="500" y="170" width="400" height="180" as="geometry"/>
+                <mxCell id="ta-1-sub" value="Share specs, understand timeline and capacity" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="175" width="400" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="metrics-tbd" value="TO BE FIGURED OUT" style="text;html=1;strokeColor=none;fillColor=#FFC72C;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#003168;rounded=1;" parent="1" vertex="1">
-                    <mxGeometry x="610" y="330" width="140" height="20" as="geometry"/>
+                <mxCell id="ta-2" value="☐ Provide data format specifications" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="205" width="400" height="30" as="geometry"/>
                 </mxCell>
-
-                <!-- 3. HOSTING DECISION -->
-                <mxCell id="hosting-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#07AFBF;strokeWidth=4;" parent="1" vertex="1">
-                    <mxGeometry x="930" y="110" width="420" height="250" as="geometry"/>
+                <mxCell id="ta-2-sub" value="Column definitions, data types, output format" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="230" width="400" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="hosting-header" value="3. Hosting &amp; Technology" style="text;html=1;strokeColor=none;fillColor=#07AFBF;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                <mxCell id="ta-3" value="☐ Align on refresh cadence" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="260" width="400" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ta-3-sub" value="How often does data update? Monthly? Weekly?" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="285" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="ta-4" value="☐ Define governance requirements" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="315" width="400" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="ta-4-sub" value="Access controls, approval workflows, audit trail" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="340" width="400" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="ta-status" value="Status: Pending alignment meeting" style="text;html=1;strokeColor=none;fillColor=#9EA2A2;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#FFFFFF;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="390" width="280" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="trackb-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#07AFBF;strokeWidth=4;" parent="1" vertex="1">
+                    <mxGeometry x="930" y="110" width="420" height="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="trackb-header" value="TRACK B: In-House Dashboard" style="text;html=1;strokeColor=none;fillColor=#07AFBF;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
                     <mxGeometry x="930" y="110" width="420" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="hosting-subtitle" value="Where does this live long-term?" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#003168;" parent="1" vertex="1">
-                    <mxGeometry x="930" y="145" width="420" height="20" as="geometry"/>
+                <mxCell id="tb-1" value="☐ Finalize HTML dashboard" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="150" width="400" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="hosting-content" value="&lt;b&gt;Option A: SharePoint (In-House)&lt;/b&gt;&lt;br&gt;• Static HTML files&lt;br&gt;• Manual refresh process&lt;br&gt;• Quick to deploy&lt;br&gt;&lt;br&gt;&lt;b&gt;Option B: Tableau/CIDM (Official)&lt;/b&gt;&lt;br&gt;• Governed, official reporting&lt;br&gt;• Automated refresh&lt;br&gt;• Broader access&lt;br&gt;&lt;br&gt;&lt;b&gt;Option C: Snowflake / New Tech&lt;/b&gt;&lt;br&gt;• Modern data platform&lt;br&gt;• Scalable, integrated&lt;br&gt;• Requires infrastructure decision" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=15;spacingTop=5;" parent="1" vertex="1">
-                    <mxGeometry x="940" y="170" width="400" height="180" as="geometry"/>
+                <mxCell id="tb-1-sub" value="vintage_dashboard.py ready, needs final polish" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="175" width="400" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="hosting-tbd" value="DECISION PENDING" style="text;html=1;strokeColor=none;fillColor=#FFC72C;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#003168;rounded=1;" parent="1" vertex="1">
-                    <mxGeometry x="1050" y="330" width="140" height="20" as="geometry"/>
+                <mxCell id="tb-2" value="☐ Add metric dropdown" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="205" width="400" height="30" as="geometry"/>
                 </mxCell>
-
-                <!-- DECISIONS TO MAKE -->
-                <mxCell id="decisions-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#003168;strokeWidth=3;" parent="1" vertex="1">
-                    <mxGeometry x="50" y="380" width="1300" height="180" as="geometry"/>
+                <mxCell id="tb-2-sub" value="Vintage curves for any metric (open rate, click rate, etc.)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="230" width="400" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="decisions-header" value="DECISIONS TO MAKE" style="text;html=1;strokeColor=none;fillColor=#003168;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
-                    <mxGeometry x="50" y="380" width="1300" height="30" as="geometry"/>
+                <mxCell id="tb-3" value="☐ Deploy to SharePoint" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="260" width="400" height="30" as="geometry"/>
                 </mxCell>
-
-                <!-- Decision boxes -->
-                <mxCell id="dec1-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7EEF1;strokeColor=#0051A5;strokeWidth=2;" parent="1" vertex="1">
-                    <mxGeometry x="70" y="420" width="290" height="125" as="geometry"/>
+                <mxCell id="tb-3-sub" value="Accessible for internal team use immediately" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="285" width="400" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="dec1-title" value="Cohort Refresh Process" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
-                    <mxGeometry x="70" y="420" width="290" height="25" as="geometry"/>
+                <mxCell id="tb-4" value="☐ Document process for adding new campaigns" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#003168;spacingLeft=15;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="315" width="400" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="dec1-content" value="• How often do we refresh?&lt;br&gt;• Who triggers the refresh?&lt;br&gt;• Automated vs manual?&lt;br&gt;• How do we notify stakeholders?" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=10;spacingTop=5;" parent="1" vertex="1">
-                    <mxGeometry x="75" y="450" width="280" height="90" as="geometry"/>
+                <mxCell id="tb-4-sub" value="Handoff documentation for team" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#676E6F;spacingLeft=35;" parent="1" vertex="1">
+                    <mxGeometry x="940" y="340" width="400" height="20" as="geometry"/>
                 </mxCell>
-
-                <mxCell id="dec2-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7EEF1;strokeColor=#0051A5;strokeWidth=2;" parent="1" vertex="1">
-                    <mxGeometry x="380" y="420" width="290" height="125" as="geometry"/>
+                <mxCell id="tb-status" value="Status: Ready for deployment" style="text;html=1;strokeColor=none;fillColor=#07AFBF;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#FFFFFF;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="1000" y="390" width="280" height="25" as="geometry"/>
                 </mxCell>
-                <mxCell id="dec2-title" value="Metric Prioritization" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
-                    <mxGeometry x="380" y="420" width="290" height="25" as="geometry"/>
+                <mxCell id="future-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#003168;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="450" width="1300" height="200" as="geometry"/>
                 </mxCell>
-                <mxCell id="dec2-content" value="• What secondary metrics matter?&lt;br&gt;• Which engagement metrics to track?&lt;br&gt;• What segment breakdowns?&lt;br&gt;• Director input needed" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=10;spacingTop=5;" parent="1" vertex="1">
-                    <mxGeometry x="385" y="450" width="280" height="90" as="geometry"/>
+                <mxCell id="future-header" value="FUTURE PHASES: When Infrastructure Ready" style="text;html=1;strokeColor=none;fillColor=#003168;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="450" width="1300" height="30" as="geometry"/>
                 </mxCell>
-
-                <mxCell id="dec3-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7EEF1;strokeColor=#0051A5;strokeWidth=2;" parent="1" vertex="1">
-                    <mxGeometry x="690" y="420" width="290" height="125" as="geometry"/>
+                <mxCell id="phase1-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7EEF1;strokeColor=#0051A5;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="495" width="290" height="140" as="geometry"/>
                 </mxCell>
-                <mxCell id="dec3-title" value="Technology Platform" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
-                    <mxGeometry x="690" y="420" width="290" height="25" as="geometry"/>
+                <mxCell id="phase1-title" value="Swap Point Execution" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="495" width="290" height="25" as="geometry"/>
                 </mxCell>
-                <mxCell id="dec3-content" value="• SharePoint good enough?&lt;br&gt;• Move to Snowflake?&lt;br&gt;• Other modern solutions?&lt;br&gt;• What's the org direction?" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=10;spacingTop=5;" parent="1" vertex="1">
-                    <mxGeometry x="695" y="450" width="280" height="90" as="geometry"/>
+                <mxCell id="phase1-content" value="• Connect to Mnemonic Mapping v2&lt;br&gt;  (when Primary Metric field added)&lt;br&gt;&lt;br&gt;• Connect to Success Library&lt;br&gt;  (when GitHub repo OR semantic layer exists)&lt;br&gt;&lt;br&gt;• Zero engine changes required" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=10;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="75" y="525" width="280" height="105" as="geometry"/>
                 </mxCell>
-
-                <mxCell id="dec4-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7EEF1;strokeColor=#0051A5;strokeWidth=2;" parent="1" vertex="1">
-                    <mxGeometry x="1000" y="420" width="330" height="125" as="geometry"/>
+                <mxCell id="phase2-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7EEF1;strokeColor=#0051A5;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="495" width="290" height="140" as="geometry"/>
                 </mxCell>
-                <mxCell id="dec4-title" value="Track A vs Track B Priority" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
-                    <mxGeometry x="1000" y="420" width="330" height="25" as="geometry"/>
+                <mxCell id="phase2-title" value="Multi-Channel Engagement" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="495" width="290" height="25" as="geometry"/>
                 </mxCell>
-                <mxCell id="dec4-content" value="• Both tracks running in parallel?&lt;br&gt;• When does Track A take over?&lt;br&gt;• Does Track B sunset eventually?&lt;br&gt;• Or do both serve different needs?" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=10;spacingTop=5;" parent="1" vertex="1">
-                    <mxGeometry x="1005" y="450" width="320" height="90" as="geometry"/>
+                <mxCell id="phase2-content" value="• Mobile Banking engagement&lt;br&gt;• Online Banking (ONB) engagement&lt;br&gt;• Advisory Centre (ONO) leads&lt;br&gt;&lt;br&gt;When feedback source tables for&lt;br&gt;each channel are identified" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=10;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="385" y="525" width="280" height="105" as="geometry"/>
                 </mxCell>
-
-                <!-- KEY MESSAGE -->
+                <mxCell id="phase3-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7EEF1;strokeColor=#0051A5;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="690" y="495" width="290" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="phase3-title" value="Scale to Other Campaign Families" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="690" y="495" width="290" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="phase3-content" value="• Beyond VVD campaigns&lt;br&gt;• Other campaign families use same engine&lt;br&gt;• Success Library continues to grow&lt;br&gt;&lt;br&gt;Prove pattern with VVD pilots,&lt;br&gt;then expand" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=10;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="695" y="525" width="280" height="105" as="geometry"/>
+                </mxCell>
+                <mxCell id="phase4-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7EEF1;strokeColor=#0051A5;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="1000" y="495" width="330" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="phase4-title" value="Feed SuperFact Ecosystem" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="1000" y="495" width="330" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="phase4-content" value="• Vintage data feeds QBR/MBR automation&lt;br&gt;• Natural language querying/AI enabled&lt;br&gt;• Self-service vintage analysis&lt;br&gt;&lt;br&gt;Structured, documented data&lt;br&gt;ready for downstream consumption" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=11;fontColor=#003168;spacingLeft=10;spacingTop=5;" parent="1" vertex="1">
+                    <mxGeometry x="1005" y="525" width="320" height="105" as="geometry"/>
+                </mxCell>
                 <mxCell id="keymsg-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#003168;strokeColor=#003168;strokeWidth=3;" parent="1" vertex="1">
-                    <mxGeometry x="50" y="580" width="1300" height="80" as="geometry"/>
+                    <mxGeometry x="50" y="670" width="1300" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="keymsg-text" value="&lt;b&gt;KEY MESSAGE&lt;/b&gt;&lt;br&gt;&lt;br&gt;Engine is built. Now we need to decide: how do we refresh, what else do we measure, and where does it live?&lt;br&gt;These decisions shape the next phase of Vintage Automation." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#FFFFFF;" parent="1" vertex="1">
-                    <mxGeometry x="60" y="585" width="1280" height="70" as="geometry"/>
+                <mxCell id="keymsg-text" value="&lt;b&gt;KEY MESSAGE&lt;/b&gt;&lt;br&gt;&lt;br&gt;Two parallel tracks. Track B gives us immediate value while Track A gets official infrastructure.&lt;br&gt;Same engine, same data, same quality - just different delivery mechanisms." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="675" width="1280" height="70" as="geometry"/>
                 </mxCell>
-
-                <!-- STATUS SUMMARY -->
-                <mxCell id="status-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0051A5;strokeWidth=2;" parent="1" vertex="1">
-                    <mxGeometry x="50" y="680" width="1300" height="100" as="geometry"/>
+                <mxCell id="questions-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFC72C;strokeColor=#B58500;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="770" width="1300" height="100" as="geometry"/>
                 </mxCell>
-                <mxCell id="status-header" value="CURRENT STATUS" style="text;html=1;strokeColor=none;fillColor=#0051A5;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
-                    <mxGeometry x="50" y="680" width="1300" height="25" as="geometry"/>
+                <mxCell id="questions-title" value="QUESTIONS TO RESOLVE" style="text;html=1;strokeColor=none;fillColor=#B58500;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="50" y="770" width="1300" height="25" as="geometry"/>
                 </mxCell>
-                <mxCell id="status-done" value="✓ Engine built&lt;br&gt;✓ 6 pilot campaigns configured&lt;br&gt;✓ Channel detection from data" style="text;html=1;strokeColor=none;fillColor=#07AFBF;align=center;verticalAlign=middle;fontSize=11;fontColor=#FFFFFF;rounded=1;" parent="1" vertex="1">
-                    <mxGeometry x="70" y="715" width="300" height="55" as="geometry"/>
+                <mxCell id="questions-content" value="1. Where are fulfillment codes documented? (Campaign docs? Separate table?)&lt;br&gt;2. What are all TST_GRP_CD values and their meanings? (For A/B test support)&lt;br&gt;3. What does RPT_GRP_CD represent? Is there a lookup table?&lt;br&gt;4. CIDM team timeline/capacity for Track A?" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=12;fontColor=#003168;spacingLeft=30;spacingTop=10;" parent="1" vertex="1">
+                    <mxGeometry x="55" y="786" width="1290" height="65" as="geometry"/>
                 </mxCell>
-                <mxCell id="status-progress" value="◐ Track B dashboard (ready)&lt;br&gt;◐ Success Library (4 metrics)&lt;br&gt;◐ Swap points documented" style="text;html=1;strokeColor=none;fillColor=#FCA311;align=center;verticalAlign=middle;fontSize=11;fontColor=#003168;rounded=1;" parent="1" vertex="1">
-                    <mxGeometry x="390" y="715" width="300" height="55" as="geometry"/>
-                </mxCell>
-                <mxCell id="status-pending" value="○ Track A alignment&lt;br&gt;○ Hosting decision&lt;br&gt;○ Metric expansion" style="text;html=1;strokeColor=none;fillColor=#9EA2A2;align=center;verticalAlign=middle;fontSize=11;fontColor=#FFFFFF;rounded=1;" parent="1" vertex="1">
-                    <mxGeometry x="710" y="715" width="300" height="55" as="geometry"/>
-                </mxCell>
-                <mxCell id="status-legend" value="✓ Done&amp;nbsp;&amp;nbsp;&amp;nbsp;◐ In Progress&amp;nbsp;&amp;nbsp;&amp;nbsp;○ To Do" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontColor=#003168;" parent="1" vertex="1">
-                    <mxGeometry x="1030" y="730" width="300" height="25" as="geometry"/>
-                </mxCell>
-
             </root>
         </mxGraphModel>
     </diagram>

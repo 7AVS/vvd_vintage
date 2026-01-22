@@ -538,9 +538,101 @@ This MVD (Minimum Viable Document) defines the content and structure for the Vin
 
 ---
 
+---
+
+# PAGE 4: Next Steps
+
+**Title:** Vintage Automation - Next Steps
+
+**Key Message:** Engine is built. Now we need to decide: how do we refresh, what else do we measure, and where does it live?
+
+## Layout
+
+Three columns for the main strategic areas, plus Decisions section below.
+
+## Content
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                              VINTAGE AUTOMATION - NEXT STEPS                             │
+│                           Strategic roadmap and decisions to be made                     │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                          │
+│  ┌──────────────────────────┐  ┌──────────────────────────┐  ┌──────────────────────────┐│
+│  │ 1. Adding New Cohorts    │  │ 2. Expand Metrics &      │  │ 3. Hosting & Technology  ││
+│  │                          │  │    Comparisons           │  │                          ││
+│  │ For existing campaigns   │  │ What else can we vintage?│  │ Where does this live?    ││
+│  ├──────────────────────────┤  ├──────────────────────────┤  ├──────────────────────────┤│
+│  │                          │  │                          │  │                          ││
+│  │ TRACK A (Official):      │  │ SUCCESS METRICS:         │  │ Option A: SharePoint     ││
+│  │ • Define refresh cadence │  │ • Primary success        │  │ • Static HTML files      ││
+│  │   with CIDM              │  │ • Secondary success (TBD)│  │ • Manual refresh         ││
+│  │ • Automated pipeline     │  │ • Tertiary success (TBD) │  │ • Quick to deploy        ││
+│  │ • New cohorts appear     │  │                          │  │                          ││
+│  │   automatically          │  │ ENGAGEMENT METRICS:      │  │ Option B: Tableau/CIDM   ││
+│  │                          │  │ • Email open rate curves │  │ • Governed, official     ││
+│  │ TRACK B (In-House):      │  │ • Click rate curves      │  │ • Automated refresh      ││
+│  │ • Re-run engine          │  │ • Unsubscribe curves     │  │ • Broader access         ││
+│  │ • Regenerate HTML        │  │                          │  │                          ││
+│  │ • Deploy to SharePoint   │  │ SEGMENT BREAKDOWNS:      │  │ Option C: Snowflake/New  ││
+│  │                          │  │ • By channel             │  │ • Modern data platform   ││
+│  │                          │  │ • By segment             │  │ • Scalable, integrated   ││
+│  │                          │  │ • Other comparisons      │  │ • Requires decision      ││
+│  │                          │  │                          │  │                          ││
+│  │                          │  │ [TO BE FIGURED OUT]      │  │ [DECISION PENDING]       ││
+│  └──────────────────────────┘  └──────────────────────────┘  └──────────────────────────┘│
+│                                                                                          │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                    DECISIONS TO MAKE                                     │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                          │
+│  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐  ┌───────────────┐ │
+│  │ Cohort Refresh    │  │ Metric            │  │ Technology        │  │ Track A vs B  │ │
+│  │ Process           │  │ Prioritization    │  │ Platform          │  │ Priority      │ │
+│  ├───────────────────┤  ├───────────────────┤  ├───────────────────┤  ├───────────────┤ │
+│  │                   │  │                   │  │                   │  │               │ │
+│  │ • How often?      │  │ • What secondary  │  │ • SharePoint good │  │ • Both tracks │ │
+│  │ • Who triggers?   │  │   metrics matter? │  │   enough?         │  │   parallel?   │ │
+│  │ • Automated vs    │  │ • Which engage-   │  │ • Move to         │  │ • When does A │ │
+│  │   manual?         │  │   ment metrics?   │  │   Snowflake?      │  │   take over?  │ │
+│  │ • How to notify   │  │ • What segment    │  │ • What's the org  │  │ • Does B      │ │
+│  │   stakeholders?   │  │   breakdowns?     │  │   direction?      │  │   sunset?     │ │
+│  │                   │  │ • Director input  │  │                   │  │               │ │
+│  └───────────────────┘  └───────────────────┘  └───────────────────┘  └───────────────┘ │
+│                                                                                          │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                    CURRENT STATUS                                        │
+├─────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                          │
+│  ✓ DONE                  ◐ IN PROGRESS              ○ TO DO                              │
+│  • Engine built          • Track B dashboard        • Track A alignment                  │
+│  • 6 pilot campaigns     • Success Library (4)      • Hosting decision                   │
+│  • Channel detection     • Swap points documented   • Metric expansion                   │
+│                                                                                          │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Key Callout Box
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                          │
+│  Engine is built. Now we need to decide:                                                 │
+│  • How do we refresh? (cohort cadence)                                                   │
+│  • What else do we measure? (metrics expansion)                                          │
+│  • Where does it live? (hosting technology)                                              │
+│                                                                                          │
+│  These decisions shape the next phase of Vintage Automation.                             │
+│                                                                                          │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## Files to Create
 
 1. `VINTAGE_ARCHITECTURE_DIAGRAMS.drawio` - Multi-page Draw.io file
    - Page 1: Big Picture (overview)
    - Page 2: Virtuous Cycle (Success Library growth)
    - Page 3: Swap Points (detailed what-to-what)
+   - Page 4: Next Steps (roadmap)

@@ -226,6 +226,13 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
         </select>
     </div>
     <div class="control-group">
+        <label>Channel</label>
+        <select id="channelSelect" onchange="updateChart()">
+            <option value="all">All Channels</option>
+            <!-- Populated by JS -->
+        </select>
+    </div>
+    <div class="control-group">
         <label>Cohort View</label>
         <select id="cohortSelect" onchange="updateChart()">
             <option value="all">All Cohorts</option>
@@ -296,13 +303,13 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
                         <th>Campaign</th>
                         <th>Total Clients</th>
                         <th>Emails Sent</th>
-                        <th>Sent Rate</th>
+                        <th>Send Rate</th>
                         <th>Opened</th>
                         <th>Open Rate</th>
                         <th>Clicked</th>
                         <th>Click Rate</th>
-                        <th>Fulfilled</th>
-                        <th>Fulfillment Rate</th>
+                        <th>Unsubscribed</th>
+                        <th>Unsub Rate</th>
                     </tr>
                 </thead>
                 <tbody id="engagementBody">
@@ -347,17 +354,47 @@ function switchTab(tab) {{
     }}
 }}
 
-// Get unique cohorts for selected campaign
-function getCohorts(mne) {{
-    const cohorts = [...new Set(rawData.filter(d => d.MNE === mne).map(d => d.COHORT))];
+// Get unique channels for selected campaign
+function getChannels(mne) {{
+    const channels = [...new Set(rawData.filter(d => d.MNE === mne).map(d => d.CHANNEL || 'ALL'))];
+    return channels.sort();
+}}
+
+// Get unique cohorts for selected campaign and channel
+function getCohorts(mne, channel) {{
+    let filtered = rawData.filter(d => d.MNE === mne);
+    if (channel && channel !== 'all') {{
+        filtered = filtered.filter(d => (d.CHANNEL || 'ALL') === channel);
+    }}
+    const cohorts = [...new Set(filtered.map(d => d.COHORT))];
     return cohorts.sort();
 }}
 
-// Update cohort dropdown when campaign changes
+// Update channel dropdown when campaign changes
+function updateChannelDropdown() {{
+    const mne = document.getElementById('campaignSelect').value;
+    const channelSelect = document.getElementById('channelSelect');
+    const channels = getChannels(mne);
+
+    // Clear existing options except "All"
+    channelSelect.innerHTML = '<option value="all">All Channels</option>';
+
+    channels.forEach(c => {{
+        if (c && c !== 'ALL') {{  // Skip null/ALL since we have "All Channels" option
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c === 'EM' ? 'Email' : c === 'IM' ? 'In-Market' : c;
+            channelSelect.appendChild(opt);
+        }}
+    }});
+}}
+
+// Update cohort dropdown when campaign or channel changes
 function updateCohortDropdown() {{
     const mne = document.getElementById('campaignSelect').value;
+    const channel = document.getElementById('channelSelect').value;
     const cohortSelect = document.getElementById('cohortSelect');
-    const cohorts = getCohorts(mne);
+    const cohorts = getCohorts(mne, channel);
 
     // Clear existing options except "All"
     cohortSelect.innerHTML = '<option value="all">All Cohorts</option>';
@@ -408,14 +445,21 @@ function aggregateMonthly(data) {{
 
 // Main chart update function
 function updateChart() {{
+    updateChannelDropdown();
     updateCohortDropdown();
 
     const mne = document.getElementById('campaignSelect').value;
+    const channelFilter = document.getElementById('channelSelect').value;
     const cohortFilter = document.getElementById('cohortSelect').value;
     const agg = document.getElementById('aggSelect').value;
 
     // Filter data
     let data = rawData.filter(d => d.MNE === mne);
+
+    // Filter by channel if selected
+    if (channelFilter !== 'all') {{
+        data = data.filter(d => (d.CHANNEL || 'ALL') === channelFilter);
+    }}
 
     if (cohortFilter !== 'all') {{
         data = data.filter(d => d.COHORT === cohortFilter);
@@ -578,10 +622,10 @@ function updateEngagementCards(engData) {{
 
     const metrics = [
         {{ label: 'Total Clients', value: engData.TOTAL_CLIENTS, rate: null }},
-        {{ label: 'Emails Sent', value: engData.EMAIL_SENT, rate: engData.EMAIL_SENT_RATE }},
-        {{ label: 'Emails Opened', value: engData.EMAIL_OPENED, rate: engData.EMAIL_OPEN_RATE }},
-        {{ label: 'Emails Clicked', value: engData.EMAIL_CLICKED, rate: engData.EMAIL_CLICK_RATE }},
-        {{ label: 'Fulfilled', value: engData.FULFILLED, rate: engData.FULFILLMENT_RATE }}
+        {{ label: 'Emails Sent', value: engData.EMAIL_SENT, rate: engData.SEND_RATE || engData.EMAIL_SENT_RATE }},
+        {{ label: 'Emails Opened', value: engData.EMAIL_OPENED, rate: engData.OPEN_RATE || engData.EMAIL_OPEN_RATE }},
+        {{ label: 'Emails Clicked', value: engData.EMAIL_CLICKED, rate: engData.CLICK_RATE || engData.EMAIL_CLICK_RATE }},
+        {{ label: 'Unsubscribed', value: engData.EMAIL_UNSUBSCRIBED, rate: engData.UNSUB_RATE }}
     ];
 
     container.innerHTML = metrics
@@ -613,13 +657,13 @@ function updateEngagementTable() {{
             <td>${{eng.MNE || '-'}}</td>
             <td>${{(eng.TOTAL_CLIENTS || 0).toLocaleString()}}</td>
             <td>${{(eng.EMAIL_SENT || 0).toLocaleString()}}</td>
-            <td>${{(eng.EMAIL_SENT_RATE || 0).toFixed(1)}}%</td>
+            <td>${{(eng.SEND_RATE || eng.EMAIL_SENT_RATE || 0).toFixed(1)}}%</td>
             <td>${{(eng.EMAIL_OPENED || 0).toLocaleString()}}</td>
-            <td>${{(eng.EMAIL_OPEN_RATE || 0).toFixed(1)}}%</td>
+            <td>${{(eng.OPEN_RATE || eng.EMAIL_OPEN_RATE || 0).toFixed(1)}}%</td>
             <td>${{(eng.EMAIL_CLICKED || 0).toLocaleString()}}</td>
-            <td>${{(eng.EMAIL_CLICK_RATE || 0).toFixed(1)}}%</td>
-            <td>${{(eng.FULFILLED || 0).toLocaleString()}}</td>
-            <td>${{(eng.FULFILLMENT_RATE || 0).toFixed(1)}}%</td>
+            <td>${{(eng.CLICK_RATE || eng.EMAIL_CLICK_RATE || 0).toFixed(1)}}%</td>
+            <td>${{(eng.EMAIL_UNSUBSCRIBED || 0).toLocaleString()}}</td>
+            <td>${{(eng.UNSUB_RATE || 0).toFixed(1)}}%</td>
         `;
         tbody.appendChild(row);
     }});
@@ -707,6 +751,12 @@ def display_dashboard(results, title="VVD Vintage Curves"):
         <div>
             <label style="font-size: 0.8em; color: #666; display: block;">Campaign</label>
             <select id="campaignSelectNb" onchange="updateDashboardNb()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+            </select>
+        </div>
+        <div>
+            <label style="font-size: 0.8em; color: #666; display: block;">Channel</label>
+            <select id="channelSelectNb" onchange="updateDashboardNb()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="all">All Channels</option>
             </select>
         </div>
         <div>
@@ -818,10 +868,10 @@ def display_dashboard(results, title="VVD Vintage Curves"):
         const cards = document.getElementById('engagementCardsNb');
         const metrics = [
             ['Total', engData.TOTAL_CLIENTS, null],
-            ['Sent', engData.EMAIL_SENT, engData.EMAIL_SENT_RATE],
-            ['Opened', engData.EMAIL_OPENED, engData.EMAIL_OPEN_RATE],
-            ['Clicked', engData.EMAIL_CLICKED, engData.EMAIL_CLICK_RATE],
-            ['Fulfilled', engData.FULFILLED, engData.FULFILLMENT_RATE]
+            ['Sent', engData.EMAIL_SENT, engData.SEND_RATE || engData.EMAIL_SENT_RATE],
+            ['Opened', engData.EMAIL_OPENED, engData.OPEN_RATE || engData.EMAIL_OPEN_RATE],
+            ['Clicked', engData.EMAIL_CLICKED, engData.CLICK_RATE || engData.EMAIL_CLICK_RATE],
+            ['Unsubscribed', engData.EMAIL_UNSUBSCRIBED, engData.UNSUB_RATE]
         ].filter(m => m[1] !== undefined);
 
         cards.innerHTML = metrics.map(m => `
@@ -835,11 +885,29 @@ def display_dashboard(results, title="VVD Vintage Curves"):
 
     window.updateDashboardNb = function() {{
         const mne = document.getElementById('campaignSelectNb').value;
+        const channelFilter = document.getElementById('channelSelectNb').value;
         const cohortFilter = document.getElementById('cohortSelectNb').value;
 
+        // Update channel dropdown
+        const channelSel = document.getElementById('channelSelectNb');
+        const channels = [...new Set(data.filter(d => d.MNE === mne).map(d => d.CHANNEL || 'ALL'))].sort();
+        channelSel.innerHTML = '<option value="all">All Channels</option>';
+        channels.forEach(c => {{
+            if (c && c !== 'ALL') {{
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c === 'EM' ? 'Email' : c === 'IM' ? 'In-Market' : c;
+                channelSel.appendChild(opt);
+            }}
+        }});
+
         // Update cohort dropdown
+        let forCohorts = data.filter(d => d.MNE === mne);
+        if (channelFilter !== 'all') {{
+            forCohorts = forCohorts.filter(d => (d.CHANNEL || 'ALL') === channelFilter);
+        }}
         const cohortSel = document.getElementById('cohortSelectNb');
-        const cohorts = [...new Set(data.filter(d => d.MNE === mne).map(d => d.COHORT))].sort();
+        const cohorts = [...new Set(forCohorts.map(d => d.COHORT))].sort();
         cohortSel.innerHTML = '<option value="all">All Cohorts</option>';
         cohorts.forEach(c => {{
             const opt = document.createElement('option');
@@ -852,6 +920,9 @@ def display_dashboard(results, title="VVD Vintage Curves"):
 
         // Filter data
         let filtered = data.filter(d => d.MNE === mne);
+        if (channelFilter !== 'all') {{
+            filtered = filtered.filter(d => (d.CHANNEL || 'ALL') === channelFilter);
+        }}
         if (cohortFilter !== 'all') {{
             filtered = filtered.filter(d => d.COHORT === cohortFilter);
         }}

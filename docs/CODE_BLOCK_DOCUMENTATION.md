@@ -113,7 +113,7 @@ CAMPAIGN_METADATA = {
         "campaign_name": "VVD Contextual Notification",
         "success_type": "ACQUISITION",
         "primary_metric": "card_acquisition",  # Links to Layer 3
-        "channel": "EMAIL",
+        # Channel is NOT here - comes from TACTIC_CELL_CD in tactic data
     },
     "VDA": {...},
     "VDT": {...},
@@ -130,7 +130,8 @@ CAMPAIGN_METADATA = {
 | `campaign_name` | Human-readable name | Hardcoded | Mnemonic Mapping v2 - Description field |
 | `success_type` | Category (ACQUISITION, USAGE, etc.) | Hardcoded | Mnemonic Mapping v2 - Measurement Category |
 | `primary_metric` | Which metric to use | Hardcoded | Mnemonic Mapping v2 - Primary Metric field |
-| `channel` | Expected delivery channel | Hardcoded | Mnemonic Mapping v2 - new field |
+
+**Note:** Channel is NOT hardcoded in CAMPAIGN_METADATA. Channel comes from **TACTIC_CELL_CD** in the tactic data (EM = Email, IM = In-Market, etc.). A campaign can have multiple channels at the client level.
 
 **SWAP POINT:**
 ```python

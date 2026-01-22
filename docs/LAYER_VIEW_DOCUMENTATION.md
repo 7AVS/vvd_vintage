@@ -179,8 +179,9 @@ tactic_evnt_hist (parquet)
 │  Each field:                                                               │
 │  ├── campaign_name   → Today: Hardcoded | Future: Mnemonic Mapping v2     │
 │  ├── success_type    → Today: Hardcoded | Future: Measurement Category    │
-│  ├── primary_metric  → Today: Hardcoded | Future: Primary Metric field    │
-│  └── channel         → Today: Hardcoded | Future: New field in MM v2      │
+│  └── primary_metric  → Today: Hardcoded | Future: Primary Metric field    │
+│                                                                            │
+│  NOTE: Channel is NOT hardcoded - comes from TACTIC_CELL_CD in tactic data │
 │                                                                            │
 └────────────────────────────────────────────────────────────────────────────┘
 ```

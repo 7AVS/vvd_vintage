@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage Automation - Meeting with Roy</title>
+    <style>
+        @media print {
+            body { font-size: 11pt; }
+            .page-break { page-break-before: always; }
+            pre { font-size: 9pt; }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        h1 {
+            color: #005587;
+            border-bottom: 3px solid #ffd700;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #005587;
+            margin-top: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            color: #444;
+            margin-top: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #005587;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .summary-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid #005587;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .key-message {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffd700;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        strong {
+            color: #005587;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 30px 0;
+        }
+
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+
+        .date {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Vintage Automation - Meeting with Roy</h1>
+<p class="date">January 2026</p>
+
+<div class="summary-box">
+<strong>One-Sentence Summary:</strong> Built a working Vintage Automation engine as a <strong>pilot project</strong> that demonstrates the SuperFact 4-layer framework - pulling experiment data from tactic tables, discovering channels automatically, and producing vintage curves with lift and confidence intervals.
+</div>
+
+<h2>The Story: Why This Matters</h2>
+
+<p><strong>The problem we're solving:</strong></p>
+<ul>
+    <li>Analysts spend weeks recreating the same vintage curve logic for each campaign</li>
+    <li>"Success" means different things to different people</li>
+    <li>No systematic way to pull campaign context from data - everything is hardcoded</li>
+</ul>
+
+<p><strong>What Vintage Automation proves:</strong></p>
+<ul>
+    <li>We CAN pull experiment metadata directly from tactic tables (Layer 1)</li>
+    <li>We CAN structure code so campaign/success definitions are "swap points" for future data sources</li>
+    <li>We CAN discover things like <strong>channel</strong> from the data instead of hardcoding</li>
+    <li>The 4-layer architecture actually works in practice</li>
+</ul>
+
+<h2>How Vintage Automation Fits SuperFact</h2>
+
+<pre>
+                    VINTAGE AUTOMATION (PILOT)
+
+  Layer 1              Layer 2              Layer 3              Layer 4
+  Experiment           Campaign             Success              Client
+  Metadata             Metadata             Library              Journey
+  +-----------+        +-----------+        +-----------+        +-----------+
+  | tactic_   |        | Mnemonic  |        | GitHub    |        | VISA_DR_  |
+  | evnt_hist |        | Mapping   |        | Success   |        | CRD       |
+  |           |        | v2        |        | Logic     |        | EMAIL     |
+  | FROM DATA |        | HARDCODED |        | HARDCODED |        | FROM DATA |
+  |    NOW    |        | (swap pt) |        | (swap pt) |        |    NOW    |
+  +-----+-----+        +-----+-----+        +-----+-----+        +-----+-----+
+        |                    |                    |                    |
+        +--------------------+--------------------+--------------------+
+                             |                    |
+                             v                    v
+           +------------------------------------------------------+
+           |            vintage_all_in_one.py                      |
+           |                                                       |
+           |  - Channel discovered from TACTIC_CELL_CD             |
+           |  - Test/Control groups from TST_GRP_CD                |
+           |  - Email engagement filtered by channel               |
+           |  - Swap points for Layers 2 & 3 when ready            |
+           +---------------------------+---------------------------+
+                                       |
+                                       v
+           +------------------------------------------------------+
+           |     Vintage Curves + Lift + Confidence Intervals      |
+           |     (CSV export -> Dashboard consumption)             |
+           +------------------------------------------------------+
+</pre>
+
+<h2>What's Built & What's Changed</h2>
+
+<h3>Current State</h3>
+
+<table>
+    <tr><th>Component</th><th>Status</th><th>Recent Progress</th></tr>
+    <tr><td>Layer 1: Experiment data (tactic)</td><td><strong>FROM DATA</strong></td><td>Correct path, partition pruning</td></tr>
+    <tr><td>Layer 2: Campaign metadata</td><td>Hardcoded</td><td>Swap point documented</td></tr>
+    <tr><td>Layer 3: Success definitions</td><td>Hardcoded</td><td>Swap point documented</td></tr>
+    <tr><td>Layer 4: Success outcome</td><td><strong>FROM DATA</strong></td><td>Card acquisition, activation, usage, tokenization</td></tr>
+    <tr><td>Layer 4: Email engagement</td><td><strong>FROM DATA</strong></td><td>Filtered by channel (only where channel contains "EM")</td></tr>
+    <tr><td>Channel detection</td><td><strong>FROM DATA</strong></td><td>Discovered from TACTIC_CELL_CD, handles combos like EM_IM</td></tr>
+    <tr><td>Vintage calculation</td><td>Working</td><td>COHORT + GROUP level, lift, CI</td></tr>
+    <tr><td>CSV/HDFS export</td><td>Working</td><td>Ready for dashboard consumption</td></tr>
+</table>
+
+<h3>Key Change: Channel Now From Data</h3>
+
+<p><strong>Before (wrong):</strong></p>
+<pre>
+# Hardcoded channel in config
+CAMPAIGN_CONFIG = {
+    "VCN": {
+        "channel": "EMAIL",  # &lt;- Hardcoded
+    }
+}
+</pre>
+
+<p><strong>After (correct):</strong></p>
+<pre>
+# Discovered from data
+channel_counts = tactic_df.groupBy(F.trim(F.col("TACTIC_CELL_CD"))).count()
+# Result: {'MB': 13M, 'XX': 762K, 'EM': 5K, 'EM_IM': 2K, ...}
+
+# Email engagement only for clients where channel contains "EM"
+email_clients = tactic_df.filter(F.trim(F.col("TACTIC_CELL_CD")).contains("EM"))
+</pre>
+
+<p><strong>Why this matters:</strong></p>
+<ul>
+    <li>CONTROL group has no real channel (they receive no contact)</li>
+    <li>Channel is a breakdown variable, not a grouping dimension for lift</li>
+    <li>Combo channels like <code>EM_IM</code> (email + internet banking) are handled correctly</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>Campaigns Covered (6 Pilots)</h2>
+
+<table>
+    <tr><th>MNE</th><th>Campaign</th><th>Success Type</th><th>Status</th></tr>
+    <tr><td>VCN</td><td>Contextual Notification</td><td>Acquisition</td><td>Ready to test</td></tr>
+    <tr><td>VDA</td><td>Black Friday Cyber Monday</td><td>Acquisition</td><td>Config exists</td></tr>
+    <tr><td>VDT</td><td>Activation Trigger</td><td>Activation</td><td>Config exists</td></tr>
+    <tr><td>VUI</td><td>Usage Trigger</td><td>Usage</td><td>Config exists</td></tr>
+    <tr><td>VUT</td><td>Tokenization Usage</td><td>Tokenization</td><td>Config exists</td></tr>
+    <tr><td>VAW</td><td>Add To Wallet</td><td>Tokenization</td><td>Config exists</td></tr>
+</table>
+
+<h2>The Philosophy: What to Hardcode vs Pull From Data</h2>
+
+<table>
+    <tr><th>Data Source</th><th>Approach</th><th>Why</th></tr>
+    <tr><td><strong>Experiment data</strong> (tactic_evnt_hist)</td><td>FROM DATA</td><td>Systematic access exists</td></tr>
+    <tr><td><strong>Channel</strong> (TACTIC_CELL_CD)</td><td>FROM DATA</td><td>Systematic access exists</td></tr>
+    <tr><td><strong>Test groups</strong> (TST_GRP_CD)</td><td>FROM DATA</td><td>Systematic access exists</td></tr>
+    <tr><td><strong>Campaign metadata</strong></td><td>HARDCODED (swap point)</td><td>Mnemonic Mapping v2 not ready</td></tr>
+    <tr><td><strong>Success definitions</strong></td><td>HARDCODED (swap point)</td><td>Success Library not ready</td></tr>
+</table>
+
+<p><strong>Swap points are documented</strong> - when the proper data sources exist, we replace the hardcoded dicts with queries.</p>
+
+<h2>What We Learned (Important for Future)</h2>
+
+<h3>1. CONTROL Has No Channel</h3>
+<p>CONTROL clients receive no contact, so they have no meaningful channel (usually marked "XX" or similar). Vintage curves must compare TEST vs CONTROL at <strong>COHORT level</strong>, not by channel.</p>
+
+<h3>2. Channels Can Be Combos</h3>
+<p>A client targeted by both email and internet banking has channel <code>EM_IM</code>. Email engagement filtering uses <code>.contains("EM")</code> to catch all combos.</p>
+
+<h3>3. Data Quality Issues</h3>
+<ul>
+    <li>TACTIC_CELL_CD values have trailing spaces (need <code>F.trim()</code>)</li>
+    <li>Some fields are consistently null (MDM fields)</li>
+</ul>
+
+<h3>4. Test Group Flexibility Still Needed</h3>
+<p>Currently hardcoded <code>TG4 = Test</code>. Some campaigns have A/B tests where TG1 and TG4 are both "action" groups. Need to make this configurable per campaign.</p>
+
+<div class="page-break"></div>
+
+<h2>What's Still Needed</h2>
+
+<h3>High Priority</h3>
+<table>
+    <tr><th>Item</th><th>Status</th><th>Blocker</th></tr>
+    <tr><td>Validate VCN against known results</td><td>Not started</td><td>Need known baseline</td></tr>
+    <tr><td>Test group flexibility (A/B tests)</td><td>Not done</td><td>Need TST_GRP_CD meanings</td></tr>
+    <tr><td>Fulfillment code mapping</td><td>Not done</td><td>Need expert input</td></tr>
+    <tr><td><strong>Metric dropdown in dashboard</strong></td><td>Not done</td><td>Design ready (see below)</td></tr>
+</table>
+
+<h3>Medium Priority</h3>
+<table>
+    <tr><th>Item</th><th>Status</th><th>Notes</th></tr>
+    <tr><td>Channel breakdown in dashboard</td><td>Function exists</td><td>Not integrated yet</td></tr>
+    <tr><td>RPT_GRP_CD segmentation</td><td>Field loaded</td><td>Don't know what it means</td></tr>
+</table>
+
+<h3>Questions for Experts</h3>
+<ol>
+    <li>Where are fulfillment codes documented?</li>
+    <li>What are all TST_GRP_CD values and their meanings?</li>
+    <li>What does RPT_GRP_CD represent?</li>
+</ol>
+
+<h2>Key Feature: Metric Dropdown (Vintage Any Metric)</h2>
+
+<h3>The Problem</h3>
+<p>Current: Email engagement shown as <strong>overall summary</strong> (one number for whole campaign).</p>
+<p>Over 2 years of cohorts, overall summary is useless. Director needs: "Show me unsubscribe rate <strong>by cohort</strong>" - not "overall unsubscribe is 2%".</p>
+
+<h3>The Solution</h3>
+<p>Dropdown to select which metric to plot as a vintage curve:</p>
+<pre>
++------------------------------------------+
+|  Metric: [Primary Success v]             |
+|          +- Primary Success (Acquisition)|
+|          +- Open Rate                    |
+|          +- Click Rate                   |
+|          +- Unsubscribe Rate             |
+|          +- Bounce Rate                  |
++------------------------------------------+
+</pre>
+
+<p>Same vintage curve structure:</p>
+<ul>
+    <li>X-axis: Days from treatment</li>
+    <li>Y-axis: Cumulative rate (for selected metric)</li>
+    <li>Lines: Test vs Control by cohort</li>
+</ul>
+
+<h3>Why This Matters</h3>
+<ul>
+    <li>See engagement <strong>trends over time</strong> per cohort</li>
+    <li>Compare cohort performance on ANY metric</li>
+    <li>Identify if recent cohorts have higher unsubscribe rates</li>
+    <li>Director-level insight, not just analyst summary</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>Two Tracks for Dashboard (Running in Parallel)</h2>
+
+<p>We're pursuing <strong>both tracks simultaneously</strong> - they're not mutually exclusive.</p>
+
+<pre>
++---------------------------------------------------------------------+
+|                    VINTAGE AUTOMATION ENGINE                         |
+|                    (vintage_all_in_one.py)                           |
+|                                                                      |
+|            Produces: Vintage curves, lift, CI                        |
+|            Output: CSV / HDFS                                        |
++---------------------------------+-----------------------------------+
+                                  |
+                                  v
+                     +------------------------+
+                     |      CSV OUTPUT        |
+                     |  (Same data feeds both)|
+                     +-----------+------------+
+                                 |
+              +------------------+------------------+
+              |                                     |
+              v                                     v
++---------------------+               +---------------------+
+|    TRACK A          |               |    TRACK B          |
+|    Official         |               |    In-House         |
++---------------------+               +---------------------+
+| Who: CDIM team      |               | Who: Us             |
+| Tool: Tableau       |               | Tool: HTML/Plotly   |
+| Location: Governed  |               | Location: SharePoint|
+| Timeline: TBD       |               | Timeline: NOW       |
+|                     |               |                     |
+| Need: Provide specs |               | Have: Working       |
+| to dashboard team   |               | vintage_dashboard.py|
++---------------------+               +---------------------+
+</pre>
+
+<table>
+    <tr><th>Track</th><th>Purpose</th></tr>
+    <tr><td><strong>Track A (Official)</strong></td><td>For governance, official reporting, broad access</td></tr>
+    <tr><td><strong>Track B (In-House)</strong></td><td>For immediate needs, ad-hoc analysis, iteration</td></tr>
+</table>
+
+<p><strong>Next step for Track A:</strong> Meet with CDIM team to share specs and understand their timeline/capacity.</p>
+<p><strong>Track B status:</strong> Working - vintage_dashboard.py generates HTML with RBC colors, Plotly charts, campaign/cohort dropdowns.</p>
+
+<h2>Next Steps (Proposed)</h2>
+
+<h3>Engine & Data (Both Tracks)</h3>
+<ol>
+    <li><strong>Test current code</strong> - Run VCN on actual Spark environment</li>
+    <li><strong>Validate results</strong> - Compare against known vintage if available</li>
+    <li><strong>Get test group info</strong> - Research TST_GRP_CD values for A/B test support</li>
+    <li><strong>Integrate channel breakdown</strong> - Show in dashboard as additional detail</li>
+</ol>
+
+<h3>Track A: Official Dashboard</h3>
+<ol start="5">
+    <li><strong>Meet with CDIM team</strong> - Share specs, understand timeline/capacity</li>
+    <li><strong>Provide data format specs</strong> - What columns, what format they need</li>
+    <li><strong>Align on refresh cadence</strong> - How often data updates</li>
+</ol>
+
+<h3>Track B: In-House Dashboard</h3>
+<ol start="8">
+    <li><strong>Finalize HTML dashboard</strong> - vintage_dashboard.py ready</li>
+    <li><strong>Deploy to SharePoint</strong> - Accessible for internal use</li>
+    <li><strong>Document for handoff</strong> - Process for adding new campaigns</li>
+</ol>
+
+<div class="key-message">
+<h2>Key Message</h2>
+<p>Vintage Automation is not parallel work - it's <strong>implementation of the SuperFact vision</strong>:</p>
+<ul>
+    <li>Pulls what we can from data NOW (experiment metadata, channel)</li>
+    <li>Documents swap points for what will come from data LATER (campaign metadata, success library)</li>
+    <li>Produces governed, consistent vintage curves with confidence intervals</li>
+    <li>Proves the 4-layer architecture works in practice</li>
+</ul>
+<p><strong>This is a pilot.</strong> The patterns here scale to other campaign families beyond these 6.</p>
+</div>
+
+</body>
+</html>

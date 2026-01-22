@@ -1181,33 +1181,118 @@ def display_dashboard(results, title="VVD Vintage Curves"):
         print(f"Engagement data: {len(all_engagement)} campaigns")
 
 
-def generate_dashboard_from_csv(csv_path, output_path="vvd_vintage_dashboard.html", title="VVD Vintage Curves", engagement_csv_path=None):
+def generate_dashboard_from_folder(folder_path, output_path="vintage_dashboard.html", title="Vintage Automation Dashboard"):
     """
-    Generate dashboard from saved CSV files.
+    Generate dashboard from a folder containing all CSV files.
+
+    Expected files in folder:
+        - vintage_curves.csv (required)
+        - channel_breakdown.csv (optional)
+        - engagement_vintage.csv (optional)
+        - summary.csv (optional)
 
     Args:
-        csv_path: Path to CSV with vintage data (must have MNE column)
+        folder_path: Path to folder containing CSV files
         output_path: Where to save the HTML
         title: Dashboard title
-        engagement_csv_path: Optional path to engagement CSV
     """
-    df = pd.read_csv(csv_path)
+    import os
 
-    # Convert to results format
+    # Find files
+    vintage_path = os.path.join(folder_path, "vintage_curves.csv")
+    channel_path = os.path.join(folder_path, "channel_breakdown.csv")
+    eng_vintage_path = os.path.join(folder_path, "engagement_vintage.csv")
+    summary_path = os.path.join(folder_path, "summary.csv")
+
+    if not os.path.exists(vintage_path):
+        # Try looking for part files (Spark output)
+        for f in os.listdir(folder_path):
+            if f.startswith("part-") and f.endswith(".csv"):
+                vintage_path = os.path.join(folder_path, f)
+                break
+
+    if not os.path.exists(vintage_path):
+        print(f"ERROR: No vintage_curves.csv found in {folder_path}")
+        return
+
+    print(f"Loading data from {folder_path}...")
+
+    # Load vintage curves (required)
+    vintage_df = pd.read_csv(vintage_path)
+    print(f"  - vintage_curves.csv: {len(vintage_df)} rows")
+
+    # Load channel breakdown (optional)
+    channel_df = None
+    if os.path.exists(channel_path):
+        channel_df = pd.read_csv(channel_path)
+        print(f"  - channel_breakdown.csv: {len(channel_df)} rows")
+
+    # Load engagement vintage (optional)
+    eng_vintage_df = None
+    if os.path.exists(eng_vintage_path):
+        eng_vintage_df = pd.read_csv(eng_vintage_path)
+        print(f"  - engagement_vintage.csv: {len(eng_vintage_df)} rows")
+
+    # Load summary (optional)
+    summary_df = None
+    if os.path.exists(summary_path):
+        summary_df = pd.read_csv(summary_path)
+        print(f"  - summary.csv: {len(summary_df)} rows")
+
+    # Build results dict
     results = {}
-    for mne in df["MNE"].unique():
+    for mne in vintage_df["MNE"].unique():
         results[mne] = {
-            "vintage_df": df[df["MNE"] == mne].copy(),
-            "summary_df": None,
-            "engagement_summary_df": None
+            "vintage_df": vintage_df[vintage_df["MNE"] == mne].copy(),
+            "summary_df": summary_df[summary_df["MNE"] == mne].copy() if summary_df is not None else None,
+            "channel_breakdown_df": channel_df[channel_df["MNE"] == mne].copy() if channel_df is not None else None,
+            "engagement_vintage_df": eng_vintage_df[eng_vintage_df["MNE"] == mne].copy() if eng_vintage_df is not None else None,
+            "engagement_summary_df": None,  # Not exported separately
         }
 
-    # Load engagement data if provided
-    if engagement_csv_path:
-        eng_df = pd.read_csv(engagement_csv_path)
-        for mne in eng_df["MNE"].unique():
-            if mne in results:
-                results[mne]["engagement_summary_df"] = eng_df[eng_df["MNE"] == mne].copy()
+    generate_dashboard(results, output_path, title)
+
+
+def generate_dashboard_from_csv(csv_path, output_path="vintage_dashboard.html", title="Vintage Automation Dashboard",
+                                 channel_csv_path=None, engagement_vintage_csv_path=None):
+    """
+    Generate dashboard from individual CSV files.
+
+    Args:
+        csv_path: Path to vintage_curves.csv
+        output_path: Where to save the HTML
+        title: Dashboard title
+        channel_csv_path: Optional path to channel_breakdown.csv
+        engagement_vintage_csv_path: Optional path to engagement_vintage.csv
+    """
+    print(f"Loading data...")
+
+    # Load vintage curves (required)
+    vintage_df = pd.read_csv(csv_path)
+    print(f"  - vintage_curves: {len(vintage_df)} rows")
+
+    # Load channel breakdown (optional)
+    channel_df = None
+    if channel_csv_path:
+        channel_df = pd.read_csv(channel_csv_path)
+        print(f"  - channel_breakdown: {len(channel_df)} rows")
+
+    # Load engagement vintage (optional)
+    eng_vintage_df = None
+    if engagement_vintage_csv_path:
+        eng_vintage_df = pd.read_csv(engagement_vintage_csv_path)
+        print(f"  - engagement_vintage: {len(eng_vintage_df)} rows")
+
+    # Build results dict
+    results = {}
+    for mne in vintage_df["MNE"].unique():
+        results[mne] = {
+            "vintage_df": vintage_df[vintage_df["MNE"] == mne].copy(),
+            "summary_df": None,
+            "channel_breakdown_df": channel_df[channel_df["MNE"] == mne].copy() if channel_df is not None else None,
+            "engagement_vintage_df": eng_vintage_df[eng_vintage_df["MNE"] == mne].copy() if eng_vintage_df is not None else None,
+            "engagement_summary_df": None,
+        }
 
     generate_dashboard(results, output_path, title)
 
@@ -1282,48 +1367,64 @@ def generate_sample_dashboard(output_path="sample_dashboard.html"):
 
 if __name__ == "__main__":
     import os
+    import sys
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Look for CSV in current folder first, then source folder
-    csv_files = [f for f in os.listdir(script_dir) if f.endswith('.csv') and 'engagement' not in f.lower()]
+    # Check command line argument for folder path
+    if len(sys.argv) > 1:
+        data_path = sys.argv[1]
+    else:
+        data_path = script_dir
 
-    if not csv_files:
-        # Try source folder at different levels
-        for source_path in [
-            os.path.join(script_dir, "..", "..", "source"),
-            os.path.join(script_dir, "..", "source"),
-            os.path.join(script_dir, "source"),
-        ]:
-            if os.path.exists(source_path):
-                csv_files = [os.path.join(source_path, f) for f in os.listdir(source_path) if f.endswith('.csv') and 'engagement' not in f.lower()]
-                if csv_files:
-                    break
+    print(f"Looking for data in: {data_path}")
 
-    if not csv_files:
-        print("ERROR: No CSV file found!")
-        print("Put your CSV file in the same folder as this script.")
-        print("\nGenerating sample dashboard instead...")
-        generate_sample_dashboard(os.path.join(script_dir, "sample_dashboard.html"))
+    # Option 1: Look for vintage_output folder (from export_all_to_hdfs)
+    output_folder = os.path.join(data_path, "vintage_output")
+    if os.path.exists(output_folder):
+        print(f"Found vintage_output folder")
+        generate_dashboard_from_folder(output_folder, os.path.join(script_dir, "vintage_dashboard.html"))
+        print(f"\nDONE! Open this file in your browser:")
+        print(f"  {os.path.join(script_dir, 'vintage_dashboard.html')}")
         exit(0)
 
-    # Get full path
-    if os.path.dirname(csv_files[0]):
-        csv_path = csv_files[0]
-    else:
-        csv_path = os.path.join(script_dir, csv_files[0])
+    # Option 2: Look for individual CSV files in the folder
+    vintage_csv = None
+    channel_csv = None
+    eng_vintage_csv = None
 
-    print(f"Found CSV: {csv_path}")
+    for f in os.listdir(data_path):
+        if f.endswith('.csv'):
+            if 'vintage_curves' in f.lower() or (f.lower().startswith('vintage') and 'engagement' not in f.lower() and 'channel' not in f.lower()):
+                vintage_csv = os.path.join(data_path, f)
+            elif 'channel' in f.lower():
+                channel_csv = os.path.join(data_path, f)
+            elif 'engagement_vintage' in f.lower():
+                eng_vintage_csv = os.path.join(data_path, f)
 
-    # Check for engagement CSV
-    engagement_csv = None
-    eng_files = [f for f in os.listdir(os.path.dirname(csv_path) or script_dir) if 'engagement' in f.lower() and f.endswith('.csv')]
-    if eng_files:
-        engagement_csv = os.path.join(os.path.dirname(csv_path) or script_dir, eng_files[0])
-        print(f"Found engagement CSV: {engagement_csv}")
+    if vintage_csv:
+        print(f"Found vintage CSV: {vintage_csv}")
+        if channel_csv:
+            print(f"Found channel CSV: {channel_csv}")
+        if eng_vintage_csv:
+            print(f"Found engagement vintage CSV: {eng_vintage_csv}")
 
-    output_path = os.path.join(script_dir, "vvd_vintage_dashboard.html")
-    generate_dashboard_from_csv(csv_path, output_path, engagement_csv_path=engagement_csv)
+        output_path = os.path.join(script_dir, "vintage_dashboard.html")
+        generate_dashboard_from_csv(vintage_csv, output_path,
+                                    channel_csv_path=channel_csv,
+                                    engagement_vintage_csv_path=eng_vintage_csv)
 
-    print(f"\nDONE! Open this file in your browser:")
-    print(f"  {output_path}")
+        print(f"\nDONE! Open this file in your browser:")
+        print(f"  {output_path}")
+        exit(0)
+
+    # Option 3: No data found - generate sample
+    print("ERROR: No data files found!")
+    print("\nExpected files:")
+    print("  - vintage_curves.csv (required)")
+    print("  - channel_breakdown.csv (optional)")
+    print("  - engagement_vintage.csv (optional)")
+    print("\nOr a folder named 'vintage_output' containing these files.")
+    print("\nGenerating sample dashboard instead...")
+    generate_sample_dashboard(os.path.join(script_dir, "sample_dashboard.html"))
+    print(f"\nOpen this file to see sample: {os.path.join(script_dir, 'sample_dashboard.html')}")

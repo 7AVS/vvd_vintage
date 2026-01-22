@@ -16,7 +16,8 @@ Items identified for the next version of the vintage calculation engine. These a
 | 4 | Test Groups | Hardcoded TG4 = Test - doesn't support A/B tests | Medium | NOT DONE |
 | 5 | Dashboard | Missing channel dropdown filter | Medium | PARTIAL (function exists) |
 | 6 | Future Channels | Only email supported, need mobile/ONB/ONO | Future | NOT STARTED |
-| 7 | Dashboard | Success metric dropdown - vintage curves for any metric | Med-High | NOT DONE |
+| 7 | Dashboard | Success metric dropdown - vintage curves for any metric | Med-High | PARTIAL |
+| 8 | Dashboard | Channel tab - show vintage curves BY CHANNEL (not just counts) | High | NOT DONE |
 
 ---
 
@@ -287,7 +288,35 @@ Medium-High - Important for understanding cohort-level engagement trends
 
 ---
 
-## Item 8: Reporting Group Code (RPT_GRP_CD)
+## Item 8: Channel Tab - Vintage Curves by Channel
+
+### Problem
+Current channel tab shows bar chart of client counts. User wants to see **vintage curves by channel** - success rate over days, broken down by channel.
+
+### Challenge
+Too many lines if showing all cohorts × all channels:
+- 6 cohorts × 3 channels = 18 lines (unreadable)
+
+### Solution Options
+1. **Single cohort view** - Force user to pick ONE cohort, show channel curves for that cohort
+2. **Latest cohort default** - Auto-select most recent cohort
+3. **Small multiples** - Grid of mini-charts, one per channel
+4. **Limit cohorts** - "Show last N cohorts" option
+
+### Decision Needed
+Which approach to implement? Recommend Option 1 (single cohort selection).
+
+### Implementation
+- Need vintage curves grouped by COHORT + CHANNEL (not COHORT + GROUP)
+- Only for TEST group (CONTROL has no real channel)
+- Add cohort selector that defaults to latest when on channel tab
+
+### Priority
+High - User specifically requested this
+
+---
+
+## Item 9: Reporting Group Code (RPT_GRP_CD)
 
 ### Problem
 RPT_GRP_CD is available in tactic but not being used.

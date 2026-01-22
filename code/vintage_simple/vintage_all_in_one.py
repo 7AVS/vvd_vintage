@@ -552,7 +552,12 @@ def enrich_with_engagement(success_df, email_df, fulfillment_df):
             F.col("EMAIL_OPENED"),
             F.col("EMAIL_CLICKED"),
             F.col("EMAIL_UNSUBSCRIBED"),
-            F.col("EMAIL_BOUNCED")
+            F.col("EMAIL_BOUNCED"),
+            F.col("EMAIL_SENT_DT"),
+            F.col("EMAIL_OPENED_DT"),
+            F.col("EMAIL_CLICKED_DT"),
+            F.col("EMAIL_UNSUBSCRIBED_DT"),
+            F.col("EMAIL_BOUNCED_DT")
         )
         result = result.join(
             email_select,

@@ -3,6 +3,7 @@ VVD Vintage Dashboard Generator
 ===============================
 
 Takes vintage analysis output and generates an interactive HTML dashboard.
+Now includes engagement funnel visualization (email sent/opened/clicked, fulfillment).
 
 For YARN/Spark Jupyter (can't save files locally):
     results = run_all_campaigns(spark)
@@ -21,13 +22,14 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
     Generate interactive HTML dashboard from vintage analysis results.
 
     Args:
-        results: Dictionary from run_all_campaigns() or dict of {mne: {"vintage_df": df, "summary_df": df}}
+        results: Dictionary from run_all_campaigns() or dict of {mne: {"vintage_df": df, "summary_df": df, "engagement_summary_df": df}}
         output_path: Where to save the HTML file
         title: Dashboard title
     """
 
     # Collect all vintage data
     all_data = []
+    all_engagement = []
     campaigns = []
 
     for mne, result in results.items():
@@ -41,11 +43,22 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
         all_data.append(df)
         campaigns.append(mne)
 
+        # Collect engagement data if available
+        if result.get("engagement_summary_df") is not None and not result["engagement_summary_df"].empty:
+            eng_df = result["engagement_summary_df"].copy()
+            all_engagement.append(eng_df)
+
     if not all_data:
         print("No data to generate dashboard")
         return
 
     combined_df = pd.concat(all_data, ignore_index=True)
+
+    # Combine engagement data if available
+    engagement_json = "[]"
+    if all_engagement:
+        combined_eng = pd.concat(all_engagement, ignore_index=True)
+        engagement_json = combined_eng.to_json(orient="records")
 
     # Convert to JSON for embedding
     data_json = combined_df.to_json(orient="records")
@@ -101,6 +114,27 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
             font-size: 1em;
             min-width: 150px;
         }}
+        .tabs {{
+            display: flex;
+            gap: 0;
+            margin-left: auto;
+        }}
+        .tab {{
+            padding: 10px 20px;
+            background: #e9ecef;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }}
+        .tab:first-child {{ border-radius: 4px 0 0 4px; }}
+        .tab:last-child {{ border-radius: 0 4px 4px 0; }}
+        .tab.active {{
+            background: #003366;
+            color: white;
+            border-color: #003366;
+        }}
+        .tab:hover:not(.active) {{ background: #dee2e6; }}
         .main {{
             padding: 20px 40px;
         }}
@@ -111,12 +145,14 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
             padding: 20px;
             margin-bottom: 20px;
         }}
+        .hidden {{ display: none !important; }}
         .summary-table {{
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding: 20px;
             overflow-x: auto;
+            margin-bottom: 20px;
         }}
         .summary-table h3 {{
             margin-bottom: 15px;
@@ -139,6 +175,31 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
         tr:hover {{ background: #f9f9f9; }}
         .positive {{ color: #28a745; font-weight: bold; }}
         .negative {{ color: #dc3545; }}
+        .funnel-container {{
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }}
+        .funnel-chart {{
+            flex: 1;
+            min-width: 300px;
+        }}
+        .funnel-table {{
+            flex: 1;
+            min-width: 300px;
+        }}
+        .metric-card {{
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }}
+        .metric-card .label {{ font-size: 0.9em; color: #666; }}
+        .metric-card .value {{ font-size: 1.5em; font-weight: bold; color: #003366; }}
+        .metric-card .rate {{ font-size: 0.85em; color: #28a745; }}
         .footer {{
             text-align: center;
             padding: 20px;
@@ -178,42 +239,87 @@ def generate_dashboard(results, output_path="vvd_vintage_dashboard.html", title=
             <option value="monthly">Monthly</option>
         </select>
     </div>
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('vintage')">Vintage Curves</div>
+        <div class="tab" onclick="switchTab('engagement')">Engagement Funnel</div>
+    </div>
 </div>
 
 <div class="main">
-    <div class="chart-container">
-        <div id="vintageChart" style="height: 500px;"></div>
+    <!-- Vintage View -->
+    <div id="vintageView">
+        <div class="chart-container">
+            <div id="vintageChart" style="height: 500px;"></div>
+        </div>
+
+        <div class="summary-table">
+            <h3>Summary - Final Day Metrics</h3>
+            <table id="summaryTable">
+                <thead>
+                    <tr>
+                        <th>Cohort</th>
+                        <th>Window</th>
+                        <th>Test N</th>
+                        <th>Test Rate</th>
+                        <th>Control N</th>
+                        <th>Control Rate</th>
+                        <th>Lift (pp)</th>
+                        <th>95% CI</th>
+                        <th>Significant</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody">
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="summary-table">
-        <h3>Summary - Final Day Metrics</h3>
-        <table id="summaryTable">
-            <thead>
-                <tr>
-                    <th>Cohort</th>
-                    <th>Window</th>
-                    <th>Test N</th>
-                    <th>Test Rate</th>
-                    <th>Control N</th>
-                    <th>Control Rate</th>
-                    <th>Lift (pp)</th>
-                    <th>95% CI</th>
-                    <th>Significant</th>
-                </tr>
-            </thead>
-            <tbody id="summaryBody">
-            </tbody>
-        </table>
+    <!-- Engagement View -->
+    <div id="engagementView" class="hidden">
+        <div class="chart-container">
+            <h3 style="margin-bottom: 15px; color: #003366;">Email Engagement Funnel</h3>
+            <div class="funnel-container">
+                <div class="funnel-chart">
+                    <div id="funnelChart" style="height: 350px;"></div>
+                </div>
+                <div class="funnel-table">
+                    <div id="engagementCards"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-table">
+            <h3>Engagement Summary - All Campaigns</h3>
+            <table id="engagementTable">
+                <thead>
+                    <tr>
+                        <th>Campaign</th>
+                        <th>Total Clients</th>
+                        <th>Emails Sent</th>
+                        <th>Sent Rate</th>
+                        <th>Opened</th>
+                        <th>Open Rate</th>
+                        <th>Clicked</th>
+                        <th>Click Rate</th>
+                        <th>Fulfilled</th>
+                        <th>Fulfillment Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="engagementBody">
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <div class="footer">
-    VVD Vintage Dashboard | Marketing Analytics
+    VVD Vintage Dashboard | Marketing Analytics | SuperFact Layer 4: Client Journey
 </div>
 
 <script>
 // Embedded data
 const rawData = {data_json};
+const engagementData = {engagement_json};
 const campaigns = {campaigns_json};
 
 // Set generated date
@@ -227,6 +333,19 @@ campaigns.forEach(c => {{
     opt.textContent = c;
     campaignSelect.appendChild(opt);
 }});
+
+// Tab switching
+function switchTab(tab) {{
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`.tab:${{tab === 'vintage' ? 'first-child' : 'last-child'}}`).classList.add('active');
+
+    document.getElementById('vintageView').classList.toggle('hidden', tab !== 'vintage');
+    document.getElementById('engagementView').classList.toggle('hidden', tab !== 'engagement');
+
+    if (tab === 'engagement') {{
+        updateEngagement();
+    }}
+}}
 
 // Get unique cohorts for selected campaign
 function getCohorts(mne) {{
@@ -253,11 +372,10 @@ function updateCohortDropdown() {{
 
 // Aggregate data monthly if needed
 function aggregateMonthly(data) {{
-    // Group by month and calculate weighted averages
     const grouped = {{}};
 
     data.forEach(row => {{
-        const month = row.COHORT.substring(0, 7); // yyyy-MM
+        const month = row.COHORT.substring(0, 7);
         const day = row.DAY;
         const key = month + '_' + day;
 
@@ -278,7 +396,6 @@ function aggregateMonthly(data) {{
         grouped[key].CTRL_SUCCESSES += row.CTRL_SUCCESSES || 0;
     }});
 
-    // Calculate rates
     return Object.values(grouped).map(row => ({{
         ...row,
         TEST_RATE: row.TEST_CLIENTS > 0 ? (row.TEST_SUCCESSES / row.TEST_CLIENTS) * 100 : 0,
@@ -356,6 +473,11 @@ function updateChart() {{
 
     // Update summary table
     updateSummaryTable(data, cohorts);
+
+    // Also update engagement if on that tab
+    if (!document.getElementById('engagementView').classList.contains('hidden')) {{
+        updateEngagement();
+    }}
 }}
 
 // Update summary table
@@ -386,8 +508,118 @@ function updateSummaryTable(data, cohorts) {{
             <td>${{(final.CTRL_CLIENTS || 0).toLocaleString()}}</td>
             <td>${{(final.CTRL_RATE || 0).toFixed(2)}}%</td>
             <td class="${{lift > 0 ? 'positive' : 'negative'}}">${{lift.toFixed(2)}}pp</td>
-            <td>[$${{ciLower.toFixed(2)}}, ${{ciUpper.toFixed(2)}}]</td>
-            <td>${{significant ? '✓ Yes' : 'No'}}</td>
+            <td>[${{ciLower.toFixed(2)}}, ${{ciUpper.toFixed(2)}}]</td>
+            <td>${{significant ? '&#10003; Yes' : 'No'}}</td>
+        `;
+        tbody.appendChild(row);
+    }});
+}}
+
+// Update engagement view
+function updateEngagement() {{
+    const mne = document.getElementById('campaignSelect').value;
+
+    // Find engagement data for this campaign
+    const engData = engagementData.find(d => d.MNE === mne);
+
+    // Update funnel chart
+    updateFunnelChart(engData);
+
+    // Update engagement cards
+    updateEngagementCards(engData);
+
+    // Update engagement table (all campaigns)
+    updateEngagementTable();
+}}
+
+// Update funnel chart
+function updateFunnelChart(engData) {{
+    if (!engData) {{
+        Plotly.newPlot('funnelChart', [], {{
+            title: 'No engagement data available',
+            height: 350
+        }});
+        return;
+    }}
+
+    const total = engData.TOTAL_CLIENTS || 0;
+    const sent = engData.EMAIL_SENT || 0;
+    const opened = engData.EMAIL_OPENED || 0;
+    const clicked = engData.EMAIL_CLICKED || 0;
+
+    const trace = {{
+        type: 'funnel',
+        y: ['Total Clients', 'Email Sent', 'Email Opened', 'Email Clicked'],
+        x: [total, sent, opened, clicked],
+        textinfo: 'value+percent previous',
+        marker: {{
+            color: ['#003366', '#2E86AB', '#28a745', '#F18F01']
+        }},
+        connector: {{ line: {{ color: '#ccc' }} }}
+    }};
+
+    const layout = {{
+        title: engData.MNE + ' - Email Funnel',
+        height: 350,
+        margin: {{ l: 100, r: 20 }}
+    }};
+
+    Plotly.newPlot('funnelChart', [trace], layout, {{ responsive: true }});
+}}
+
+// Update engagement cards
+function updateEngagementCards(engData) {{
+    const container = document.getElementById('engagementCards');
+
+    if (!engData) {{
+        container.innerHTML = '<div class="metric-card"><span class="label">No engagement data available for this campaign</span></div>';
+        return;
+    }}
+
+    const metrics = [
+        {{ label: 'Total Clients', value: engData.TOTAL_CLIENTS, rate: null }},
+        {{ label: 'Emails Sent', value: engData.EMAIL_SENT, rate: engData.EMAIL_SENT_RATE }},
+        {{ label: 'Emails Opened', value: engData.EMAIL_OPENED, rate: engData.EMAIL_OPEN_RATE }},
+        {{ label: 'Emails Clicked', value: engData.EMAIL_CLICKED, rate: engData.EMAIL_CLICK_RATE }},
+        {{ label: 'Fulfilled', value: engData.FULFILLED, rate: engData.FULFILLMENT_RATE }}
+    ];
+
+    container.innerHTML = metrics
+        .filter(m => m.value !== undefined && m.value !== null)
+        .map(m => `
+            <div class="metric-card">
+                <span class="label">${{m.label}}</span>
+                <div>
+                    <span class="value">${{(m.value || 0).toLocaleString()}}</span>
+                    ${{m.rate !== null && m.rate !== undefined ? `<span class="rate">${{m.rate.toFixed(1)}}%</span>` : ''}}
+                </div>
+            </div>
+        `).join('');
+}}
+
+// Update engagement table
+function updateEngagementTable() {{
+    const tbody = document.getElementById('engagementBody');
+    tbody.innerHTML = '';
+
+    if (!engagementData || engagementData.length === 0) {{
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#666;">No engagement data available</td></tr>';
+        return;
+    }}
+
+    engagementData.forEach(eng => {{
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${{eng.MNE || '-'}}</td>
+            <td>${{(eng.TOTAL_CLIENTS || 0).toLocaleString()}}</td>
+            <td>${{(eng.EMAIL_SENT || 0).toLocaleString()}}</td>
+            <td>${{(eng.EMAIL_SENT_RATE || 0).toFixed(1)}}%</td>
+            <td>${{(eng.EMAIL_OPENED || 0).toLocaleString()}}</td>
+            <td>${{(eng.EMAIL_OPEN_RATE || 0).toFixed(1)}}%</td>
+            <td>${{(eng.EMAIL_CLICKED || 0).toLocaleString()}}</td>
+            <td>${{(eng.EMAIL_CLICK_RATE || 0).toFixed(1)}}%</td>
+            <td>${{(eng.FULFILLED || 0).toLocaleString()}}</td>
+            <td>${{(eng.FULFILLMENT_RATE || 0).toFixed(1)}}%</td>
         `;
         tbody.appendChild(row);
     }});
@@ -407,7 +639,9 @@ updateChart();
 
     print(f"Dashboard generated: {output_path}")
     print(f"Campaigns included: {', '.join(campaigns)}")
-    print(f"Total data points: {len(combined_df)}")
+    print(f"Total vintage data points: {len(combined_df)}")
+    if all_engagement:
+        print(f"Engagement data: {len(all_engagement)} campaigns")
 
 
 def display_dashboard(results, title="VVD Vintage Curves"):
@@ -427,6 +661,7 @@ def display_dashboard(results, title="VVD Vintage Curves"):
     """
     # Collect all vintage data
     all_data = []
+    all_engagement = []
     campaigns = []
 
     for mne, result in results.items():
@@ -440,11 +675,22 @@ def display_dashboard(results, title="VVD Vintage Curves"):
         all_data.append(df)
         campaigns.append(mne)
 
+        # Collect engagement data if available
+        if result.get("engagement_summary_df") is not None and not result["engagement_summary_df"].empty:
+            eng_df = result["engagement_summary_df"].copy()
+            all_engagement.append(eng_df)
+
     if not all_data:
         print("No data to display")
         return
 
     combined_df = pd.concat(all_data, ignore_index=True)
+
+    # Combine engagement data if available
+    engagement_json = "[]"
+    if all_engagement:
+        combined_eng = pd.concat(all_engagement, ignore_index=True)
+        engagement_json = combined_eng.to_json(orient="records")
 
     # Convert to JSON for embedding
     data_json = combined_df.to_json(orient="records")
@@ -457,26 +703,29 @@ def display_dashboard(results, title="VVD Vintage Curves"):
         <div style="opacity: 0.8; font-size: 0.85em;">Test vs Control Comparison</div>
     </div>
 
-    <div style="background: white; padding: 15px 20px; border-bottom: 1px solid #ddd; display: flex; gap: 20px; flex-wrap: wrap;">
+    <div style="background: white; padding: 15px 20px; border-bottom: 1px solid #ddd; display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
         <div>
             <label style="font-size: 0.8em; color: #666; display: block;">Campaign</label>
-            <select id="campaignSelect" onchange="updateDashboard()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <select id="campaignSelectNb" onchange="updateDashboardNb()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
             </select>
         </div>
         <div>
             <label style="font-size: 0.8em; color: #666; display: block;">Cohort</label>
-            <select id="cohortSelect" onchange="updateDashboard()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <select id="cohortSelectNb" onchange="updateDashboardNb()" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
                 <option value="all">All Cohorts</option>
             </select>
         </div>
+        <div style="margin-left: auto;">
+            <button onclick="toggleViewNb('vintage')" id="vintageTabNb" style="padding: 8px 16px; background: #003366; color: white; border: none; cursor: pointer;">Vintage</button>
+            <button onclick="toggleViewNb('engagement')" id="engagementTabNb" style="padding: 8px 16px; background: #e9ecef; border: 1px solid #ddd; cursor: pointer;">Engagement</button>
+        </div>
     </div>
 
-    <div id="chartArea" style="padding: 20px; background: white;"></div>
-
-    <div style="padding: 20px; background: white;">
-        <h4 style="color: #003366; margin-bottom: 10px;">Summary - Final Day Metrics</h4>
+    <div id="vintageViewNb" style="padding: 20px; background: white;">
+        <div id="chartAreaNb"></div>
+        <h4 style="color: #003366; margin: 20px 0 10px;">Summary - Final Day Metrics</h4>
         <div style="overflow-x: auto;">
-            <table id="summaryTbl" style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+            <table id="summaryTblNb" style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
                 <thead>
                     <tr style="background: #003366; color: white;">
                         <th style="padding: 8px; text-align: left;">Cohort</th>
@@ -489,9 +738,15 @@ def display_dashboard(results, title="VVD Vintage Curves"):
                         <th style="padding: 8px; text-align: left;">95% CI</th>
                     </tr>
                 </thead>
-                <tbody id="summaryBody"></tbody>
+                <tbody id="summaryBodyNb"></tbody>
             </table>
         </div>
+    </div>
+
+    <div id="engagementViewNb" style="padding: 20px; background: white; display: none;">
+        <div id="funnelChartNb" style="height: 300px;"></div>
+        <h4 style="color: #003366; margin: 20px 0 10px;">Engagement Summary</h4>
+        <div id="engagementCardsNb" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
     </div>
 </div>
 
@@ -499,22 +754,91 @@ def display_dashboard(results, title="VVD Vintage Curves"):
 <script>
 (function() {{
     const data = {data_json};
+    const engagementData = {engagement_json};
     const campaigns = {campaigns_json};
 
     // Populate campaign dropdown
-    const campSel = document.getElementById('campaignSelect');
+    const campSel = document.getElementById('campaignSelectNb');
     campaigns.forEach(c => {{
         const opt = document.createElement('option');
         opt.value = c; opt.textContent = c;
         campSel.appendChild(opt);
     }});
 
-    window.updateDashboard = function() {{
-        const mne = document.getElementById('campaignSelect').value;
-        const cohortFilter = document.getElementById('cohortSelect').value;
+    window.toggleViewNb = function(view) {{
+        const vintageBtn = document.getElementById('vintageTabNb');
+        const engBtn = document.getElementById('engagementTabNb');
+        const vintageView = document.getElementById('vintageViewNb');
+        const engView = document.getElementById('engagementViewNb');
+
+        if (view === 'vintage') {{
+            vintageBtn.style.background = '#003366';
+            vintageBtn.style.color = 'white';
+            engBtn.style.background = '#e9ecef';
+            engBtn.style.color = 'black';
+            vintageView.style.display = 'block';
+            engView.style.display = 'none';
+        }} else {{
+            engBtn.style.background = '#003366';
+            engBtn.style.color = 'white';
+            vintageBtn.style.background = '#e9ecef';
+            vintageBtn.style.color = 'black';
+            vintageView.style.display = 'none';
+            engView.style.display = 'block';
+            updateEngagementNb();
+        }}
+    }};
+
+    window.updateEngagementNb = function() {{
+        const mne = document.getElementById('campaignSelectNb').value;
+        const engData = engagementData.find(d => d.MNE === mne);
+
+        if (!engData) {{
+            document.getElementById('funnelChartNb').innerHTML = '<p style="color:#666;text-align:center;padding:50px;">No engagement data available</p>';
+            document.getElementById('engagementCardsNb').innerHTML = '';
+            return;
+        }}
+
+        // Funnel chart
+        const trace = {{
+            type: 'funnel',
+            y: ['Total', 'Sent', 'Opened', 'Clicked'],
+            x: [engData.TOTAL_CLIENTS || 0, engData.EMAIL_SENT || 0, engData.EMAIL_OPENED || 0, engData.EMAIL_CLICKED || 0],
+            textinfo: 'value+percent previous',
+            marker: {{ color: ['#003366', '#2E86AB', '#28a745', '#F18F01'] }}
+        }};
+
+        Plotly.newPlot('funnelChartNb', [trace], {{
+            title: mne + ' Email Funnel',
+            height: 300,
+            margin: {{ l: 80 }}
+        }});
+
+        // Cards
+        const cards = document.getElementById('engagementCardsNb');
+        const metrics = [
+            ['Total', engData.TOTAL_CLIENTS, null],
+            ['Sent', engData.EMAIL_SENT, engData.EMAIL_SENT_RATE],
+            ['Opened', engData.EMAIL_OPENED, engData.EMAIL_OPEN_RATE],
+            ['Clicked', engData.EMAIL_CLICKED, engData.EMAIL_CLICK_RATE],
+            ['Fulfilled', engData.FULFILLED, engData.FULFILLMENT_RATE]
+        ].filter(m => m[1] !== undefined);
+
+        cards.innerHTML = metrics.map(m => `
+            <div style="background:#f8f9fa;padding:12px 20px;border-radius:6px;min-width:120px;">
+                <div style="font-size:0.8em;color:#666;">${{m[0]}}</div>
+                <div style="font-size:1.4em;font-weight:bold;color:#003366;">${{(m[1]||0).toLocaleString()}}</div>
+                ${{m[2] !== null && m[2] !== undefined ? `<div style="font-size:0.75em;color:#28a745;">${{m[2].toFixed(1)}}%</div>` : ''}}
+            </div>
+        `).join('');
+    }};
+
+    window.updateDashboardNb = function() {{
+        const mne = document.getElementById('campaignSelectNb').value;
+        const cohortFilter = document.getElementById('cohortSelectNb').value;
 
         // Update cohort dropdown
-        const cohortSel = document.getElementById('cohortSelect');
+        const cohortSel = document.getElementById('cohortSelectNb');
         const cohorts = [...new Set(data.filter(d => d.MNE === mne).map(d => d.COHORT))].sort();
         cohortSel.innerHTML = '<option value="all">All Cohorts</option>';
         cohorts.forEach(c => {{
@@ -559,7 +883,7 @@ def display_dashboard(results, title="VVD Vintage Curves"):
             }});
         }});
 
-        Plotly.newPlot('chartArea', traces, {{
+        Plotly.newPlot('chartAreaNb', traces, {{
             title: mne + ' Vintage Curves (solid=Test, dashed=Control)',
             xaxis: {{ title: 'Days from Treatment' }},
             yaxis: {{ title: 'Cumulative Rate (%)' }},
@@ -568,7 +892,7 @@ def display_dashboard(results, title="VVD Vintage Curves"):
         }});
 
         // Update summary table
-        const tbody = document.getElementById('summaryBody');
+        const tbody = document.getElementById('summaryBodyNb');
         tbody.innerHTML = '';
         uniqueCohorts.forEach(cohort => {{
             const cData = filtered.filter(d => d.COHORT === cohort);
@@ -594,25 +918,33 @@ def display_dashboard(results, title="VVD Vintage Curves"):
             `;
             tbody.appendChild(row);
         }});
+
+        // Update engagement if visible
+        if (document.getElementById('engagementViewNb').style.display !== 'none') {{
+            updateEngagementNb();
+        }}
     }};
 
-    updateDashboard();
+    updateDashboardNb();
 }})();
 </script>
 '''
 
     display(HTML(html_content))
     print(f"Dashboard displayed. Campaigns: {', '.join(campaigns)}")
+    if all_engagement:
+        print(f"Engagement data: {len(all_engagement)} campaigns")
 
 
-def generate_dashboard_from_csv(csv_path, output_path="vvd_vintage_dashboard.html", title="VVD Vintage Curves"):
+def generate_dashboard_from_csv(csv_path, output_path="vvd_vintage_dashboard.html", title="VVD Vintage Curves", engagement_csv_path=None):
     """
-    Generate dashboard from a saved CSV file.
+    Generate dashboard from saved CSV files.
 
     Args:
         csv_path: Path to CSV with vintage data (must have MNE column)
         output_path: Where to save the HTML
         title: Dashboard title
+        engagement_csv_path: Optional path to engagement CSV
     """
     df = pd.read_csv(csv_path)
 
@@ -621,8 +953,16 @@ def generate_dashboard_from_csv(csv_path, output_path="vvd_vintage_dashboard.htm
     for mne in df["MNE"].unique():
         results[mne] = {
             "vintage_df": df[df["MNE"] == mne].copy(),
-            "summary_df": None
+            "summary_df": None,
+            "engagement_summary_df": None
         }
+
+    # Load engagement data if provided
+    if engagement_csv_path:
+        eng_df = pd.read_csv(engagement_csv_path)
+        for mne in eng_df["MNE"].unique():
+            if mne in results:
+                results[mne]["engagement_summary_df"] = eng_df[eng_df["MNE"] == mne].copy()
 
     generate_dashboard(results, output_path, title)
 
@@ -632,7 +972,7 @@ def generate_sample_dashboard(output_path="sample_dashboard.html"):
     """Generate a sample dashboard with fake data for testing."""
     import numpy as np
 
-    # Create sample data
+    # Create sample vintage data
     data = []
     for mne in ["VCN", "VDA", "VDT"]:
         for cohort in ["2025-01", "2025-02", "2025-03"]:
@@ -657,11 +997,38 @@ def generate_sample_dashboard(output_path="sample_dashboard.html"):
                 })
 
     df = pd.DataFrame(data)
+
+    # Create sample engagement data
+    engagement_data = []
+    for mne in ["VCN", "VDA", "VDT"]:
+        total = np.random.randint(8000, 12000)
+        sent = int(total * np.random.uniform(0.85, 0.95))
+        opened = int(sent * np.random.uniform(0.15, 0.30))
+        clicked = int(opened * np.random.uniform(0.10, 0.25))
+        fulfilled = int(total * np.random.uniform(0.80, 0.90))
+
+        engagement_data.append({
+            "MNE": mne,
+            "TOTAL_CLIENTS": total,
+            "EMAIL_SENT": sent,
+            "EMAIL_SENT_RATE": round(sent / total * 100, 2),
+            "EMAIL_OPENED": opened,
+            "EMAIL_OPEN_RATE": round(opened / total * 100, 2),
+            "EMAIL_CLICKED": clicked,
+            "EMAIL_CLICK_RATE": round(clicked / total * 100, 2),
+            "FULFILLED": fulfilled,
+            "FULFILLMENT_RATE": round(fulfilled / total * 100, 2)
+        })
+
+    eng_df = pd.DataFrame(engagement_data)
+
+    # Build results
     results = {}
     for mne in df["MNE"].unique():
         results[mne] = {
             "vintage_df": df[df["MNE"] == mne].copy(),
-            "summary_df": None
+            "summary_df": None,
+            "engagement_summary_df": eng_df[eng_df["MNE"] == mne].copy()
         }
 
     generate_dashboard(results, output_path, "Sample VVD Dashboard")
@@ -674,7 +1041,7 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Look for CSV in current folder first, then source folder
-    csv_files = [f for f in os.listdir(script_dir) if f.endswith('.csv')]
+    csv_files = [f for f in os.listdir(script_dir) if f.endswith('.csv') and 'engagement' not in f.lower()]
 
     if not csv_files:
         # Try source folder at different levels
@@ -684,14 +1051,16 @@ if __name__ == "__main__":
             os.path.join(script_dir, "source"),
         ]:
             if os.path.exists(source_path):
-                csv_files = [os.path.join(source_path, f) for f in os.listdir(source_path) if f.endswith('.csv')]
+                csv_files = [os.path.join(source_path, f) for f in os.listdir(source_path) if f.endswith('.csv') and 'engagement' not in f.lower()]
                 if csv_files:
                     break
 
     if not csv_files:
         print("ERROR: No CSV file found!")
         print("Put your CSV file in the same folder as this script.")
-        exit(1)
+        print("\nGenerating sample dashboard instead...")
+        generate_sample_dashboard(os.path.join(script_dir, "sample_dashboard.html"))
+        exit(0)
 
     # Get full path
     if os.path.dirname(csv_files[0]):
@@ -701,8 +1070,15 @@ if __name__ == "__main__":
 
     print(f"Found CSV: {csv_path}")
 
+    # Check for engagement CSV
+    engagement_csv = None
+    eng_files = [f for f in os.listdir(os.path.dirname(csv_path) or script_dir) if 'engagement' in f.lower() and f.endswith('.csv')]
+    if eng_files:
+        engagement_csv = os.path.join(os.path.dirname(csv_path) or script_dir, eng_files[0])
+        print(f"Found engagement CSV: {engagement_csv}")
+
     output_path = os.path.join(script_dir, "vvd_vintage_dashboard.html")
-    generate_dashboard_from_csv(csv_path, output_path)
+    generate_dashboard_from_csv(csv_path, output_path, engagement_csv_path=engagement_csv)
 
     print(f"\nDONE! Open this file in your browser:")
     print(f"  {output_path}")

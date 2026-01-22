@@ -907,6 +907,7 @@ def run_vintage_analysis(spark, mne, show_plots=True, verbose=True, include_enga
     # 4a: Check what channels exist in the tactic data
     # Channel comes from TACTIC_CELL_CD - NOT hardcoded
     # Note: TACTIC_CELL_CD values may have trailing spaces, so we trim them
+    # Note: Channels can be combos like EM_IM (email + internet banking)
     channel_counts = tactic_df.groupBy(F.trim(F.col("TACTIC_CELL_CD")).alias("CHANNEL_TRIMMED")).count().collect()
     channels_in_data = {row["CHANNEL_TRIMMED"]: row["count"] for row in channel_counts}
     log(f"    [Layer 4] Channels in data: {channels_in_data}")
@@ -914,17 +915,18 @@ def run_vintage_analysis(spark, mne, show_plots=True, verbose=True, include_enga
     # 4b: Fulfillment - for email, this is captured via EMAIL_SENT
     fulfillment_df = None
     if include_engagement:
-        # Check if there are email clients - fulfillment for email = email sent
-        has_email = "EM" in channels_in_data and channels_in_data["EM"] > 0
+        # Check if there are email clients - channel contains "EM" (handles combos like EM_IM)
+        has_email = any("EM" in ch for ch in channels_in_data.keys() if ch)
         fulfillment_df = load_fulfillment(spark, tactic_ids, channel="EMAIL" if has_email else "OTHER")
 
-    # 4c: Email engagement (only for clients with TACTIC_CELL_CD = 'EM')
+    # 4c: Email engagement (for clients where channel CONTAINS 'EM')
+    # This includes: EM, EM_IM, EM_MB, etc. (any combo with email)
     email_df = None
     if include_engagement:
-        # Filter tactic to only email channel clients (trim to handle spaces)
-        email_clients = tactic_df.filter(F.trim(F.col("TACTIC_CELL_CD")) == "EM")
-        email_client_count = channels_in_data.get("EM", 0)
-        log(f"    [Layer 4] Email channel clients (TACTIC_CELL_CD=EM): {email_client_count:,}")
+        # Filter to clients whose channel contains "EM" (trim to handle spaces)
+        email_clients = tactic_df.filter(F.trim(F.col("TACTIC_CELL_CD")).contains("EM"))
+        email_client_count = sum(count for ch, count in channels_in_data.items() if ch and "EM" in ch)
+        log(f"    [Layer 4] Email channel clients (TACTIC_CELL_CD contains EM): {email_client_count:,}")
 
         if email_client_count > 0:
             # Get tactic IDs for email clients only

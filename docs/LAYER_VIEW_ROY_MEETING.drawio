@@ -1,0 +1,169 @@
+<mxfile host="65bd71144e">
+    <diagram name="Roy Meeting - Pilot Status" id="roy-meeting">
+        <mxGraphModel dx="1200" dy="849" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0" adaptiveColors="auto">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Vintage Automation: SuperFact Pilot in Action" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=28;fontStyle=1;fontColor=#1a1a1a;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="20" width="800" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="subtitle" value="Proving the 4-Layer Architecture Works — Ready for Roy" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=2;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="60" width="800" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="summary-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="100" width="1200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="summary-text" value="&lt;b&gt;ONE SENTENCE:&lt;/b&gt; Built a working Vintage Automation engine as a &lt;b&gt;pilot project&lt;/b&gt; that demonstrates the SuperFact 4-layer framework — pulling experiment data from tactic tables, discovering channels automatically, and producing vintage curves with lift and confidence intervals." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontColor=#5b2c6f;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="105" width="1160" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="layers-title" value="THE 4 LAYERS: What&#39;s Working Now vs Swap Points" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=18;fontStyle=1;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="180" width="500" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer1-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="220" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer1-status" value="✅ FROM DATA" style="text;html=1;strokeColor=none;fillColor=#82b366;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#ffffff;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="230" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer1-title" value="Layer 1: Experiment Metadata" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;fontColor=#145a32;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="260" width="280" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer1-content" value="&lt;div style=&#39;text-align:left;font-size:12px;padding:10px&#39;&gt;&lt;b&gt;Source:&lt;/b&gt; tactic_evnt_hist&lt;br&gt;&lt;br&gt;&lt;b&gt;What we pull:&lt;/b&gt;&lt;br&gt;• Test/Control groups (TST_GRP_CD)&lt;br&gt;• Cohorts (TREATMT_STRT_DT)&lt;br&gt;• Channel (TACTIC_CELL_CD) ← &lt;b&gt;NEW!&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&#39;color:#145a32&#39;&gt;✓ No hardcoding needed&lt;/span&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="290" width="260" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer2-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="220" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer2-status" value="⏳ SWAP POINT" style="text;html=1;strokeColor=none;fillColor=#d6b656;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#ffffff;" parent="1" vertex="1">
+                    <mxGeometry x="390" y="230" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer2-title" value="Layer 2: Campaign Metadata" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;fontColor=#7f6000;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="260" width="280" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer2-content" value="&lt;div style=&#39;text-align:left;font-size:12px;padding:10px&#39;&gt;&lt;b&gt;Today:&lt;/b&gt; CAMPAIGN_METADATA dict&lt;br&gt;(hardcoded in Python)&lt;br&gt;&lt;br&gt;&lt;b&gt;Future:&lt;/b&gt; Mnemonic Mapping v2&lt;br&gt;&lt;br&gt;&lt;b&gt;When to swap:&lt;/b&gt;&lt;br&gt;MM v2 has primary/secondary metric fields&lt;br&gt;&lt;br&gt;&lt;span style=&#39;color:#7f6000&#39;&gt;⟳ Ready to swap when source exists&lt;/span&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="390" y="290" width="260" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer3-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="680" y="220" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer3-status" value="⏳ SWAP POINT" style="text;html=1;strokeColor=none;fillColor=#d6b656;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#ffffff;" parent="1" vertex="1">
+                    <mxGeometry x="690" y="230" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer3-title" value="Layer 3: Success Definitions" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;fontColor=#7f6000;" parent="1" vertex="1">
+                    <mxGeometry x="680" y="260" width="280" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer3-content" value="&lt;div style=&#39;text-align:left;font-size:12px;padding:10px&#39;&gt;&lt;b&gt;Today:&lt;/b&gt; SUCCESS_DEFINITIONS dict&lt;br&gt;(hardcoded in Python)&lt;br&gt;&lt;br&gt;&lt;b&gt;Future:&lt;/b&gt; Success Library (GitHub)&lt;br&gt;&lt;br&gt;&lt;b&gt;When to swap:&lt;/b&gt;&lt;br&gt;Success Library code files ready&lt;br&gt;&lt;br&gt;&lt;span style=&#39;color:#7f6000&#39;&gt;⟳ Ready to swap when source exists&lt;/span&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="690" y="290" width="260" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer4-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="980" y="220" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer4-status" value="✅ FROM DATA" style="text;html=1;strokeColor=none;fillColor=#82b366;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#ffffff;" parent="1" vertex="1">
+                    <mxGeometry x="990" y="230" width="100" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer4-title" value="Layer 4: Client Journey" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;fontColor=#145a32;" parent="1" vertex="1">
+                    <mxGeometry x="980" y="260" width="280" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="layer4-content" value="&lt;div style=&#39;text-align:left;font-size:12px;padding:10px&#39;&gt;&lt;b&gt;Sources:&lt;/b&gt; VISA_DR_CRD, POS_TXN, EDW&lt;br&gt;&lt;br&gt;&lt;b&gt;What we pull:&lt;/b&gt;&lt;br&gt;• Card acquisition/activation&lt;br&gt;• Card usage (transactions)&lt;br&gt;• Wallet provisioning (tokens)&lt;br&gt;• Email engagement&lt;br&gt;&lt;br&gt;&lt;span style=&#39;color:#145a32&#39;&gt;✓ All success outcomes working&lt;/span&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="990" y="290" width="260" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow1" value="" style="endArrow=classic;html=1;strokeWidth=3;strokeColor=#666666;rounded=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="360" y="320" as="sourcePoint"/>
+                        <mxPoint x="380" y="320" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow2" value="" style="endArrow=classic;html=1;strokeWidth=3;strokeColor=#666666;rounded=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="660" y="320" as="sourcePoint"/>
+                        <mxPoint x="680" y="320" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow3" value="" style="endArrow=classic;html=1;strokeWidth=3;strokeColor=#666666;rounded=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="960" y="320" as="sourcePoint"/>
+                        <mxPoint x="980" y="320" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="insight-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="450" width="580" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="insight-title" value="💡 KEY BREAKTHROUGH: Channel From Data" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=16;fontStyle=1;fontColor=#1a5276;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="460" width="400" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="insight-content" value="&lt;table style=&quot;font-size:12px;width:100%&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td style=&quot;width: 45%; padding: 10px;&quot;&gt;&lt;b style=&quot;vertical-align: top; color: rgb(146, 43, 33);&quot;&gt;BEFORE (Wrong):&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;background-color: rgb(255, 200, 109);&quot; color=&quot;#ffffff&quot;&gt;&lt;code style=&quot;&quot;&gt;channel: &quot;EMAIL&quot;  # hardcoded&lt;/code&gt;&lt;br&gt;&lt;/font&gt;&lt;br&gt;&lt;span style=&quot;vertical-align: top;&quot;&gt;• Assumed all clients got email&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;vertical-align: top;&quot;&gt;• CONTROL has no channel!&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;vertical-align: top;&quot;&gt;• Missed combo channels (EM_IM)&lt;/span&gt;&lt;/td&gt;&lt;td style=&quot;width:10%;text-align:center;font-size:24px&quot;&gt;→&lt;/td&gt;&lt;td style=&quot;width:45%;vertical-align:top;padding:10px&quot;&gt;&lt;b style=&quot;color: rgb(20, 90, 50);&quot;&gt;AFTER (Correct):&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;background-color: light-dark(rgb(255, 255, 255), rgb(255, 255, 255));&quot;&gt;&lt;code&gt;TACTIC_CELL_CD.contains(&quot;EM&quot;)&lt;/code&gt;&lt;br&gt;&lt;/span&gt;&lt;br&gt;• Discovered from data&lt;br&gt;• Handles EM, EM_IM, MB, XX&lt;br&gt;• Email engagement filtered correctly&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="470" width="560" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="campaigns-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="680" y="450" width="280" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="campaigns-title" value="6 Pilot Campaigns" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="680" y="455" width="280" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="campaigns-table" value="&lt;table style=&#39;font-size:11px;width:100%;border-collapse:collapse&#39;&gt;&lt;tr&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;&lt;b&gt;VCN&lt;/b&gt; Contextual Notification&lt;/td&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;Acquisition&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;&lt;b&gt;VDA&lt;/b&gt; Black Friday Cyber Monday&lt;/td&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;Acquisition&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;&lt;b&gt;VDT&lt;/b&gt; Activation Trigger&lt;/td&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;Activation&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;&lt;b&gt;VUI&lt;/b&gt; Usage Trigger&lt;/td&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;Usage&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;&lt;b&gt;VUT&lt;/b&gt; Tokenization Usage&lt;/td&gt;&lt;td style=&#39;padding:3px;border-bottom:1px solid #ccc&#39;&gt;Tokenization&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;padding:3px&#39;&gt;&lt;b&gt;VAW&lt;/b&gt; Add To Wallet&lt;/td&gt;&lt;td style=&#39;padding:3px&#39;&gt;Tokenization&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="683" y="471" width="260" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="output-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="980" y="450" width="280" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="output-title" value="✅ Working Output" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;fontColor=#145a32;" parent="1" vertex="1">
+                    <mxGeometry x="980" y="455" width="280" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="output-content" value="&lt;div style=&#39;text-align:left;font-size:12px;padding:10px&#39;&gt;• Vintage curves by cohort&lt;br&gt;• Test vs Control comparison&lt;br&gt;• Lift calculation&lt;br&gt;• 95% Confidence intervals&lt;br&gt;• CSV export for dashboards&lt;br&gt;• HTML dashboard (self-sufficient)&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="990" y="473" width="260" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="alignment-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="630" width="580" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="alignment-title" value="How This Aligns with SuperFact Goals" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;fontColor=#5b2c6f;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="635" width="580" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="alignment-table" value="&lt;table style=&#39;font-size:12px;width:100%;border-collapse:collapse&#39;&gt;&lt;tr style=&#39;background:#f0f0f0&#39;&gt;&lt;th style=&#39;padding:6px;border:1px solid #ccc;text-align:left&#39;&gt;SuperFact Target&lt;/th&gt;&lt;th style=&#39;padding:6px;border:1px solid #ccc;text-align:left&#39;&gt;Vintage Automation Delivers&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;padding:6px;border:1px solid #ccc&#39;&gt;Fast turnaround on Vintages&lt;/td&gt;&lt;td style=&#39;padding:6px;border:1px solid #ccc&#39;&gt;&lt;b&gt;This is the direct output&lt;/b&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;padding:6px;border:1px solid #ccc&#39;&gt;Feed dashboards quickly&lt;/td&gt;&lt;td style=&#39;padding:6px;border:1px solid #ccc&#39;&gt;CSV export + HTML dashboard ready&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;padding:6px;border:1px solid #ccc&#39;&gt;QBR/MBR automation&lt;/td&gt;&lt;td style=&#39;padding:6px;border:1px solid #ccc&#39;&gt;Vintage data feeds aggregated results&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&#39;padding:6px;border:1px solid #ccc&#39;&gt;AI/NL Querying ready&lt;/td&gt;&lt;td style=&#39;padding:6px;border:1px solid #ccc&#39;&gt;Structured, documented data&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="90" y="665" width="560" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="next-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="680" y="630" width="280" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="next-title" value="Next Steps" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;fontColor=#7f6000;" parent="1" vertex="1">
+                    <mxGeometry x="680" y="635" width="280" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="next-content" value="&lt;div style=&#39;text-align:left;font-size:12px;padding:10px&#39;&gt;1. Test VCN on Spark environment&lt;br&gt;2. Validate against known results&lt;br&gt;3. Get TST_GRP_CD meanings&lt;br&gt;4. Integrate channel breakdown&lt;br&gt;5. Document for handoff&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="690" y="665" width="260" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="questions-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="980" y="630" width="280" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="questions-title" value="Questions for Experts" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=14;fontStyle=1;fontColor=#922b21;" parent="1" vertex="1">
+                    <mxGeometry x="980" y="635" width="280" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="questions-content" value="&lt;div style=&#39;text-align:left;font-size:12px;padding:10px&#39;&gt;❓ Where are fulfillment codes documented?&lt;br&gt;&lt;br&gt;❓ All TST_GRP_CD values and meanings?&lt;br&gt;&lt;br&gt;❓ What does RPT_GRP_CD represent?&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="990" y="642" width="260" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="key-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1a5276;strokeColor=#1a5276;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="800" width="1180" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="key-text" value="&lt;span style=&quot;font-size: 16px; color: rgb(255, 255, 255);&quot;&gt;&lt;font color=&quot;#ffffff&quot;&gt;&lt;b style=&quot;&quot;&gt;KEY MESSAGE:&lt;/b&gt; Vintage Automation is not parallel work — it&#39;s &lt;b style=&quot;&quot;&gt;implementation of the SuperFact vision&lt;/b&gt;.&lt;br&gt;We pull what we can from data NOW, document swap points for LATER, and prove the 4-layer architecture works.&lt;br&gt;&lt;b style=&quot;&quot;&gt;This is a pilot. The patterns scale to other campaign families.&lt;/b&gt;&lt;/font&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="810" width="1140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1;" parent="1" vertex="1">
+                    <mxGeometry x="1300" y="180" width="180" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-title" value="Status Legend" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fontStyle=1;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="1300" y="185" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-green" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#82b366;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="1310" y="210" width="20" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-green-text" value="FROM DATA (working)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="1335" y="207" width="140" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-yellow" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d6b656;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="1310" y="232" width="20" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-yellow-text" value="SWAP POINT (ready)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;rounded=1;" parent="1" vertex="1">
+                    <mxGeometry x="1335" y="229" width="140" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

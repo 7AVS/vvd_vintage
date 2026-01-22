@@ -2,18 +2,21 @@
 
 Items identified for the next version of the vintage calculation engine. These are NOT to be coded immediately - this is a planning document.
 
+**Last Updated:** January 2026
+
 ---
 
 ## Summary of Issues
 
-| # | Area | Issue | Priority |
-|---|------|-------|----------|
-| 1 | Data Sources | Not leveraging all available fields from tactic/ODS | High |
-| 2 | Fulfillment | Logic is WRONG - no fulfillment code mapping | Critical |
-| 3 | Channel | Not using channel field - affects email calculation | High |
-| 4 | Test Groups | Hardcoded TG4 = Test - doesn't support A/B tests | Medium |
-| 5 | Dashboard | Missing channel dropdown filter | Medium |
-| 6 | Future Channels | Only email supported, need mobile/ONB/ONO | Future |
+| # | Area | Issue | Priority | Status |
+|---|------|-------|----------|--------|
+| 1 | Data Sources | Not leveraging all available fields from tactic/ODS | High | **PARTIAL** |
+| 2 | Fulfillment | Logic is WRONG - no fulfillment code mapping | Critical | NOT DONE |
+| 3 | Channel | Not using channel field - affects email calculation | High | **DONE** |
+| 4 | Test Groups | Hardcoded TG4 = Test - doesn't support A/B tests | Medium | NOT DONE |
+| 5 | Dashboard | Missing channel dropdown filter | Medium | PARTIAL (function exists) |
+| 6 | Future Channels | Only email supported, need mobile/ONB/ONO | Future | NOT STARTED |
+| 7 | Dashboard | Success metric dropdown - vintage curves for any metric | Med-High | NOT DONE |
 
 ---
 
@@ -103,41 +106,34 @@ FULFILLMENT_CODES = {
 
 ---
 
-## Item 3: Channel Field & Email Calculation
+## Item 3: Channel Field & Email Calculation - **COMPLETED**
 
-### Problem
+### Problem (RESOLVED)
 The email engagement calculation currently includes ALL clients in the experiment, but:
 - Not all clients in a deployment receive email
 - Some clients may be targeted by other channels (mobile, ONB, etc.)
 - Including non-email clients in email metrics is wrong
 
-### Example
-```
-Deployment has 10,000 clients:
-- 7,000 targeted by EMAIL
-- 2,000 targeted by MOBILE
-- 1,000 targeted by ONB
+### Solution Implemented
 
-Current (wrong): Calculate email metrics for all 10,000
-Correct: Calculate email metrics only for 7,000 email-targeted clients
-```
+**Channel field:** `TACTIC_CELL_CD` in tactic_evnt_hist
 
-### What We Need
-1. Pull channel from tactic data
-2. Filter clients by channel when calculating channel-specific metrics
-3. Add channel as a filter in the dashboard
+**Key findings:**
+- Channel codes: EM (email), IM (internet), MB (mobile banking), XX (control)
+- Channels can be combos like `EM_IM` (email + internet banking)
+- CONTROL group has no real channel (they receive no contact)
+- Values may have trailing spaces - use `F.trim()`
 
-### Where Channel Might Be
-- `CHNL_CD` in tactic_evnt_hist
-- `ADDNL_DECISN_DATA1` or similar flexible field
-- ODS table
+**Code changes:**
+1. Channel discovered from `TACTIC_CELL_CD` (not hardcoded)
+2. Email engagement filtered to clients where `TACTIC_CELL_CD.contains("EM")`
+3. Vintage curves calculated at COHORT + GROUP level (not by channel)
+4. `build_channel_breakdown()` function created for dashboard visibility
+5. Channel breakdown shows distribution by channel (TEST group only meaningful)
 
-### Action Required
-1. Confirm where channel field is stored
-2. Add channel to `load_tactic()` output
-3. Filter `load_email_engagement()` to only include EMAIL channel clients
-4. Add channel column to output data
-5. Add channel dropdown to dashboard
+**Remaining:**
+- [ ] Integrate channel breakdown into dashboard
+- [ ] Add channel dropdown filter to dashboard
 
 ---
 
@@ -262,7 +258,36 @@ This is for future phases. Current focus:
 
 ---
 
-## Item 7: Reporting Group Code (RPT_GRP_CD)
+## Item 7: Success Metric Dropdown (Vintage Any Metric)
+
+### Problem
+Email engagement metrics (open rate, click rate, unsubscribe) are shown as **overall summary** - one number for the whole campaign. Over 2 years of cohorts, this is useless. Need to see the **curve per cohort** for any metric.
+
+### What Director Wants to See
+"Show me the unsubscribe rate curve by cohort" - not just "overall unsubscribe rate is 2%"
+
+### Solution
+Add **metric dropdown** to dashboard:
+- Primary success (card acquisition, activation, etc.)
+- Open rate curve (by cohort)
+- Click rate curve (by cohort)
+- Unsubscribe rate curve (by cohort)
+- Bounce rate curve (by cohort)
+
+Same vintage curve structure, different Y-axis metric.
+
+### Implementation Notes
+- Email engagement already captured per client with dates (EMAIL_OPENED_DT, EMAIL_CLICKED_DT, etc.)
+- Need to build vintage curves for engagement metrics same way we do for success
+- `DAYS_TO_OPEN`, `DAYS_TO_CLICK`, etc. instead of `DAYS_TO_SUCCESS`
+- Dashboard dropdown switches which curve to display
+
+### Priority
+Medium-High - Important for understanding cohort-level engagement trends
+
+---
+
+## Item 8: Reporting Group Code (RPT_GRP_CD)
 
 ### Problem
 RPT_GRP_CD is available in tactic but not being used.
@@ -277,6 +302,9 @@ RPT_GRP_CD is available in tactic but not being used.
 2. Find lookup table for RPT_GRP_CD descriptions
 3. Add to output data
 4. Add segment dropdown to dashboard (if useful)
+
+### Priority
+Medium - Need to understand meaning first
 
 ---
 

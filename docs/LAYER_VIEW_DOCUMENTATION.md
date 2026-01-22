@@ -574,3 +574,138 @@ journey_df = query_client_journey(client_list, start_date, end_date)
 | **Total** | | **59 swappable items** |
 
 When SuperFact layers mature, these 59 items become dynamic queries instead of hardcoded values.
+
+---
+
+## The Virtuous Cycle: Metadata Enrichment
+
+### The Hidden Benefit
+
+While the primary goal of this architecture is to measure campaign performance, there's a powerful secondary effect: **every campaign we onboard enriches our metadata ecosystem**.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     THE VIRTUOUS CYCLE                                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ┌──────────────┐                          ┌──────────────────────┐       │
+│   │ New Campaign │                          │  Richer Metadata     │       │
+│   │   Onboarded  │ ─────────────────────▶  │    Catalog           │       │
+│   └──────────────┘                          └──────────────────────┘       │
+│          │                                           │                      │
+│          │                                           │                      │
+│          │    ┌─────────────────────────────────────┘                      │
+│          │    │                                                            │
+│          │    ▼                                                            │
+│          │   ┌────────────────────────────────────────┐                    │
+│          │   │  Success Library grows with:           │                    │
+│          │   │  • New metric definitions              │                    │
+│          │   │  • Documented business rules           │                    │
+│          │   │  • Reusable calculation logic          │                    │
+│          │   └────────────────────────────────────────┘                    │
+│          │                                           │                      │
+│          │                                           │                      │
+│          ▼                                           ▼                      │
+│   ┌──────────────────────┐              ┌──────────────────────┐           │
+│   │ Mnemonic Mapping v2  │              │ Future Projects      │           │
+│   │ gets more campaigns  │              │ can reuse all this   │           │
+│   └──────────────────────┘              └──────────────────────┘           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### What Gets Captured With Each Campaign
+
+When we onboard a new campaign (like VCN, VDA, etc.), we're not just running an analysis—we're building institutional knowledge:
+
+| What We Capture | Where It Goes | Benefit |
+|-----------------|---------------|---------|
+| Campaign → Metric mapping | Mnemonic Mapping v2 | Anyone can look up what VCN measures |
+| Success metric definition | Success Library | Reusable across all projects |
+| Filter logic (STS_CD, SRVC_ID) | Success Library code | No more tribal knowledge |
+| Data source paths | Documented in Layer 4 | Clear data lineage |
+| Test group definitions | Experiment Metadata | Standardized across experiments |
+
+### The Compounding Effect
+
+```
+Campaign 1 (VCN):
+  → Defines card_acquisition metric
+  → Documents VISA_DR_CRD filters
+  → Establishes baseline architecture
+
+Campaign 2 (VDA):
+  → Reuses card_acquisition (already defined!)
+  → Adds Black Friday context to metadata
+  → Zero new metric work needed
+
+Campaign 3 (VDT):
+  → Needs card_activation (new metric)
+  → Success Library grows by 1 metric
+  → Future activation campaigns benefit
+
+Campaign 6 (VAW):
+  → Reuses wallet_provisioning from VUT
+  → Only config changes, no logic work
+  → Metadata now has 6 campaigns documented
+```
+
+### Why This Matters for the Organization
+
+1. **Reduced Onboarding Time**: Each new campaign is faster than the last because metrics already exist
+
+2. **Consistency Across Teams**: When another team needs "card acquisition", they use our exact definition
+
+3. **Self-Documenting System**: The metadata catalog IS the documentation—always up to date
+
+4. **Audit Trail**: We know exactly how every metric is calculated and where data comes from
+
+5. **Scalability**: Adding campaign 7, 8, 9... becomes trivial if metrics are already defined
+
+### The End State Vision
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          FUTURE STATE                                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Marketing Team wants to measure a new campaign:                            │
+│                                                                             │
+│  1. Look up metric in Success Library catalog          ✅ Already exists    │
+│  2. Add row to Mnemonic Mapping v2                     ✅ Self-service      │
+│  3. Run Vintage Engine                                 ✅ No code changes   │
+│  4. Get results in dashboard                           ✅ Same day          │
+│                                                                             │
+│  Total effort: Minutes, not days                                            │
+│  Engineering involvement: Zero (for existing metrics)                       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Tracking Our Progress
+
+As we onboard more campaigns, we should track:
+
+| Metric | Current | Goal |
+|--------|---------|------|
+| Campaigns in Vintage Engine | 6 | 20+ |
+| Metrics in Success Library | 4 | 15+ |
+| Fields in Mnemonic Mapping v2 | Basic | Full measurement fields |
+| Average time to onboard new campaign | Days | Hours |
+| Engineering involvement for new campaign | Required | Optional |
+
+---
+
+## Visual Resources
+
+This documentation is accompanied by several visual diagrams (Draw.io format) that present the architecture from different perspectives:
+
+| Diagram | File | Best For |
+|---------|------|----------|
+| Layer Architecture | `LAYER_VIEW_DIAGRAM.drawio` | Technical deep-dive |
+| Pain vs. Gain | `LAYER_VIEW_PAIN_VS_GAIN.drawio` | Executive summary - why we're doing this |
+| Dependency Map | `LAYER_VIEW_DEPENDENCY_MAP.drawio` | Showing impact of changes |
+| Medallion Architecture | `LAYER_VIEW_MEDALLION.drawio` | Industry-standard framing |
+| Assembly Line | `LAYER_VIEW_ASSEMBLY_LINE.drawio` | Intuitive metaphor for non-technical audience |
+
+All diagrams can be opened in Draw.io (diagrams.net) and exported to Visio (.vsdx) or PowerPoint.

@@ -15,6 +15,7 @@ eggs/
 venv/
 ENV/
 .venv/
+agents/
 
 # Jupyter
 .ipynb_checkpoints/

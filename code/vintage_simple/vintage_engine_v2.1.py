@@ -1444,7 +1444,14 @@ def export_all_to_hdfs(results, spark, base_path=None):
     for mne, result in results.items():
         if mne.startswith("_") or result is None:
             continue
-        df = result["vintage_df"].copy()
+        # Handle both dict format and direct DataFrame
+        if isinstance(result, dict) and "vintage_df" in result:
+            df = result["vintage_df"].copy()
+        elif isinstance(result, pd.DataFrame):
+            df = result.copy()
+        else:
+            print(f"    Warning: Unexpected result format for {mne}: {type(result)}")
+            continue
         df["MNE"] = mne
         all_vintage.append(df)
 
@@ -1458,7 +1465,7 @@ def export_all_to_hdfs(results, spark, base_path=None):
     for mne, result in results.items():
         if mne.startswith("_") or result is None:
             continue
-        if result.get("channel_breakdown_df") is not None:
+        if isinstance(result, dict) and result.get("channel_breakdown_df") is not None:
             all_channel.append(result["channel_breakdown_df"])
 
     if all_channel:
@@ -1471,7 +1478,7 @@ def export_all_to_hdfs(results, spark, base_path=None):
     for mne, result in results.items():
         if mne.startswith("_") or result is None:
             continue
-        if result.get("engagement_vintage_df") is not None:
+        if isinstance(result, dict) and result.get("engagement_vintage_df") is not None:
             all_eng_vintage.append(result["engagement_vintage_df"])
 
     if all_eng_vintage:
@@ -1484,7 +1491,7 @@ def export_all_to_hdfs(results, spark, base_path=None):
     for mne, result in results.items():
         if mne.startswith("_") or result is None:
             continue
-        if result.get("summary_df") is not None:
+        if isinstance(result, dict) and result.get("summary_df") is not None:
             all_summary.append(result["summary_df"])
 
     if all_summary:

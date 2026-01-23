@@ -1,20 +1,7 @@
-# Check if the file actually exists
-  fs = spark._jvm.org.apache.hadoop.fs.FileSystem.get(spark._jsc.hadoopConfiguration())
-  path = spark._jvm.org.apache.hadoop.fs.Path("/user/427966379/vintage_output/vintage_curves.csv")
-  print(f"File exists: {fs.exists(path)}")
+import base64
+  from IPython.display import HTML
 
-  # List what's actually in the folder
-  folder = spark._jvm.org.apache.hadoop.fs.Path("/user/427966379/vintage_output/")
-  if fs.exists(folder):
-      files = fs.listStatus(folder)
-      print("\nFiles in folder:")
-      for f in files:
-          print(f"  {f.getPath().getName()}")
-  else:
-      print("Folder doesn't exist")
-
-  This will tell us:
-  1. Does the file exist at the path we're linking to?
-  2. What's actually in the folder?
-
-  The rename might have failed silently, leaving the file as part-00000-xxx.csv instead of vintage_curves.csv. Let's see what's there.
+  csv_data = results['vintage_df'].to_csv(index=False)
+  b64 = base64.b64encode(csv_data.encode()).decode()
+  html = f'<a download="vintage_curves.csv" href="data:text/csv;base64,{b64}">Click to download vintage_curves.csv</a>'
+  display(HTML(html))

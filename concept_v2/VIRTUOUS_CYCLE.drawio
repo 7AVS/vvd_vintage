@@ -1,0 +1,371 @@
+<mxfile host="65bd71144e">
+    <diagram id="virtuous-cycle-v1" name="Version 1 - Library Center">
+        <mxGraphModel dx="1345" dy="1048" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="BUILDING THE SOURCE OF TRUTH" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=26;fontStyle=1;fontColor=#003168;" parent="1" vertex="1">
+                    <mxGeometry x="250" y="30" width="600" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="subtitle" value="Every campaign we build expands the library for the next one" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=2;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="250" y="70" width="600" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="library-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#003168;strokeColor=#003168;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="200" width="340" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="library-title" value="SUCCESS LIBRARY" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="220" width="300" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="library-subtitle" value="Source of Truth" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;fontColor=#07AFBF;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="250" width="300" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="metrics-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="410" y="285" width="280" height="175" as="geometry"/>
+                </mxCell>
+                <mxCell id="metrics-title" value="Reusable Metric Definitions" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontColor=#003168;" parent="1" vertex="1">
+                    <mxGeometry x="410" y="290" width="280" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="metric-1" value="✓  card_acquisition" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#003168;spacingLeft=20;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="315" width="180" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="metric-1-tag" value="VCN" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0091DA;strokeColor=none;fontColor=#FFFFFF;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="610" y="318" width="35" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="metric-2" value="✓  balance_increase" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#003168;spacingLeft=20;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="342" width="180" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="metric-2-tag" value="VCN" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0091DA;strokeColor=none;fontColor=#FFFFFF;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="610" y="345" width="35" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="metric-3" value="✓  deposit_growth" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#003168;spacingLeft=20;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="369" width="180" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="metric-3-tag" value="VDA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFC72C;strokeColor=none;fontColor=#003168;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="610" y="372" width="35" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="metric-4" value="✓  product_adoption" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#003168;spacingLeft=20;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="396" width="180" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="metric-4-tag" value="VDT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#07AFBF;strokeColor=none;fontColor=#FFFFFF;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="610" y="399" width="35" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="metric-more" value="..." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#999999;spacingLeft=25;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="420" width="100" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="left-label" value="Campaigns ADD" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="150" width="150" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="camp-vcn" value="VCN" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0091DA;strokeColor=#0091DA;fontColor=#FFFFFF;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="130" y="200" width="90" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="camp-vda" value="VDA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFC72C;strokeColor=#FFC72C;fontColor=#003168;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="130" y="280" width="90" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="camp-vdt" value="VDT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#07AFBF;strokeColor=#07AFBF;fontColor=#FFFFFF;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="130" y="360" width="90" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="camp-more" value="..." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontColor=#999999;" parent="1" vertex="1">
+                    <mxGeometry x="150" y="420" width="50" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-vcn" value="" style="endArrow=classic;html=1;strokeColor=#0091DA;strokeWidth=3;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="220" y="225" as="sourcePoint"/>
+                        <mxPoint x="380" y="320" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="300" y="225"/>
+                            <mxPoint x="300" y="320"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-vda" value="" style="endArrow=classic;html=1;strokeColor=#FFC72C;strokeWidth=3;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="220" y="305" as="sourcePoint"/>
+                        <mxPoint x="380" y="375" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="280" y="305"/>
+                            <mxPoint x="280" y="375"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-vdt" value="" style="endArrow=classic;html=1;strokeColor=#07AFBF;strokeWidth=3;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="220" y="385" as="sourcePoint"/>
+                        <mxPoint x="380" y="400" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="260" y="385"/>
+                            <mxPoint x="260" y="400"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="right-label" value="Future Campaigns REUSE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" parent="1" vertex="1">
+                    <mxGeometry x="850" y="150" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="future-1" value="VUI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#003168;strokeWidth=2;fontColor=#003168;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="250" width="90" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="future-1-note" value="reuses 2 metrics" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=2;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="875" y="300" width="100" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="future-2" value="VAW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#003168;strokeWidth=2;fontColor=#003168;fontSize=14;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="350" width="90" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="future-2-note" value="reuses 3 metrics" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=2;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="875" y="400" width="100" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-future1" value="" style="endArrow=classic;html=1;strokeColor=#003168;strokeWidth=2;dashed=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="720" y="340" as="sourcePoint"/>
+                        <mxPoint x="880" y="275" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="800" y="340"/>
+                            <mxPoint x="800" y="275"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-future2" value="" style="endArrow=classic;html=1;strokeColor=#003168;strokeWidth=2;dashed=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="720" y="380" as="sourcePoint"/>
+                        <mxPoint x="880" y="375" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="800" y="380"/>
+                            <mxPoint x="800" y="375"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="cycle-arrow" value="" style="curved=1;endArrow=classic;html=1;strokeColor=#FCA311;strokeWidth=4;startArrow=none;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="925" y="430" as="sourcePoint"/>
+                        <mxPoint x="175" y="460" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="800" y="530"/>
+                            <mxPoint x="550" y="560"/>
+                            <mxPoint x="300" y="530"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="cycle-label" value="...and they ADD more metrics" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#FCA311;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="540" width="260" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="message-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#CCCCCC;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="610" width="460" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="message-text" value="The more campaigns we build, the richer the library becomes,&#xa;the faster the next campaign goes." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=2;fontColor=#003168;" parent="1" vertex="1">
+                    <mxGeometry x="330" y="615" width="440" height="50" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="virtuous-cycle-v2" name="Version 2 - Simple Flow">
+        <mxGraphModel dx="874" dy="681" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="600" math="0" shadow="0">
+            <root>
+                <mxCell id="v2-0"/>
+                <mxCell id="v2-1" parent="v2-0"/>
+                <mxCell id="v2-title" value="THE COMPOUNDING EFFECT" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" parent="v2-1" vertex="1">
+                    <mxGeometry x="300" y="40" width="500" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0091DA;strokeColor=#0091DA;" parent="v2-1" vertex="1">
+                    <mxGeometry x="100" y="180" width="200" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box1-title" value="BUILD CAMPAIGN" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#FFFFFF;" parent="v2-1" vertex="1">
+                    <mxGeometry x="100" y="200" width="200" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box1-sub" value="VCN, VDA, VDT..." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#FFFFFF;" parent="v2-1" vertex="1">
+                    <mxGeometry x="100" y="225" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box1-detail" value="Define success metrics&#xa;Calculate vintage curves" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#FFFFFF;fontStyle=2;" parent="v2-1" vertex="1">
+                    <mxGeometry x="100" y="250" width="200" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-arrow1" value="" style="endArrow=classic;html=1;strokeColor=#003168;strokeWidth=4;" parent="v2-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="300" y="240" as="sourcePoint"/>
+                        <mxPoint x="400" y="240" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v2-arrow1-label" value="adds to" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;fontColor=#003168;" parent="v2-1" vertex="1">
+                    <mxGeometry x="320" y="210" width="60" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#003168;strokeColor=#003168;" parent="v2-1" vertex="1">
+                    <mxGeometry x="400" y="140" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box2-title" value="SUCCESS LIBRARY" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#FFFFFF;" parent="v2-1" vertex="1">
+                    <mxGeometry x="400" y="155" width="300" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box2-sub" value="Source of Truth" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2;fontColor=#07AFBF;" parent="v2-1" vertex="1">
+                    <mxGeometry x="400" y="180" width="300" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-metrics-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;" parent="v2-1" vertex="1">
+                    <mxGeometry x="420" y="210" width="260" height="115" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-m1" value="✓ card_acquisition" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#003168;spacingLeft=10;" parent="v2-1" vertex="1">
+                    <mxGeometry x="425" y="218" width="150" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-m2" value="✓ balance_increase" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#003168;spacingLeft=10;" parent="v2-1" vertex="1">
+                    <mxGeometry x="425" y="242" width="150" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-m3" value="✓ deposit_growth" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#003168;spacingLeft=10;" parent="v2-1" vertex="1">
+                    <mxGeometry x="425" y="266" width="150" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-m4" value="✓ product_adoption" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#003168;spacingLeft=10;" parent="v2-1" vertex="1">
+                    <mxGeometry x="425" y="290" width="150" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-growing" value="GROWING" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=bottom;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=1;fontColor=#07AFBF;spacingRight=10;" parent="v2-1" vertex="1">
+                    <mxGeometry x="580" y="295" width="90" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-arrow2" value="" style="endArrow=classic;html=1;strokeColor=#003168;strokeWidth=4;" parent="v2-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="700" y="240" as="sourcePoint"/>
+                        <mxPoint x="800" y="240" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v2-arrow2-label" value="enables" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;fontColor=#003168;" parent="v2-1" vertex="1">
+                    <mxGeometry x="720" y="210" width="60" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#07AFBF;strokeColor=#07AFBF;" parent="v2-1" vertex="1">
+                    <mxGeometry x="800" y="180" width="200" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box3-title" value="NEXT CAMPAIGN" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#FFFFFF;" parent="v2-1" vertex="1">
+                    <mxGeometry x="800" y="200" width="200" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box3-sub" value="Faster to build" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#FFFFFF;" parent="v2-1" vertex="1">
+                    <mxGeometry x="800" y="225" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-box3-detail" value="Reuse existing metrics&#xa;Only define what&#39;s new" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#FFFFFF;fontStyle=2;" parent="v2-1" vertex="1">
+                    <mxGeometry x="800" y="250" width="200" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-loop" value="" style="curved=1;endArrow=classic;html=1;strokeColor=#FCA311;strokeWidth=5;" parent="v2-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="900" y="300" as="sourcePoint"/>
+                        <mxPoint x="200" y="300" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="900" y="420"/>
+                            <mxPoint x="550" y="460"/>
+                            <mxPoint x="200" y="420"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v2-loop-label" value="...and adds MORE to the library" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1;fontColor=#FCA311;" parent="v2-1" vertex="1">
+                    <mxGeometry x="400" y="440" width="300" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="v2-message" value="Work compounds. Each campaign makes the next one easier." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#003168;" parent="v2-1" vertex="1">
+                    <mxGeometry x="250" y="520" width="600" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="virtuous-cycle-v3" name="Version 3 - Hub and Spoke">
+        <mxGraphModel dx="874" dy="681" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+            <root>
+                <mxCell id="v3-0"/>
+                <mxCell id="v3-1" parent="v3-0"/>
+                <mxCell id="v3-title" value="ONE LIBRARY, MANY CAMPAIGNS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" parent="v3-1" vertex="1">
+                    <mxGeometry x="300" y="30" width="500" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-subtitle" value="Each campaign contributes. All campaigns benefit." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=2;fontColor=#666666;" parent="v3-1" vertex="1">
+                    <mxGeometry x="300" y="65" width="500" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-hub" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#003168;strokeColor=#003168;" parent="v3-1" vertex="1">
+                    <mxGeometry x="400" y="220" width="300" height="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-hub-title" value="SUCCESS&#xa;LIBRARY" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#FFFFFF;" parent="v3-1" vertex="1">
+                    <mxGeometry x="450" y="290" width="200" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-hub-sub" value="Source of Truth" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;fontColor=#07AFBF;" parent="v3-1" vertex="1">
+                    <mxGeometry x="450" y="340" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-inner" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;" parent="v3-1" vertex="1">
+                    <mxGeometry x="475" y="370" width="150" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-metrics" value="card_acquisition&#xa;balance_increase&#xa;deposit_growth&#xa;..." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#003168;" parent="v3-1" vertex="1">
+                    <mxGeometry x="485" y="385" width="130" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-vcn" value="VCN" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0091DA;strokeColor=#0091DA;fontColor=#FFFFFF;fontSize=16;fontStyle=1;" parent="v3-1" vertex="1">
+                    <mxGeometry x="180" y="140" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-vcn-arrow" value="" style="endArrow=classic;startArrow=classic;html=1;strokeColor=#0091DA;strokeWidth=3;" parent="v3-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="270" y="195" as="sourcePoint"/>
+                        <mxPoint x="430" y="280" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v3-vda" value="VDA" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFC72C;strokeColor=#FFC72C;fontColor=#003168;fontSize=16;fontStyle=1;" parent="v3-1" vertex="1">
+                    <mxGeometry x="820" y="140" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-vda-arrow" value="" style="endArrow=classic;startArrow=classic;html=1;strokeColor=#FFC72C;strokeWidth=3;" parent="v3-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="830" y="195" as="sourcePoint"/>
+                        <mxPoint x="670" y="280" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v3-vdt" value="VDT" style="ellipse;whiteSpace=wrap;html=1;fillColor=#07AFBF;strokeColor=#07AFBF;fontColor=#FFFFFF;fontSize=16;fontStyle=1;" parent="v3-1" vertex="1">
+                    <mxGeometry x="900" y="335" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-vdt-arrow" value="" style="endArrow=classic;startArrow=classic;html=1;strokeColor=#07AFBF;strokeWidth=3;" parent="v3-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="900" y="370" as="sourcePoint"/>
+                        <mxPoint x="700" y="370" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v3-vui" value="VUI" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#003168;strokeWidth=2;fontColor=#003168;fontSize=16;fontStyle=1;" parent="v3-1" vertex="1">
+                    <mxGeometry x="780" y="530" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-vui-arrow" value="" style="endArrow=classic;startArrow=classic;html=1;strokeColor=#003168;strokeWidth=2;dashed=1;" parent="v3-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="790" y="545" as="sourcePoint"/>
+                        <mxPoint x="650" y="480" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v3-vui-note" value="future" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=2;fontColor=#666666;" parent="v3-1" vertex="1">
+                    <mxGeometry x="805" y="600" width="50" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-vaw" value="VAW" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#003168;strokeWidth=2;fontColor=#003168;fontSize=16;fontStyle=1;" parent="v3-1" vertex="1">
+                    <mxGeometry x="220" y="530" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-vaw-arrow" value="" style="endArrow=classic;startArrow=classic;html=1;strokeColor=#003168;strokeWidth=2;dashed=1;" parent="v3-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="310" y="545" as="sourcePoint"/>
+                        <mxPoint x="450" y="480" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v3-vaw-note" value="future" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=2;fontColor=#666666;" parent="v3-1" vertex="1">
+                    <mxGeometry x="245" y="600" width="50" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-vut" value="VUT" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FCA311;strokeColor=#FCA311;fontColor=#FFFFFF;fontSize=16;fontStyle=1;" parent="v3-1" vertex="1">
+                    <mxGeometry x="100" y="335" width="100" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-vut-arrow" value="" style="endArrow=classic;startArrow=classic;html=1;strokeColor=#FCA311;strokeWidth=3;" parent="v3-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="200" y="370" as="sourcePoint"/>
+                        <mxPoint x="400" y="370" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v3-legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#CCCCCC;" parent="v3-1" vertex="1">
+                    <mxGeometry x="40" y="100" width="130" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-legend-title" value="LEGEND" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=1;fontColor=#003168;" parent="v3-1" vertex="1">
+                    <mxGeometry x="40" y="105" width="130" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-leg1" value="───►" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;spacingLeft=10;" parent="v3-1" vertex="1">
+                    <mxGeometry x="40" y="125" width="40" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-leg1-t" value="contributes" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#666666;" parent="v3-1" vertex="1">
+                    <mxGeometry x="80" y="125" width="80" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-leg2" value="◄───" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;spacingLeft=10;" parent="v3-1" vertex="1">
+                    <mxGeometry x="40" y="145" width="40" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-leg2-t" value="reuses" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#666666;" parent="v3-1" vertex="1">
+                    <mxGeometry x="80" y="145" width="80" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-leg3" value="- - -►" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#CCCCCC;spacingLeft=10;" parent="v3-1" vertex="1">
+                    <mxGeometry x="40" y="160" width="40" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-leg3-t" value="future" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#666666;" parent="v3-1" vertex="1">
+                    <mxGeometry x="80" y="160" width="80" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="v3-message" value="The library is the asset. Every campaign enriches it." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#003168;" parent="v3-1" vertex="1">
+                    <mxGeometry x="300" y="650" width="500" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

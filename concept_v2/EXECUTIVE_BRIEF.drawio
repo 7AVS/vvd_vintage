@@ -1,0 +1,428 @@
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
+  <diagram id="slide1-title" name="1. Title">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title-main" value="VINTAGE AUTOMATION" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=48;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="150" y="250" width="800" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="title-sub" value="Building Measurement Infrastructure That Scales" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="320" width="700" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="title-line" value="" style="endArrow=none;html=1;strokeColor=#CCCCCC;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="370" as="sourcePoint" />
+            <mxPoint x="700" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="title-brief" value="Executive Brief" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="450" y="390" width="200" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="slide2-problem" name="2. The Problem">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="prob-title" value="The Problem We Solved" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="prob-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="720" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="prob-today" value="TODAY: Every measurement request means..." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="prob-box1" value="Manual&#xa;Data&#xa;Extraction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="130" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="prob-box2" value="Tribal&#xa;Knowledge&#xa;&quot;How to calculate&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="290" y="130" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="prob-box3" value="Weeks&#xa;of Work&#xa;Per Campaign" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="500" y="130" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="prob-result" value="Result: Inconsistent definitions across teams" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#9EA2A2;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="230" width="360" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="prob-arrow" value="▼" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="385" y="290" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="prob-solution" value="WE BUILT AN ENGINE THAT CHANGES THIS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FCA311;strokeWidth=2;fontColor=#003168;fontSize=14;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="200" y="330" width="400" height="50" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="slide3-architecture" name="3. The Architecture">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="arch-title" value="The Vintage Automation Engine" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-sub" value="SuperFact 4-Layer Framework" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="55" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-L1" value="Layer 1&#xa;Who is in test?" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#0091DA;strokeWidth=2;fontColor=#003168;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="90" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-L2" value="Layer 2&#xa;What metric?" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FFC72C;strokeWidth=2;fontColor=#003168;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="210" y="90" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-L3" value="Layer 3&#xa;How to calc?" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FFC72C;strokeWidth=2;fontColor=#003168;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="380" y="90" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-L4" value="Layer 4&#xa;What did they do?" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#0091DA;strokeWidth=2;fontColor=#003168;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="550" y="90" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-arrow1" value="▼" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="355" y="155" width="30" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-engine" value="VINTAGE ENGINE&#xa;(Stable Core)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#003168;strokeWidth=1;fontColor=#003168;fontSize=12;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="220" y="185" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-arrow2" value="▼" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="355" y="250" width="30" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-csv" value="CSV / HDFS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="320" y="278" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-arrow3" value="▼" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="300" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-arrow4" value="▼" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="510" y="300" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-trackA" value="TRACK A&#xa;Tableau / CIDM&#xa;(Official)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="100" y="325" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-trackB" value="TRACK B&#xa;SharePoint / HTML&#xa;(In-House)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="420" y="325" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-parallel" value="◄───── PARALLEL ─────►" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="270" y="350" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-message" value="One engine. Two delivery tracks. Running in parallel." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="180" y="410" width="380" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-legend-title" value="LEGEND" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontStyle=1;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="750" y="90" width="60" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-legend1" value="" style="endArrow=none;html=1;strokeColor=#0091DA;strokeWidth=3;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="750" y="115" as="sourcePoint" />
+            <mxPoint x="770" y="115" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arch-legend1-text" value="From Data" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="775" y="108" width="60" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="arch-legend2" value="" style="endArrow=none;html=1;strokeColor=#FFC72C;strokeWidth=3;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="750" y="135" as="sourcePoint" />
+            <mxPoint x="770" y="135" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arch-legend2-text" value="Swap Point" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="775" y="128" width="60" height="15" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="slide4-current" name="4. Current State">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="cur-title" value="Current State: Proven and Ready" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cur-box1" value="6&#xa;Campaigns&#xa;Measured&#xa;&#xa;VCN VDA VDT&#xa;VUI VUT VAW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="180" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="cur-box2" value="4&#xa;Metrics&#xa;Defined&#xa;&#xa;card_acq&#xa;card_act&#xa;card_use&#xa;wallet_prov" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="270" y="90" width="180" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="cur-box3" value="Engine&#xa;Built&#xa;&#xa;✓" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="480" y="90" width="180" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="cur-trackA" value="Track A: Pending&#xa;Alignment with CIDM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="120" y="270" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cur-trackB" value="Track B: Ready NOW&#xa;HTML on SharePoint" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#07AFBF;strokeWidth=2;fontColor=#003168;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="390" y="270" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cur-message" value="We're not waiting. Track B delivers value TODAY." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="180" y="360" width="380" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="slide5-cycle" name="5. Virtuous Cycle">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="cyc-title" value="The Virtuous Cycle: Why This Scales" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-container1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="320" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-label1" value="THE CYCLE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="150" y="85" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-step1" value="New&#xa;Campaign" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=9;align=center;" vertex="1" parent="1">
+          <mxGeometry x="60" y="115" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-arr1" value="→" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="145" y="125" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-step2" value="Define&#xa;Metric" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=9;align=center;" vertex="1" parent="1">
+          <mxGeometry x="170" y="115" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-arr2" value="→" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="255" y="125" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-step3" value="Add to&#xa;Library" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FCA311;strokeWidth=2;fontColor=#003168;fontSize=9;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="280" y="115" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-arr3" value="↓" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="300" y="160" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-step4" value="Next&#xa;Faster" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#07AFBF;strokeWidth=2;fontColor=#003168;fontSize=9;align=center;" vertex="1" parent="1">
+          <mxGeometry x="60" y="200" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-arr4" value="←" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="145" y="210" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-step5" value="Library&#xa;Grows" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=9;align=center;" vertex="1" parent="1">
+          <mxGeometry x="170" y="200" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-arr5" value="←" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="255" y="210" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-loop" value="↺" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="160" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-container2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="80" width="340" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-label2" value="GROWTH: 6 campaigns, only 4 unique metrics" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="85" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-row1" value="VCN ──► defines card_acq" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="420" y="115" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-row2" value="VDA ──► reuses card_acq ✓" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="420" y="140" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-row3" value="VDT ──► adds card_act" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="420" y="165" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-row4" value="VUI ──► adds card_use" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="420" y="190" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-row5" value="VUT ──► adds wallet_prov" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="420" y="215" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-row6" value="VAW ──► reuses wallet_prov ✓" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="420" y="240" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="cyc-result" value="Campaign 7, 8, 9... become trivial if metrics exist" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="200" y="310" width="400" height="25" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="slide6-swap" name="6. Swap Points">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="swap-title" value="Modular Architecture: Built for the Future" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-sub" value="53 hardcoded items → Dynamic when infrastructure ready" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="55" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L2-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FFC72C;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="90" width="680" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L2-title" value="LAYER 2: Campaign Metadata" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="50" y="95" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L2-today-label" value="TODAY" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=1;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="120" width="50" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L2-today" value="Python dict&#xa;6 campaigns hardcoded" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=9;align=center;" vertex="1" parent="1">
+          <mxGeometry x="50" y="138" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L2-arrow" value="→" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#FCA311;" vertex="1" parent="1">
+          <mxGeometry x="250" y="150" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L2-swap" value="SWAP" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontStyle=1;fontColor=#FCA311;" vertex="1" parent="1">
+          <mxGeometry x="250" y="175" width="40" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L2-future-label" value="FUTURE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=1;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="310" y="120" width="50" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L2-future" value="Query Mnemonic&#xa;Mapping v2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#07AFBF;strokeWidth=1;fontColor=#003168;fontSize=9;align=center;" vertex="1" parent="1">
+          <mxGeometry x="310" y="138" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L3-container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FFC72C;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="215" width="680" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L3-title" value="LAYER 3: Success Definitions" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="50" y="220" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L3-today-label" value="TODAY" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=1;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="245" width="50" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L3-today" value="Filters in code&#xa;(24 items)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=9;align=center;" vertex="1" parent="1">
+          <mxGeometry x="50" y="263" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L3-arrow" value="→" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;fontColor=#FCA311;" vertex="1" parent="1">
+          <mxGeometry x="250" y="275" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L3-swap" value="SWAP" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontStyle=1;fontColor=#FCA311;" vertex="1" parent="1">
+          <mxGeometry x="250" y="300" width="40" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L3-future-label" value="FUTURE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=1;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="310" y="245" width="50" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-L3-future" value="Success Library&#xa;(GitHub)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#07AFBF;strokeWidth=1;fontColor=#003168;fontSize=9;align=center;" vertex="1" parent="1">
+          <mxGeometry x="310" y="263" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="swap-message" value="Engine core doesn't change - only the inputs swap" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="180" y="350" width="400" height="25" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="slide7-tracks" name="7. Two Tracks">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="trk-title" value="Two Tracks: Speed AND Governance" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-sub" value="One engine feeds both. We're not choosing - we get BOTH." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#9EA2A2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="55" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-A" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="90" width="300" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-A-title" value="TRACK A&#xa;Official" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="150" y="100" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-A-content" value="Platform:&#xa;Tableau via CIDM&#xa;&#xa;Status:&#xa;Pending alignment&#xa;&#xa;Strength:&#xa;Governed, enterprise-trusted&#xa;&#xa;Refresh:&#xa;Automated (when ready)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="80" y="145" width="260" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-B" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="90" width="300" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-B-title" value="TRACK B&#xa;In-House" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="490" y="100" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-B-content" value="Platform:&#xa;HTML/Plotly + SharePoint&#xa;&#xa;Status:&#xa;READY NOW&#xa;&#xa;Strength:&#xa;Fast, controlled, iterative&#xa;&#xa;Refresh:&#xa;Manual re-run" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="420" y="145" width="260" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-B-ready" value="READY NOW" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=1;fontColor=#07AFBF;" vertex="1" parent="1">
+          <mxGeometry x="480" y="195" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-parallel" value="◄────────── PARALLEL ──────────►" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="260" y="200" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="trk-message" value="Track B proves value NOW. Track A becomes official when ready." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="150" y="360" width="460" height="25" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="slide8-ask" name="8. What We Need">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ask-title" value="What We Need: Support and Buy-In" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ask-pillar1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="220" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="ask-pillar1-header" value="LEADERSHIP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="220" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ask-pillar1-content" value="• Awareness&#xa;• Support&#xa;• Champion this as&#xa;  the measurement standard" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="55" y="120" width="190" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="ask-pillar2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="80" width="220" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="ask-pillar2-header" value="CIDM / INFRA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="280" y="80" width="220" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ask-pillar2-content" value="• Alignment&#xa;• Prioritize integration&#xa;• Collaborate on&#xa;  Track A path" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="295" y="120" width="190" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="ask-pillar3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="80" width="220" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="ask-pillar3-header" value="OTHER TEAMS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#CCCCCC;strokeWidth=1;fontColor=#003168;fontSize=11;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="520" y="80" width="220" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ask-pillar3-content" value="• Adoption&#xa;• Contribute metric&#xa;  definitions&#xa;• Use Success Library&#xa;  for consistency" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="535" y="120" width="190" height="150" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="slide9-vision" name="9. The Vision">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="vis-title" value="The Vision: Self-Service Measurement" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=28;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#FCA311;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="80" width="560" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-header" value="FUTURE STATE" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#FCA311;" vertex="1" parent="1">
+          <mxGeometry x="330" y="85" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-intro" value="Marketing wants to measure a new campaign:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="130" y="115" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-step1" value="1. Look up metric in Success Library     ✓ Already exists" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="150" y="145" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-step2" value="2. Add row to Mnemonic Mapping v2        ✓ Self-service" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="150" y="170" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-step3" value="3. Run Vintage Engine                    ✓ No code changes" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="150" y="195" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-step4" value="4. View results in dashboard             ✓ Same day" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="150" y="220" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-result" value="Total effort: MINUTES, not weeks&#xa;Engineering involvement: ZERO (for existing metrics)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="200" y="250" width="360" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-quote-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#CCCCCC;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="310" width="560" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="vis-quote" value="&quot;Every campaign onboarded enriches our metadata ecosystem.&#xa;We're not just measuring - we're building the source of truth.&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="120" y="320" width="520" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

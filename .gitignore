@@ -25,6 +25,7 @@ ENV/
 .vscode/
 *.swp
 *.swo
+claude.md
 
 # OS
 .DS_Store
@@ -45,6 +46,7 @@ data/
 *.pem
 credentials.json
 context/
+archive/
 
 # Images
 image/

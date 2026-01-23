@@ -1666,6 +1666,170 @@ def export_to_hdfs_csv(results, spark, hdfs_path=None):
 
 
 # =============================================================================
+# BROWSER DOWNLOAD FUNCTIONS
+# =============================================================================
+# For environments where HDFS download links don't work (e.g., Jupyter on
+# separate server from Hue). Creates base64-encoded download links that work
+# directly in the browser.
+# =============================================================================
+
+def download_csv(data, filename="vintage_results.csv"):
+    """
+    Create a clickable download link for a DataFrame.
+
+    Converts DataFrame to CSV, base64-encodes it, and displays an HTML link
+    that triggers a browser download. Works in Jupyter notebooks when HDFS
+    download links are inaccessible.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        The DataFrame to download.
+    filename : str, optional
+        Name for the downloaded file (default: "vintage_results.csv").
+
+    Returns
+    -------
+    None
+        Displays an HTML download link in the notebook.
+
+    Notes
+    -----
+    - Maximum file size: 50 MB (to avoid browser memory issues)
+    - For larger datasets, filter before exporting
+    """
+    import base64
+
+    csv_data = data.to_csv(index=False)
+    size_mb = len(csv_data.encode('utf-8')) / (1024 * 1024)
+
+    if size_mb > 50:
+        print(f"Data too large ({size_mb:.1f} MB). Filter before exporting.")
+        return
+
+    b64 = base64.b64encode(csv_data.encode()).decode()
+    link = (
+        f'<a download="{filename}" href="data:text/csv;base64,{b64}" '
+        f'style="padding:6px 12px; background:#2196F3; color:white; '
+        f'text-decoration:none; border-radius:3px; margin:2px; display:inline-block;">'
+        f'Download {filename}</a>'
+    )
+    display(HTML(f'<div style="margin:5px 0;">{link} <span style="color:#666;">({size_mb:.2f} MB)</span></div>'))
+
+
+def download_results(results, mne=None):
+    """
+    Download all result DataFrames with one call.
+
+    Creates browser download links for vintage_df, summary_df,
+    channel_breakdown_df, and engagement_vintage_df. Works with both
+    single-campaign and multi-campaign results.
+
+    Parameters
+    ----------
+    results : dict
+        Output from run_vintage_analysis() or run_all_campaigns().
+    mne : str, optional
+        Campaign mnemonic. Required for single-campaign results to name files.
+        Ignored for multi-campaign results (uses combined data).
+
+    Returns
+    -------
+    None
+        Displays HTML download links in the notebook.
+
+    Examples
+    --------
+    # Single campaign
+    results = run_vintage_analysis(spark, 'VUT')
+    download_results(results, 'VUT')
+
+    # Multiple campaigns
+    results = run_all_campaigns(spark)
+    download_results(results)
+    """
+    structure = _detect_result_structure(results)
+
+    if structure == 'flat':
+        # Single campaign results
+        prefix = f"{mne}_" if mne else ""
+        print(f"Creating download links for {mne or 'single campaign'}...")
+        print("-" * 40)
+
+        if results.get("vintage_df") is not None and not results["vintage_df"].empty:
+            download_csv(results["vintage_df"], f"{prefix}vintage_curves.csv")
+
+        if results.get("summary_df") is not None and not results["summary_df"].empty:
+            download_csv(results["summary_df"], f"{prefix}summary.csv")
+
+        if results.get("channel_breakdown_df") is not None and not results["channel_breakdown_df"].empty:
+            download_csv(results["channel_breakdown_df"], f"{prefix}channel_breakdown.csv")
+
+        if results.get("engagement_vintage_df") is not None and not results["engagement_vintage_df"].empty:
+            download_csv(results["engagement_vintage_df"], f"{prefix}engagement_vintage.csv")
+
+    elif structure == 'nested':
+        # Multi-campaign results - combine all data
+        print("Creating download links for all campaigns...")
+        print("-" * 40)
+
+        # Vintage curves
+        all_vintage = []
+        for key, result in results.items():
+            if key.startswith("_") or result is None:
+                continue
+            if isinstance(result, dict) and result.get("vintage_df") is not None:
+                df = result["vintage_df"].copy()
+                df["MNE"] = key
+                all_vintage.append(df)
+        if all_vintage:
+            download_csv(pd.concat(all_vintage, ignore_index=True), "vintage_curves.csv")
+
+        # Summary
+        if results.get("_combined_summary") is not None:
+            download_csv(results["_combined_summary"], "summary.csv")
+        else:
+            all_summary = []
+            for key, result in results.items():
+                if key.startswith("_") or result is None:
+                    continue
+                if isinstance(result, dict) and result.get("summary_df") is not None:
+                    all_summary.append(result["summary_df"])
+            if all_summary:
+                download_csv(pd.concat(all_summary, ignore_index=True), "summary.csv")
+
+        # Channel breakdown
+        if results.get("_combined_channel_breakdown") is not None:
+            download_csv(results["_combined_channel_breakdown"], "channel_breakdown.csv")
+        else:
+            all_channel = []
+            for key, result in results.items():
+                if key.startswith("_") or result is None:
+                    continue
+                if isinstance(result, dict) and result.get("channel_breakdown_df") is not None:
+                    all_channel.append(result["channel_breakdown_df"])
+            if all_channel:
+                download_csv(pd.concat(all_channel, ignore_index=True), "channel_breakdown.csv")
+
+        # Engagement vintage
+        if results.get("_combined_engagement_vintage") is not None:
+            download_csv(results["_combined_engagement_vintage"], "engagement_vintage.csv")
+        else:
+            all_eng = []
+            for key, result in results.items():
+                if key.startswith("_") or result is None:
+                    continue
+                if isinstance(result, dict) and result.get("engagement_vintage_df") is not None:
+                    all_eng.append(result["engagement_vintage_df"])
+            if all_eng:
+                download_csv(pd.concat(all_eng, ignore_index=True), "engagement_vintage.csv")
+
+    else:
+        print("ERROR: Could not understand results structure.")
+        print("       Pass output from run_vintage_analysis() or run_all_campaigns()")
+
+
+# =============================================================================
 # SETUP & USAGE
 # =============================================================================
 
@@ -1674,29 +1838,32 @@ spark = SparkSession.builder.appName("Vintage Engine v2.1").getOrCreate()
 print_module_status()
 
 print("""
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                        VINTAGE ENGINE v2.1                                    ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+===============================================================================
+                          VINTAGE ENGINE v2.1
+===============================================================================
 
 Available campaigns: """ + ", ".join(ALL_MNES) + """
 
-USAGE - TWO STEPS:
+USAGE:
 
   Step 1: Run analysis
   --------------------
-  # Single campaign
-  results = run_vintage_analysis(spark, 'VUT')
+  results = run_vintage_analysis(spark, 'VUT')   # Single campaign
+  results = run_all_campaigns(spark)              # All campaigns
 
-  # OR multiple campaigns
-  results = run_all_campaigns(spark)
+  Step 2: Export (choose one)
+  ---------------------------
+  # Option A: HDFS export (if Hue download links work)
+  export_results(results, spark, 'VUT')           # Single campaign
+  export_results(results, spark)                  # Multiple campaigns
 
-  Step 2: Export
-  --------------------
-  # Single campaign - include the campaign name
-  export_results(results, spark, 'VUT')
+  # Option B: Browser download (if HDFS links don't work)
+  download_results(results, 'VUT')                # Single campaign
+  download_results(results)                       # Multiple campaigns
 
-  # Multiple campaigns - no name needed
-  export_results(results, spark)
+  # Option C: Download individual DataFrame
+  download_csv(results['vintage_df'], 'my_data.csv')
 
-That's it. Files go to: """ + get_hdfs_output_path() + """
+HDFS output folder: """ + get_hdfs_output_path() + """
+===============================================================================
 """)

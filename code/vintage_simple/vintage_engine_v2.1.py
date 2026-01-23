@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from scipy import stats
+from urllib.parse import quote
 from IPython.display import HTML, display
 
 # For inline plots in Jupyter
@@ -57,8 +58,10 @@ def get_hdfs_output_path():
     return f"{USER_CONFIG['hdfs_base_path']}/{USER_CONFIG['output_folder']}"
 
 def get_hue_download_link(hdfs_path):
-    """Generate a Hue download link for an HDFS path (relative - works in Hue environment)."""
-    return f"/filebrowser/download={hdfs_path}"
+    """Generate a Hue file browser link for an HDFS path (opens file in Hue)."""
+    # URL encode the path (/ becomes %2F)
+    encoded_path = quote(hdfs_path, safe='')
+    return f"/hue/filebrowser/view={encoded_path}"
 
 def get_hue_browse_link(hdfs_path):
     """Generate a Hue file browser link for an HDFS path."""
@@ -116,15 +119,44 @@ def rename_spark_output(spark, temp_folder_path, final_file_path):
         return False
 
 def display_download_links(exported_files):
-    """Display clickable download links in Jupyter notebook."""
+    """Display download information in Jupyter notebook."""
     if not exported_files:
         return
 
-    html = "<h3>Download Links</h3><ul>"
+    # Get the folder path from the first file
+    if exported_files:
+        folder_path = "/".join(exported_files[0][1].rsplit("/", 1)[:-1])
+    else:
+        folder_path = ""
+
+    # Build HTML with both clickable links and plain paths
+    html = f"""
+    <div style="background:#f5f5f5; padding:10px; border-radius:5px; margin:10px 0;">
+        <h4 style="margin-top:0;">Files exported to HDFS:</h4>
+        <p><b>Folder:</b> <code>{folder_path}</code></p>
+        <p><i>In Hue: Go to File Browser → Navigate to the path above → Click file to download</i></p>
+        <table style="width:100%; border-collapse:collapse;">
+            <tr style="background:#e0e0e0;">
+                <th style="text-align:left; padding:5px;">File</th>
+                <th style="text-align:right; padding:5px;">Rows</th>
+                <th style="text-align:left; padding:5px;">Full Path</th>
+            </tr>
+    """
+
     for name, path, rows in exported_files:
         link = get_hue_download_link(path)
-        html += f'<li><a href="{link}" target="_blank">{name}</a> ({rows:,} rows)</li>'
-    html += "</ul>"
+        html += f"""
+            <tr style="border-bottom:1px solid #ddd;">
+                <td style="padding:5px;"><a href="{link}" target="_blank">{name}</a></td>
+                <td style="text-align:right; padding:5px;">{rows:,}</td>
+                <td style="padding:5px; font-size:0.9em;"><code>{path}</code></td>
+            </tr>
+        """
+
+    html += """
+        </table>
+    </div>
+    """
 
     display(HTML(html))
 
@@ -1406,6 +1438,92 @@ def run_all_campaigns(spark, mnes=None, show_plots=True, include_engagement=True
 # EXPORT FUNCTIONS
 # =============================================================================
 
+def _detect_result_structure(results):
+    """Detect if results are flat (single campaign) or nested (multi-campaign)."""
+    if not isinstance(results, dict):
+        return 'unknown'
+    flat_keys = {'vintage_df', 'summary_df', 'channel_breakdown_df',
+                 'engagement_summary_df', 'engagement_vintage_df'}
+    if any(key in results for key in flat_keys):
+        return 'flat'
+    for key, value in results.items():
+        if key.startswith("_"):
+            continue
+        if isinstance(value, dict) and any(k in value for k in flat_keys):
+            return 'nested'
+    return 'unknown'
+
+
+def _cleanup_hdfs_folder(spark, folder_path):
+    """Delete existing HDFS folder if it exists."""
+    try:
+        fs = spark._jvm.org.apache.hadoop.fs.FileSystem.get(spark._jsc.hadoopConfiguration())
+        path = spark._jvm.org.apache.hadoop.fs.Path(folder_path)
+        if fs.exists(path):
+            fs.delete(path, True)  # True = recursive
+            return True
+        return False
+    except Exception as e:
+        print(f"  Warning: Could not clean up folder: {e}")
+        return False
+
+
+def export_results(results, spark, mne=None, base_path=None, clean_first=True):
+    """
+    SIMPLE EXPORT - Just call this after running vintage analysis.
+
+    Works with both single campaign and multi-campaign results.
+    Automatically detects the structure and handles it.
+
+    Usage:
+        # Single campaign
+        results = run_vintage_analysis(spark, 'VUT')
+        export_results(results, spark, 'VUT')
+
+        # Multiple campaigns
+        results = run_all_campaigns(spark)
+        export_results(results, spark)
+
+    Parameters:
+        results: Output from run_vintage_analysis() or run_all_campaigns()
+        spark: SparkSession
+        mne: Campaign mnemonic (required for single campaign, ignored for multi)
+        base_path: HDFS output path (optional, uses USER_CONFIG if not provided)
+        clean_first: If True, deletes existing output folder before export (default True)
+    """
+    if base_path is None:
+        base_path = get_hdfs_output_path()
+
+    # Detect structure
+    structure = _detect_result_structure(results)
+
+    if structure == 'flat':
+        # Single campaign - need MNE
+        if mne is None:
+            print("ERROR: For single campaign results, you must provide the campaign mnemonic.")
+            print("       Example: export_results(results, spark, 'VUT')")
+            return None
+        # Wrap it
+        results_to_export = {mne: results}
+        print(f"Single campaign detected: {mne}")
+    elif structure == 'nested':
+        results_to_export = results
+        campaigns = [k for k in results.keys() if not k.startswith("_")]
+        print(f"Multiple campaigns detected: {', '.join(campaigns)}")
+    else:
+        print("ERROR: Could not understand results structure.")
+        print("       Make sure you're passing the output from run_vintage_analysis() or run_all_campaigns()")
+        return None
+
+    # Clean up existing folder
+    if clean_first:
+        if _cleanup_hdfs_folder(spark, base_path):
+            print(f"Cleaned up existing folder: {base_path}")
+
+    # Now export using the existing function
+    return export_all_to_hdfs(results_to_export, spark, base_path)
+
+
 def export_all_to_hdfs(results, spark, base_path=None):
     """
     Export ALL vintage results to HDFS as separate CSV files.
@@ -1558,32 +1676,27 @@ print_module_status()
 print("""
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║                        VINTAGE ENGINE v2.1                                    ║
-║                                                                              ║
-║  Changes from v2:                                                            ║
-║  - FIXED: Email engagement now uses ALL tactic IDs (was limited to 5)        ║
-║  - REMOVED: MODULE_CONTRACTS (reduced clutter)                               ║
-║  - OPTIMIZED: Reduced unnecessary .count() calls                             ║
-║  - ADDED: Validation summary after each run                                  ║
-║  - ADDED: Clickable download links (files renamed from part-00000)           ║
-║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
-IMPORTANT: Update USER_CONFIG at the top of this file with your settings:
-  - user_id: Your user ID
-  - hdfs_base_path: Your HDFS home directory (e.g., /user/YOUR_ID)
 
 Available campaigns: """ + ", ".join(ALL_MNES) + """
 
-Usage:
-  # Single campaign
-  results = run_vintage_analysis(spark, 'VCN')
+USAGE - TWO STEPS:
 
-  # All campaigns
+  Step 1: Run analysis
+  --------------------
+  # Single campaign
+  results = run_vintage_analysis(spark, 'VUT')
+
+  # OR multiple campaigns
   results = run_all_campaigns(spark)
 
-  # Export to HDFS (clickable download links appear!)
-  export_all_to_hdfs(results, spark)
+  Step 2: Export
+  --------------------
+  # Single campaign - include the campaign name
+  export_results(results, spark, 'VUT')
 
-  # Check module status
-  print_module_status()
+  # Multiple campaigns - no name needed
+  export_results(results, spark)
+
+That's it. Files go to: """ + get_hdfs_output_path() + """
 """)

@@ -21,7 +21,7 @@ Copy this entire file into a Jupyter notebook cell and run.
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark import StorageLevel
-import matplotlib.pyplot as plt
+# matplotlib removed - plotting moved to separate file if needed
 import pandas as pd
 import numpy as np
 from scipy import stats
@@ -1053,91 +1053,6 @@ def generate_engagement_summary(success_df, mne):
     }
 
     return pd.DataFrame([summary_data])
-
-
-# =============================================================================
-# PLOTTING
-# =============================================================================
-
-def plot_vintage(vintage_df, mne, config):
-    """Plot vintage curves."""
-    if vintage_df.empty:
-        print(f"No data to plot for {mne}")
-        return
-
-    fig, ax = plt.subplots(figsize=(14, 8))
-    cohorts = sorted(vintage_df["COHORT"].unique())
-    colors = plt.cm.tab10(np.linspace(0, 1, min(len(cohorts), 10)))
-    if len(cohorts) > 10:
-        colors = plt.cm.tab20(np.linspace(0, 1, min(len(cohorts), 20)))
-
-    for i, cohort in enumerate(cohorts):
-        data = vintage_df[vintage_df["COHORT"] == cohort]
-        if data.empty:
-            continue
-        color = colors[i % len(colors)]
-        test_n = int(data["TEST_CLIENTS"].iloc[0])
-        ctrl_n = int(data["CTRL_CLIENTS"].iloc[0])
-        ax.plot(data["DAY"], data["TEST_RATE"], '-o', linewidth=1.5, markersize=3,
-                color=color, label=f'{cohort} Test (n={test_n:,})', alpha=0.9)
-        ax.plot(data["DAY"], data["CTRL_RATE"], '--s', linewidth=1.5, markersize=3,
-                color=color, label=f'{cohort} Ctrl (n={ctrl_n:,})', alpha=0.7)
-
-    ax.set_xlabel("Days from Treatment", fontsize=12)
-    ax.set_ylabel("Cumulative Conversion Rate (%)", fontsize=12)
-    ax.set_title(f"{mne} - {config['campaign_name']}\nTest (solid) vs Control (dashed) | {config['success_type']}", fontsize=13)
-    ax.legend(title="Cohort / Group", bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8)
-    ax.grid(True, alpha=0.3)
-    ax.set_xlim(0, None)
-    ax.set_ylim(0, None)
-    plt.tight_layout()
-    plt.show()
-
-
-def plot_grid(vintage_df, mne, config):
-    """Plot grid view."""
-    cohorts = sorted(vintage_df["COHORT"].unique())
-    n_cohorts = len(cohorts)
-
-    if n_cohorts == 0 or n_cohorts > 12:
-        print(f"Skipping grid plot: {n_cohorts} cohorts")
-        return
-
-    n_cols = min(3, n_cohorts)
-    n_rows = (n_cohorts + n_cols - 1) // n_cols
-
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(min(5*n_cols, 15), min(4*n_rows, 12)), squeeze=False)
-
-    for idx, cohort in enumerate(cohorts):
-        ax = axes[idx // n_cols, idx % n_cols]
-        data = vintage_df[vintage_df["COHORT"] == cohort]
-
-        if data.empty:
-            continue
-
-        final = data[data["DAY"] == data["DAY"].max()].iloc[0]
-
-        ax.plot(data["DAY"], data["TEST_RATE"], '-o', color='#2E86AB',
-                label=f'Test (n={int(final["TEST_CLIENTS"]):,})')
-        ax.plot(data["DAY"], data["CTRL_RATE"], '-s', color='#A23B72',
-                label=f'Control (n={int(final["CTRL_CLIENTS"]):,})')
-
-        ax.annotate(f'Lift: {final["ABS_LIFT"]:.2f}pp\n[{final["CI_LOWER"]:.2f}, {final["CI_UPPER"]:.2f}]',
-                    xy=(0.95, 0.05), xycoords='axes fraction', fontsize=8, ha='right', va='bottom',
-                    bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
-
-        ax.set_title(f'Cohort: {cohort}', fontsize=10)
-        ax.set_xlabel("Days", fontsize=9)
-        ax.set_ylabel("Rate (%)", fontsize=9)
-        ax.legend(fontsize=7, loc='upper left')
-        ax.grid(True, alpha=0.3)
-
-    for idx in range(n_cohorts, n_rows * n_cols):
-        axes[idx // n_cols, idx % n_cols].set_visible(False)
-
-    fig.suptitle(f"{mne} - {config['campaign_name']} | {config['success_type']}", fontsize=13, y=1.02)
-    plt.tight_layout()
-    plt.show()
 
 
 # =============================================================================

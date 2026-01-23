@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage Dashboard v2.2</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #003168 0%, #0091DA 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .header .version {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Data Upload Section */
+        .upload-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .upload-section h2 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #003168;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn {
+            background: #0091DA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #007bb8;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #003168;
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            min-width: 150px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 5px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #f8f9fa;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .checkbox-item input {
+            margin: 0;
+        }
+
+        /* Chart Container */
+        .chart-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .chart-section h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #003168;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+
+        /* Summary Table */
+        .summary-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .summary-section h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #003168;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #003168;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rate {
+            font-weight: 600;
+        }
+
+        .positive {
+            color: #28a745;
+        }
+
+        .negative {
+            color: #dc3545;
+        }
+
+        /* Tab content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* No data message */
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-data h3 {
+            margin-bottom: 10px;
+            color: #003168;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>VVD Vintage Curves Dashboard</h1>
+        <span class="version">v2.2</span>
+    </div>
+
+    <div class="container">
+        <!-- Data Upload -->
+        <div class="upload-section">
+            <h2>Load Data</h2>
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept=".csv">
+                <button class="btn" onclick="loadFile()">Load CSV</button>
+                <button class="btn btn-secondary" onclick="loadSampleData()">Load Sample Data</button>
+            </div>
+            <div id="status" class="status" style="display: none;"></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('testgroup')">Test Group Comparison</button>
+            <button class="tab" onclick="switchTab('reportgroup')">Report Group Comparison</button>
+        </div>
+
+        <!-- Tab 1: Test Group Comparison -->
+        <div id="tab-testgroup" class="tab-content active">
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Campaign</label>
+                    <select id="tg-campaign" onchange="updateFilters('testgroup')"></select>
+                </div>
+                <div class="filter-group">
+                    <label>Cohort</label>
+                    <select id="tg-cohort" onchange="updateChart('testgroup')"></select>
+                </div>
+                <div class="filter-group">
+                    <label>Metric</label>
+                    <select id="tg-metric" onchange="updateChart('testgroup')"></select>
+                </div>
+                <div class="filter-group">
+                    <label>Report Group (filter)</label>
+                    <select id="tg-rptgrp" onchange="updateChart('testgroup')">
+                        <option value="ALL">All Report Groups</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Test Groups to Show</label>
+                    <div id="tg-testgroups" class="checkbox-group"></div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <h3>Vintage Curves by Test Group</h3>
+                <div class="chart-container">
+                    <canvas id="chart-testgroup"></canvas>
+                </div>
+            </div>
+
+            <div class="summary-section">
+                <h3>Summary at Final Day</h3>
+                <table id="table-testgroup">
+                    <thead>
+                        <tr>
+                            <th>Test Group</th>
+                            <th>Clients</th>
+                            <th>Successes</th>
+                            <th>Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Report Group Comparison -->
+        <div id="tab-reportgroup" class="tab-content">
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Campaign</label>
+                    <select id="rg-campaign" onchange="updateFilters('reportgroup')"></select>
+                </div>
+                <div class="filter-group">
+                    <label>Cohort</label>
+                    <select id="rg-cohort" onchange="updateChart('reportgroup')"></select>
+                </div>
+                <div class="filter-group">
+                    <label>Metric</label>
+                    <select id="rg-metric" onchange="updateChart('reportgroup')"></select>
+                </div>
+                <div class="filter-group">
+                    <label>Test Group (filter)</label>
+                    <select id="rg-tstgrp" onchange="updateChart('reportgroup')">
+                        <option value="ALL">All Test Groups</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Report Groups to Show</label>
+                    <div id="rg-reportgroups" class="checkbox-group"></div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <h3>Vintage Curves by Report Group</h3>
+                <div class="chart-container">
+                    <canvas id="chart-reportgroup"></canvas>
+                </div>
+            </div>
+
+            <div class="summary-section">
+                <h3>Summary at Final Day</h3>
+                <table id="table-reportgroup">
+                    <thead>
+                        <tr>
+                            <th>Report Group</th>
+                            <th>Clients</th>
+                            <th>Successes</th>
+                            <th>Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- No Data Message -->
+        <div id="no-data" class="no-data" style="display: none;">
+            <h3>No Data Loaded</h3>
+            <p>Upload a vintage_curves.csv file from the Vintage Engine v2.2 output, or click "Load Sample Data" to see a demo.</p>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let data = [];
+        let charts = {
+            testgroup: null,
+            reportgroup: null
+        };
+
+        // Colors for chart lines
+        const COLORS = [
+            '#0091DA', '#FCA311', '#28a745', '#dc3545', '#6f42c1',
+            '#fd7e14', '#20c997', '#e83e8c', '#17a2b8', '#6c757d'
+        ];
+
+        // Load file from input
+        function loadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showStatus('Please select a file', 'error');
+                return;
+            }
+
+            Papa.parse(file, {
+                header: true,
+                dynamicTyping: true,
+                complete: function(results) {
+                    data = results.data.filter(row => row.MNE && row.DAY !== null);
+                    showStatus(`Loaded ${data.length} rows from ${file.name}`, 'success');
+                    initializeDashboard();
+                },
+                error: function(err) {
+                    showStatus(`Error parsing file: ${err.message}`, 'error');
+                }
+            });
+        }
+
+        // Load sample data for demo
+        function loadSampleData() {
+            // Generate sample data
+            const campaigns = ['VCN', 'VAW'];
+            const cohorts = ['2025-07', '2025-08'];
+            const testGroups = ['TG1', 'TG4', 'TG7'];
+            const reportGroups = ['PSLCRG01', 'PSLCRG03'];
+            const metrics = ['PRIMARY', 'SECONDARY'];
+
+            data = [];
+
+            campaigns.forEach(mne => {
+                cohorts.forEach(cohort => {
+                    testGroups.forEach(tst => {
+                        reportGroups.forEach(rpt => {
+                            metrics.forEach(metric => {
+                                // Generate curve with some randomness
+                                const baseRate = Math.random() * 2 + 2; // 2-4%
+                                const growth = Math.random() * 0.1 + 0.05; // 5-15% daily growth
+
+                                for (let day = 0; day <= 90; day++) {
+                                    const rate = baseRate * (1 - Math.exp(-growth * day));
+                                    const clients = Math.floor(5000 + Math.random() * 10000);
+                                    const successes = Math.floor(clients * rate / 100);
+
+                                    data.push({
+                                        MNE: mne,
+                                        COHORT: cohort,
+                                        TST_GRP_CD: tst,
+                                        RPT_GRP_CD: rpt,
+                                        METRIC: metric,
+                                        DAY: day,
+                                        WINDOW_DAYS: 90,
+                                        CLIENT_CNT: clients,
+                                        SUCCESS_CNT: successes,
+                                        RATE: parseFloat(rate.toFixed(4))
+                                    });
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+
+            showStatus(`Loaded ${data.length} rows of sample data`, 'success');
+            initializeDashboard();
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize dashboard with loaded data
+        function initializeDashboard() {
+            if (data.length === 0) {
+                document.getElementById('no-data').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('no-data').style.display = 'none';
+
+            // Populate campaign dropdowns
+            const campaigns = [...new Set(data.map(d => d.MNE))].sort();
+
+            populateSelect('tg-campaign', campaigns);
+            populateSelect('rg-campaign', campaigns);
+
+            updateFilters('testgroup');
+            updateFilters('reportgroup');
+        }
+
+        // Populate a select element
+        function populateSelect(id, options, includeAll = false) {
+            const select = document.getElementById(id);
+            select.innerHTML = '';
+
+            if (includeAll) {
+                const opt = document.createElement('option');
+                opt.value = 'ALL';
+                opt.textContent = 'All';
+                select.appendChild(opt);
+            }
+
+            options.forEach(value => {
+                const opt = document.createElement('option');
+                opt.value = value;
+                opt.textContent = value;
+                select.appendChild(opt);
+            });
+        }
+
+        // Update filters based on campaign selection
+        function updateFilters(tab) {
+            const prefix = tab === 'testgroup' ? 'tg' : 'rg';
+            const campaign = document.getElementById(`${prefix}-campaign`).value;
+
+            if (!campaign) return;
+
+            const filtered = data.filter(d => d.MNE === campaign);
+
+            // Get unique values
+            const cohorts = [...new Set(filtered.map(d => d.COHORT))].sort();
+            const metrics = [...new Set(filtered.map(d => d.METRIC))].sort();
+            const testGroups = [...new Set(filtered.map(d => d.TST_GRP_CD))].sort();
+            const reportGroups = [...new Set(filtered.map(d => d.RPT_GRP_CD))].sort();
+
+            // Populate dropdowns
+            populateSelect(`${prefix}-cohort`, cohorts);
+            populateSelect(`${prefix}-metric`, metrics);
+
+            if (tab === 'testgroup') {
+                populateSelect('tg-rptgrp', reportGroups, true);
+                populateCheckboxes('tg-testgroups', testGroups, 'tst');
+            } else {
+                populateSelect('rg-tstgrp', testGroups, true);
+                populateCheckboxes('rg-reportgroups', reportGroups, 'rpt');
+            }
+
+            updateChart(tab);
+        }
+
+        // Populate checkboxes
+        function populateCheckboxes(containerId, options, prefix) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            options.forEach((value, idx) => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-item';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `${prefix}-${value}`;
+                checkbox.value = value;
+                checkbox.checked = true;
+                checkbox.onchange = () => updateChart(containerId.startsWith('tg') ? 'testgroup' : 'reportgroup');
+
+                const label = document.createElement('label');
+                label.htmlFor = `${prefix}-${value}`;
+                label.textContent = value;
+
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+
+        // Get selected checkboxes
+        function getSelectedCheckboxes(containerId) {
+            const container = document.getElementById(containerId);
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        // Update chart
+        function updateChart(tab) {
+            const prefix = tab === 'testgroup' ? 'tg' : 'rg';
+
+            const campaign = document.getElementById(`${prefix}-campaign`).value;
+            const cohort = document.getElementById(`${prefix}-cohort`).value;
+            const metric = document.getElementById(`${prefix}-metric`).value;
+
+            if (!campaign || !cohort || !metric) return;
+
+            let filtered = data.filter(d =>
+                d.MNE === campaign &&
+                d.COHORT === cohort &&
+                d.METRIC === metric
+            );
+
+            let groupBy, filterBy, selectedGroups;
+
+            if (tab === 'testgroup') {
+                groupBy = 'TST_GRP_CD';
+                filterBy = document.getElementById('tg-rptgrp').value;
+                selectedGroups = getSelectedCheckboxes('tg-testgroups');
+
+                if (filterBy !== 'ALL') {
+                    filtered = filtered.filter(d => d.RPT_GRP_CD === filterBy);
+                }
+                filtered = filtered.filter(d => selectedGroups.includes(d.TST_GRP_CD));
+            } else {
+                groupBy = 'RPT_GRP_CD';
+                filterBy = document.getElementById('rg-tstgrp').value;
+                selectedGroups = getSelectedCheckboxes('rg-reportgroups');
+
+                if (filterBy !== 'ALL') {
+                    filtered = filtered.filter(d => d.TST_GRP_CD === filterBy);
+                }
+                filtered = filtered.filter(d => selectedGroups.includes(d.RPT_GRP_CD));
+            }
+
+            // Aggregate by group and day
+            const aggregated = aggregateData(filtered, groupBy);
+
+            // Build chart
+            buildChart(tab, aggregated, groupBy);
+
+            // Update table
+            updateTable(tab, aggregated, groupBy);
+        }
+
+        // Aggregate data by group
+        function aggregateData(filtered, groupBy) {
+            const groups = {};
+
+            filtered.forEach(row => {
+                const group = row[groupBy];
+                const day = row.DAY;
+
+                if (!groups[group]) {
+                    groups[group] = {};
+                }
+
+                if (!groups[group][day]) {
+                    groups[group][day] = {
+                        clients: 0,
+                        successes: 0
+                    };
+                }
+
+                groups[group][day].clients += row.CLIENT_CNT;
+                groups[group][day].successes += row.SUCCESS_CNT;
+            });
+
+            // Calculate rates
+            Object.keys(groups).forEach(group => {
+                Object.keys(groups[group]).forEach(day => {
+                    const d = groups[group][day];
+                    d.rate = d.clients > 0 ? (d.successes / d.clients * 100) : 0;
+                });
+            });
+
+            return groups;
+        }
+
+        // Build chart
+        function buildChart(tab, aggregated, groupBy) {
+            const canvasId = `chart-${tab}`;
+            const ctx = document.getElementById(canvasId).getContext('2d');
+
+            // Destroy existing chart
+            if (charts[tab]) {
+                charts[tab].destroy();
+            }
+
+            const groups = Object.keys(aggregated).sort();
+            const datasets = [];
+
+            groups.forEach((group, idx) => {
+                const groupData = aggregated[group];
+                const days = Object.keys(groupData).map(Number).sort((a, b) => a - b);
+
+                datasets.push({
+                    label: group,
+                    data: days.map(day => ({
+                        x: day,
+                        y: groupData[day].rate
+                    })),
+                    borderColor: COLORS[idx % COLORS.length],
+                    backgroundColor: COLORS[idx % COLORS.length] + '20',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                });
+            });
+
+            charts[tab] = new Chart(ctx, {
+                type: 'line',
+                data: { datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'Days Since Treatment'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Cumulative Rate (%)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update summary table
+        function updateTable(tab, aggregated, groupBy) {
+            const tableId = `table-${tab}`;
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+
+            const groups = Object.keys(aggregated).sort();
+
+            groups.forEach(group => {
+                const groupData = aggregated[group];
+                const days = Object.keys(groupData).map(Number).sort((a, b) => a - b);
+                const maxDay = Math.max(...days);
+                const finalData = groupData[maxDay];
+
+                if (!finalData) return;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${group}</strong></td>
+                    <td>${finalData.clients.toLocaleString()}</td>
+                    <td>${finalData.successes.toLocaleString()}</td>
+                    <td class="rate">${finalData.rate.toFixed(2)}%</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('no-data').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

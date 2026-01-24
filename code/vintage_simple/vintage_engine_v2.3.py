@@ -1,8 +1,11 @@
 """
-Vintage Engine v2.2
+Vintage Engine v2.3
 ===================
 
-Changes from v2.1:
+Changes from v2.2:
+- REMOVED: METRIC_TYPES constant (unused, not modular)
+
+Changes from v2.1 (carried forward):
 - NEW OUTPUT SCHEMA: TST_GRP_CD x RPT_GRP_CD x METRIC x DAY (raw codes, no TEST/CONTROL mapping)
 - REMOVED: Lift calculation (dashboard handles this now)
 - REMOVED: generate_summary(), calculate_ci() (dashboard handles this)
@@ -16,7 +19,7 @@ Architecture: SuperFact 4-Layer Framework
 - Layer 3: Success Definitions (SUCCESS_DEFINITIONS) - "How to calculate?"
 - Layer 4: Client Journey (fulfillment, engagement, outcome) - "What actually happened?"
 
-Output Schema (v2.2):
+Output Schema:
   MNE | COHORT | TST_GRP_CD | RPT_GRP_CD | METRIC | DAY | WINDOW_DAYS | CLIENT_CNT | SUCCESS_CNT | RATE
 
 Copy this entire file into a Jupyter notebook cell and run.
@@ -66,14 +69,6 @@ OUTPUT_SCHEMA = {
     },
 }
 
-# Allowed METRIC values
-METRIC_TYPES = {
-    "PRIMARY": "Primary success metric from campaign config",
-    "SECONDARY": "Secondary success metric from campaign config",
-    "EMAIL_OPEN": "Email open rate (opened / sent)",
-    "EMAIL_CLICK": "Email click rate (clicked / sent)",
-}
-
 # =============================================================================
 # CONFIGURATION - GLOBAL SETTINGS
 # =============================================================================
@@ -88,16 +83,6 @@ PATHS = {
     "tactic_base_path": "/prod/sz/tsz/00150/cc/DTZTA_T_TACTIC_EVNT_HIST/",
     "visa_dr_crd": "/prod/sz/tsz/00050/data/DDWTA_VISA_DR_CRD/PartitionColumn=Latest/CAPTR_DT=",
     "pos_txn": "/prod/sz/tsz/00050/data/DDWTA_T_PT_OF_SALE_TXN/SNAP_DT=",
-}
-
-# =============================================================================
-# SUPPORTED CHANNELS
-# =============================================================================
-
-SUPPORTED_CHANNELS = {
-    "EMAIL": {"status": "ACTIVE", "code_prefix": "EM"},
-    "MOBILE": {"status": "PLANNED", "code_prefix": "MB"},
-    "BANNER": {"status": "PLANNED", "code_prefix": "BN"},
 }
 
 # =============================================================================
@@ -309,21 +294,21 @@ def load_tactic(spark, mne):
 # =============================================================================
 
 def load_channel_engagement(spark, treatment_ids, channel):
-    """Layer 4: Load engagement data for a channel."""
+    """
+    Layer 4: Load engagement data for a channel.
+
+    Dynamically routes to the appropriate loader based on channel.
+    Add new loaders as _load_{channel}_engagement() functions.
+    """
     channel_upper = channel.upper()
-
-    if channel_upper not in SUPPORTED_CHANNELS:
-        print(f"    [Layer 4] Unknown channel: {channel}")
-        return None
-
-    if SUPPORTED_CHANNELS[channel_upper]["status"] == "PLANNED":
-        print(f"    [Layer 4] Channel '{channel}' is PLANNED but not yet implemented")
-        return None
 
     if channel_upper == "EMAIL":
         return _load_email_engagement(spark, treatment_ids)
+    # Future: add more channels here
+    # elif channel_upper == "MOBILE":
+    #     return _load_mobile_engagement(spark, treatment_ids)
     else:
-        print(f"    [Layer 4] No loader for channel: {channel}")
+        print(f"    [Layer 4] No loader implemented for channel: {channel}")
         return None
 
 
@@ -752,7 +737,7 @@ def run_vintage_analysis(spark, mne, verbose=True, include_engagement=True):
             print(msg)
 
     log(f"\n{'='*60}")
-    log(f"VINTAGE ANALYSIS v2.2: {mne}")
+    log(f"VINTAGE ANALYSIS v2.3: {mne}")
     log(f"{'='*60}")
 
     # Layer 2: Get campaign metadata
@@ -973,14 +958,14 @@ def download_results(results, mne=None):
 # SETUP & USAGE
 # =============================================================================
 
-spark = SparkSession.builder.appName("Vintage Engine v2.2").getOrCreate()
+spark = SparkSession.builder.appName("Vintage Engine v2.3").getOrCreate()
 
 print("""
 ===============================================================================
-                          VINTAGE ENGINE v2.2
+                          VINTAGE ENGINE v2.3
 ===============================================================================
 
-OUTPUT SCHEMA (v2.2):
+OUTPUT SCHEMA:
   MNE | COHORT | TST_GRP_CD | RPT_GRP_CD | METRIC | DAY | WINDOW_DAYS | CLIENT_CNT | SUCCESS_CNT | RATE
 
 CHANGES FROM v2.1:

@@ -42,6 +42,29 @@ If the answer isn't clear, stop and clarify before proceeding.
 3. **Keep it simple** - If it can't be explained in 2 sentences, it's not ready
 4. **Check periodically** - "Could you explain this to your director right now?"
 
+---
+
+## Consultant Rule (MANDATORY)
+
+**Before making any code changes or architectural decisions, ALWAYS bring in the Consultant agent to:**
+1. Review the proposed change
+2. Challenge the approach - ask "is this necessary?" and "is there a simpler way?"
+3. Verify the reasoning is sound
+
+**Process:**
+1. User identifies issue or request
+2. I propose a solution
+3. **Consultant reviews and challenges** (do NOT skip this)
+4. User approves
+5. Then implement
+
+**Do NOT:**
+- Make changes without Consultant verification
+- Invent justifications for things I don't actually know
+- Wait for user to ask for Consultant - bring them in proactively
+
+If I ever skip this step, the user should say "where's the Consultant?" and I must stop and get their input.
+
 ## Current Status
 
 - [x] High-level campaign inventory created

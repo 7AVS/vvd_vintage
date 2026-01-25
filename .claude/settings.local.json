@@ -2,7 +2,21 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(python3:*)",
+      "Bash(tree:*)",
+      "Bash(while read ts file)",
+      "Bash(do date -d @$ts \"+%Y-%m-%d %H:%M $file\")",
+      "Bash(done)",
+      "Bash(find:*)",
+      "Bash(xargs:*)",
+      "Bash(for f in CONSOLIDATED_NEXT_STEPS.md FIELD_ANALYSIS_TACTIC_ODS.md LAYER_VIEW_DOCUMENTATION.md LAYER_VIEW_SLIDES.md VINTAGE_AUTOMATION_ARCHITECTURE.md)",
+      "Bash(do diff \"/mnt/c/Users/andre/New_projects/Vintage/Vvd/docs/$f\" \"/mnt/c/Users/andre/New_projects/Vintage/Vvd/archive/pres/$f\")",
+      "Bash(echo:*)",
+      "WebFetch(domain:cookiecutter-data-science.drivendata.org)",
+      "Bash(grep:*)",
+      "Bash(python converter.py:*)",
+      "Bash(head:*)"
     ]
   }
 }

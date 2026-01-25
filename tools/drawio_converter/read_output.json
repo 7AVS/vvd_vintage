@@ -1,0 +1,1633 @@
+{
+  "source": {
+    "file": "ENGINE_ARCHITECTURE_DETAILED.drawio",
+    "canvas": {"width": 1400, "height": 1000}
+  },
+  "hierarchy": {
+    "description": "A detailed data view of the Vintage Engine architecture. Top section shows SUPERFACT PILLARS (4 pillars in a dashed container). Below that is the CONTEXT LAYER containing 5 expanded modules (Experiment, Campaign, Success, Enrichment, Journey). Below is the ANALYSIS LAYER with the Vintage Engine and future engine placeholders, leading to Adaptive Output and dual track outputs. Right side has a DATA EXAMPLES callout, KEY QUESTIONS panel, and a LEGEND at bottom-right."
+  },
+  "elements": [
+    {
+      "id": "title",
+      "type": "text",
+      "geometry": {"x": 300, "y": 10, "width": 500, "height": 30},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 22,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "VINTAGE ENGINE: DATA VIEW",
+      "semantic_role": "title"
+    },
+    {
+      "id": "subtitle",
+      "type": "text",
+      "geometry": {"x": 300, "y": 35, "width": 500, "height": 20},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 11,
+        "fontStyle": 2,
+        "fontColor": "#666666",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "What data flows through each module",
+      "semantic_role": "subtitle"
+    },
+    {
+      "id": "pillars-container",
+      "type": "container",
+      "geometry": {"x": 40, "y": 65, "width": 820, "height": 80},
+      "style": {
+        "fillColor": "#F5F5F5",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": true,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "container"
+    },
+    {
+      "id": "pillars-label",
+      "type": "text",
+      "geometry": {"x": 55, "y": 70, "width": 280, "height": 16},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 10,
+        "fontStyle": 1,
+        "fontColor": "#666666",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "SUPERFACT PILLARS (Team-Wide Initiatives)",
+      "semantic_role": "label"
+    },
+    {
+      "id": "pillar-1",
+      "type": "box",
+      "geometry": {"x": 55, "y": 92, "width": 100, "height": 40},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#0091DA",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "Experiment\nMetadata",
+      "semantic_role": "module"
+    },
+    {
+      "id": "pillar-2",
+      "type": "box",
+      "geometry": {"x": 205, "y": 92, "width": 100, "height": 40},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#FFC72C",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "Campaign\nMetadata (MM v2)",
+      "semantic_role": "module"
+    },
+    {
+      "id": "pillar-3",
+      "type": "box",
+      "geometry": {"x": 455, "y": 92, "width": 100, "height": 40},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#FFC72C",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "Success Library\n(Source of Truth)",
+      "semantic_role": "module"
+    },
+    {
+      "id": "pillar-4",
+      "type": "box",
+      "geometry": {"x": 705, "y": 92, "width": 100, "height": 40},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#0091DA",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "Client\nJourney",
+      "semantic_role": "module"
+    },
+    {
+      "id": "arrow-p1",
+      "type": "arrow",
+      "geometry": {"x1": 105, "y1": 132, "x2": 105, "y2": 160},
+      "style": {
+        "fillColor": null,
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": null,
+        "endArrow": "classic"
+      },
+      "value": "",
+      "semantic_role": "arrow"
+    },
+    {
+      "id": "arrow-p2",
+      "type": "arrow",
+      "geometry": {"x1": 255, "y1": 132, "x2": 255, "y2": 160},
+      "style": {
+        "fillColor": null,
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": null,
+        "endArrow": "classic"
+      },
+      "value": "",
+      "semantic_role": "arrow"
+    },
+    {
+      "id": "arrow-p3",
+      "type": "arrow",
+      "geometry": {"x1": 505, "y1": 132, "x2": 505, "y2": 160},
+      "style": {
+        "fillColor": null,
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": null,
+        "endArrow": "classic"
+      },
+      "value": "",
+      "semantic_role": "arrow"
+    },
+    {
+      "id": "arrow-p4",
+      "type": "arrow",
+      "geometry": {"x1": 755, "y1": 132, "x2": 755, "y2": 160},
+      "style": {
+        "fillColor": null,
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": null,
+        "endArrow": "classic"
+      },
+      "value": "",
+      "semantic_role": "arrow"
+    },
+    {
+      "id": "context-container",
+      "type": "container",
+      "geometry": {"x": 40, "y": 155, "width": 820, "height": 280},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "#003168",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "container"
+    },
+    {
+      "id": "context-label",
+      "type": "text",
+      "geometry": {"x": 55, "y": 162, "width": 280, "height": 18},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 11,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "CONTEXT LAYER (Upgradable Modules)",
+      "semantic_role": "label"
+    },
+    {
+      "id": "module-1",
+      "type": "box",
+      "geometry": {"x": 55, "y": 190, "width": 150, "height": 130},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#0091DA",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "module"
+    },
+    {
+      "id": "mod1-title",
+      "type": "text",
+      "geometry": {"x": 55, "y": 195, "width": 150, "height": 16},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "EXPERIMENT MODULE",
+      "semantic_role": "label"
+    },
+    {
+      "id": "mod1-q",
+      "type": "text",
+      "geometry": {"x": 55, "y": 210, "width": 150, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 2,
+        "fontColor": "#666666",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "\"Who is in the test?\"",
+      "semantic_role": "subtitle"
+    },
+    {
+      "id": "mod1-divider",
+      "type": "line",
+      "geometry": {"x": 65, "y": 226, "width": 130, "height": 8},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "",
+      "semantic_role": "divider"
+    },
+    {
+      "id": "mod1-data",
+      "type": "text",
+      "geometry": {"x": 55, "y": 234, "width": 150, "height": 80},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "- client_id\n- segment\n- treatment_flag\n- channel\n- start_date\n- frequency",
+      "semantic_role": "data"
+    },
+    {
+      "id": "module-2",
+      "type": "box",
+      "geometry": {"x": 205, "y": 190, "width": 150, "height": 130},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#FFC72C",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "module"
+    },
+    {
+      "id": "mod2-badge",
+      "type": "box",
+      "geometry": {"x": 280, "y": 182, "width": 55, "height": 12},
+      "style": {
+        "fillColor": "#FFC72C",
+        "strokeColor": "#FFC72C",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 7,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "UPGRADABLE",
+      "semantic_role": "badge"
+    },
+    {
+      "id": "mod2-title",
+      "type": "text",
+      "geometry": {"x": 205, "y": 195, "width": 150, "height": 16},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "CAMPAIGN MODULE",
+      "semantic_role": "label"
+    },
+    {
+      "id": "mod2-q",
+      "type": "text",
+      "geometry": {"x": 205, "y": 210, "width": 150, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 2,
+        "fontColor": "#666666",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "\"What metric to measure?\"",
+      "semantic_role": "subtitle"
+    },
+    {
+      "id": "mod2-divider",
+      "type": "line",
+      "geometry": {"x": 215, "y": 226, "width": 130, "height": 8},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "",
+      "semantic_role": "divider"
+    },
+    {
+      "id": "mod2-data",
+      "type": "text",
+      "geometry": {"x": 205, "y": 234, "width": 150, "height": 80},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "- primary_metric\n- secondary_metric\n- tertiary_metric\n- action_type\n- measurement_period",
+      "semantic_role": "data"
+    },
+    {
+      "id": "module-3",
+      "type": "box",
+      "geometry": {"x": 355, "y": 190, "width": 150, "height": 130},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#FFC72C",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "module"
+    },
+    {
+      "id": "mod3-badge1",
+      "type": "box",
+      "geometry": {"x": 360, "y": 182, "width": 55, "height": 12},
+      "style": {
+        "fillColor": "#FFC72C",
+        "strokeColor": "#FFC72C",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 7,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "UPGRADABLE",
+      "semantic_role": "badge"
+    },
+    {
+      "id": "mod3-badge2",
+      "type": "box",
+      "geometry": {"x": 418, "y": 182, "width": 50, "height": 12},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#FFC72C",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 7,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "SWAPPABLE",
+      "semantic_role": "badge"
+    },
+    {
+      "id": "mod3-title",
+      "type": "text",
+      "geometry": {"x": 355, "y": 195, "width": 150, "height": 16},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "SUCCESS MODULE",
+      "semantic_role": "label"
+    },
+    {
+      "id": "mod3-q",
+      "type": "text",
+      "geometry": {"x": 355, "y": 210, "width": 150, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 2,
+        "fontColor": "#666666",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "\"How to calculate success?\"",
+      "semantic_role": "subtitle"
+    },
+    {
+      "id": "mod3-divider",
+      "type": "line",
+      "geometry": {"x": 365, "y": 226, "width": 130, "height": 8},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "",
+      "semantic_role": "divider"
+    },
+    {
+      "id": "mod3-data",
+      "type": "text",
+      "geometry": {"x": 355, "y": 234, "width": 150, "height": 80},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "- table_path\n- filters\n- calculation_logic\n- conditions\n- success_flag",
+      "semantic_role": "data"
+    },
+    {
+      "id": "module-4",
+      "type": "box",
+      "geometry": {"x": 505, "y": 190, "width": 150, "height": 130},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#FCA311",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "module"
+    },
+    {
+      "id": "mod4-badge",
+      "type": "box",
+      "geometry": {"x": 580, "y": 182, "width": 45, "height": 12},
+      "style": {
+        "fillColor": "#FCA311",
+        "strokeColor": "#FCA311",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 7,
+        "fontStyle": 1,
+        "fontColor": "#FFFFFF",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "OPTIONAL",
+      "semantic_role": "badge"
+    },
+    {
+      "id": "mod4-title",
+      "type": "text",
+      "geometry": {"x": 505, "y": 195, "width": 150, "height": 16},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "ENRICHMENT MODULE",
+      "semantic_role": "label"
+    },
+    {
+      "id": "mod4-q",
+      "type": "text",
+      "geometry": {"x": 505, "y": 210, "width": 150, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 2,
+        "fontColor": "#666666",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "\"What context to add?\"",
+      "semantic_role": "subtitle"
+    },
+    {
+      "id": "mod4-divider",
+      "type": "line",
+      "geometry": {"x": 515, "y": 226, "width": 130, "height": 8},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "",
+      "semantic_role": "divider"
+    },
+    {
+      "id": "mod4-data",
+      "type": "text",
+      "geometry": {"x": 505, "y": 234, "width": 150, "height": 80},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "- tenure\n- profitability\n- region\n- demographics\n- attrition_risk",
+      "semantic_role": "data"
+    },
+    {
+      "id": "mod4-output",
+      "type": "text",
+      "geometry": {"x": 505, "y": 305, "width": 150, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 7,
+        "fontStyle": 2,
+        "fontColor": "#FCA311",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "-> Becomes SEGMENT in output",
+      "semantic_role": "label"
+    },
+    {
+      "id": "module-5",
+      "type": "box",
+      "geometry": {"x": 705, "y": 190, "width": 150, "height": 130},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#0091DA",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "module"
+    },
+    {
+      "id": "mod5-title",
+      "type": "text",
+      "geometry": {"x": 705, "y": 195, "width": 150, "height": 16},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "JOURNEY MODULE",
+      "semantic_role": "label"
+    },
+    {
+      "id": "mod5-q",
+      "type": "text",
+      "geometry": {"x": 705, "y": 210, "width": 150, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 2,
+        "fontColor": "#666666",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "\"What did they do?\"",
+      "semantic_role": "subtitle"
+    },
+    {
+      "id": "mod5-divider",
+      "type": "line",
+      "geometry": {"x": 715, "y": 226, "width": 130, "height": 8},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "",
+      "semantic_role": "divider"
+    },
+    {
+      "id": "mod5-data",
+      "type": "text",
+      "geometry": {"x": 705, "y": 234, "width": 150, "height": 80},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "- email_opens\n- email_clicks\n- mobile_engagement\n- banner_exposure\n- channel_touchpoints",
+      "semantic_role": "data"
+    },
+    {
+      "id": "data-flow",
+      "type": "text",
+      "geometry": {"x": 200, "y": 415, "width": 500, "height": 15},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 2,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "--------------------------- STANDARDIZED DATA ---------------------------",
+      "semantic_role": "label"
+    },
+    {
+      "id": "analysis-container",
+      "type": "container",
+      "geometry": {"x": 40, "y": 450, "width": 820, "height": 200},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "#003168",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "container"
+    },
+    {
+      "id": "analysis-label",
+      "type": "text",
+      "geometry": {"x": 55, "y": 457, "width": 280, "height": 18},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 11,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "ANALYSIS LAYER (Pluggable Engines)",
+      "semantic_role": "label"
+    },
+    {
+      "id": "vintage-engine",
+      "type": "box",
+      "geometry": {"x": 100, "y": 485, "width": 200, "height": 110},
+      "style": {
+        "fillColor": "#F5F5F5",
+        "strokeColor": "#003168",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "module"
+    },
+    {
+      "id": "ve-badge",
+      "type": "box",
+      "geometry": {"x": 265, "y": 478, "width": 30, "height": 12},
+      "style": {
+        "fillColor": "#07AFBF",
+        "strokeColor": "#07AFBF",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 7,
+        "fontStyle": 1,
+        "fontColor": "#FFFFFF",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "BUILT",
+      "semantic_role": "badge"
+    },
+    {
+      "id": "ve-title",
+      "type": "text",
+      "geometry": {"x": 100, "y": 490, "width": 200, "height": 18},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 11,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "VINTAGE ENGINE",
+      "semantic_role": "label"
+    },
+    {
+      "id": "ve-divider",
+      "type": "line",
+      "geometry": {"x": 110, "y": 510, "width": 180, "height": 8},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "",
+      "semantic_role": "divider"
+    },
+    {
+      "id": "ve-functions",
+      "type": "text",
+      "geometry": {"x": 100, "y": 518, "width": 200, "height": 72},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": "Courier New",
+        "align": "left"
+      },
+      "value": "detect_success()\nbuild_vintage_data()\ncalculate_ci()\nprepare_vintage_table()\ngenerate_summary()",
+      "semantic_role": "data"
+    },
+    {
+      "id": "future-1",
+      "type": "box",
+      "geometry": {"x": 360, "y": 510, "width": 90, "height": 50},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": true,
+        "fontSize": 9,
+        "fontStyle": 2,
+        "fontColor": "#CCCCCC",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "Future\nEngine",
+      "semantic_role": "placeholder"
+    },
+    {
+      "id": "future-2",
+      "type": "box",
+      "geometry": {"x": 490, "y": 510, "width": 90, "height": 50},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": true,
+        "fontSize": 9,
+        "fontStyle": 2,
+        "fontColor": "#CCCCCC",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "Future\nEngine",
+      "semantic_role": "placeholder"
+    },
+    {
+      "id": "future-dots",
+      "type": "text",
+      "geometry": {"x": 610, "y": 510, "width": 50, "height": 50},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 16,
+        "fontStyle": 0,
+        "fontColor": "#CCCCCC",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "...",
+      "semantic_role": "placeholder"
+    },
+    {
+      "id": "output",
+      "type": "box",
+      "geometry": {"x": 100, "y": 610, "width": 200, "height": 35},
+      "style": {
+        "fillColor": "#07AFBF",
+        "strokeColor": "#07AFBF",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "module"
+    },
+    {
+      "id": "out-title",
+      "type": "text",
+      "geometry": {"x": 100, "y": 610, "width": 200, "height": 18},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 10,
+        "fontStyle": 1,
+        "fontColor": "#FFFFFF",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "ADAPTIVE OUTPUT",
+      "semantic_role": "label"
+    },
+    {
+      "id": "out-sub",
+      "type": "text",
+      "geometry": {"x": 100, "y": 625, "width": 200, "height": 18},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 7,
+        "fontStyle": 0,
+        "fontColor": "#FFFFFF",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "Curves x Metrics  |  Segments x Enrichments  |  Channel Stats",
+      "semantic_role": "subtitle"
+    },
+    {
+      "id": "arr-e-o",
+      "type": "arrow",
+      "geometry": {"x1": 200, "y1": 595, "x2": 200, "y2": 610},
+      "style": {
+        "fillColor": null,
+        "strokeColor": "#003168",
+        "strokeWidth": 2,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": null,
+        "endArrow": "classic"
+      },
+      "value": "",
+      "semantic_role": "arrow"
+    },
+    {
+      "id": "track-a",
+      "type": "box",
+      "geometry": {"x": 80, "y": 680, "width": 100, "height": 40},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "TRACK A\nTableau / CIDM",
+      "semantic_role": "module"
+    },
+    {
+      "id": "track-b",
+      "type": "box",
+      "geometry": {"x": 220, "y": 680, "width": 100, "height": 40},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "TRACK B\nSharePoint / HTML",
+      "semantic_role": "module"
+    },
+    {
+      "id": "parallel",
+      "type": "text",
+      "geometry": {"x": 110, "y": 725, "width": 180, "height": 15},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "<--- PARALLEL --->",
+      "semantic_role": "label"
+    },
+    {
+      "id": "arr-o-ta",
+      "type": "arrow",
+      "geometry": {"x1": 170, "y1": 655, "x2": 130, "y2": 680},
+      "style": {
+        "fillColor": null,
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": null,
+        "endArrow": "classic"
+      },
+      "value": "",
+      "semantic_role": "arrow"
+    },
+    {
+      "id": "arr-o-tb",
+      "type": "arrow",
+      "geometry": {"x1": 230, "y1": 655, "x2": 270, "y2": 680},
+      "style": {
+        "fillColor": null,
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": null,
+        "endArrow": "classic"
+      },
+      "value": "",
+      "semantic_role": "arrow"
+    },
+    {
+      "id": "legend-container",
+      "type": "container",
+      "geometry": {"x": 680, "y": 460, "width": 170, "height": 140},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#CCCCCC",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "legend-title",
+      "type": "text",
+      "geometry": {"x": 680, "y": 465, "width": 170, "height": 16},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 10,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "LEGEND",
+      "semantic_role": "label"
+    },
+    {
+      "id": "leg-1",
+      "type": "box",
+      "geometry": {"x": 695, "y": 488, "width": 18, "height": 12},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#0091DA",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "leg-1-t",
+      "type": "text",
+      "geometry": {"x": 718, "y": 486, "width": 120, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "From Data (stable)",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "leg-2",
+      "type": "box",
+      "geometry": {"x": 695, "y": 508, "width": 18, "height": 12},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#FFC72C",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "leg-2-t",
+      "type": "text",
+      "geometry": {"x": 718, "y": 506, "width": 120, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "Upgradable / Swappable",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "leg-3",
+      "type": "box",
+      "geometry": {"x": 695, "y": 528, "width": 18, "height": 12},
+      "style": {
+        "fillColor": "#FFFFFF",
+        "strokeColor": "#FCA311",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "leg-3-t",
+      "type": "text",
+      "geometry": {"x": 718, "y": 526, "width": 120, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "Optional / Attachable",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "leg-4",
+      "type": "box",
+      "geometry": {"x": 695, "y": 548, "width": 18, "height": 12},
+      "style": {
+        "fillColor": "#F5F5F5",
+        "strokeColor": "#003168",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "leg-4-t",
+      "type": "text",
+      "geometry": {"x": 718, "y": 546, "width": 120, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "Engine (stable)",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "leg-5",
+      "type": "box",
+      "geometry": {"x": 695, "y": 568, "width": 18, "height": 12},
+      "style": {
+        "fillColor": "#07AFBF",
+        "strokeColor": "#07AFBF",
+        "strokeWidth": 2,
+        "rounded": true,
+        "dashed": false,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "leg-5-t",
+      "type": "text",
+      "geometry": {"x": 718, "y": 566, "width": 120, "height": 14},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "Output / Future state",
+      "semantic_role": "legend"
+    },
+    {
+      "id": "example-container",
+      "type": "container",
+      "geometry": {"x": 880, "y": 65, "width": 220, "height": 200},
+      "style": {
+        "fillColor": "#FFFBF0",
+        "strokeColor": "#FFC72C",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": true,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "container"
+    },
+    {
+      "id": "example-title",
+      "type": "text",
+      "geometry": {"x": 880, "y": 70, "width": 220, "height": 16},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 10,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "DATA EXAMPLES",
+      "semantic_role": "label"
+    },
+    {
+      "id": "ex-exp",
+      "type": "text",
+      "geometry": {"x": 885, "y": 92, "width": 210, "height": 50},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": "Courier New",
+        "align": "left"
+      },
+      "value": "Experiment:\n  client_id = \"C12345\"\n  treatment = \"Test\"\n  segment = \"High Value\"",
+      "semantic_role": "data"
+    },
+    {
+      "id": "ex-camp",
+      "type": "text",
+      "geometry": {"x": 885, "y": 142, "width": 210, "height": 40},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": "Courier New",
+        "align": "left"
+      },
+      "value": "Campaign:\n  primary = \"card_acquisition\"\n  action_type = \"Cross-sell\"",
+      "semantic_role": "data"
+    },
+    {
+      "id": "ex-succ",
+      "type": "text",
+      "geometry": {"x": 885, "y": 182, "width": 210, "height": 40},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": "Courier New",
+        "align": "left"
+      },
+      "value": "Success:\n  table = \"edw.card_opened\"\n  filter = \"product='VVD'\"",
+      "semantic_role": "data"
+    },
+    {
+      "id": "ex-enrich",
+      "type": "text",
+      "geometry": {"x": 885, "y": 222, "width": 210, "height": 40},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 8,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": "Courier New",
+        "align": "left"
+      },
+      "value": "Enrichment:\n  tenure = \"5+ years\"\n  region = \"West\"",
+      "semantic_role": "data"
+    },
+    {
+      "id": "questions-container",
+      "type": "container",
+      "geometry": {"x": 880, "y": 280, "width": 220, "height": 120},
+      "style": {
+        "fillColor": "#F0F8FF",
+        "strokeColor": "#0091DA",
+        "strokeWidth": 1,
+        "rounded": true,
+        "dashed": true,
+        "fontSize": null,
+        "fontStyle": 0,
+        "fontColor": null,
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "",
+      "semantic_role": "container"
+    },
+    {
+      "id": "questions-title",
+      "type": "text",
+      "geometry": {"x": 880, "y": 285, "width": 220, "height": 16},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 10,
+        "fontStyle": 1,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "center"
+      },
+      "value": "EACH MODULE ANSWERS",
+      "semantic_role": "label"
+    },
+    {
+      "id": "q-list",
+      "type": "text",
+      "geometry": {"x": 880, "y": 305, "width": 220, "height": 85},
+      "style": {
+        "fillColor": "none",
+        "strokeColor": "none",
+        "strokeWidth": 1,
+        "rounded": false,
+        "dashed": false,
+        "fontSize": 9,
+        "fontStyle": 0,
+        "fontColor": "#003168",
+        "fontFamily": null,
+        "align": "left"
+      },
+      "value": "1. Who is in the test?\n2. What metric to measure?\n3. How to calculate success?\n4. What context to add?\n5. What did clients do?",
+      "semantic_role": "data"
+    }
+  ]
+}

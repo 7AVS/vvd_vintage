@@ -654,4 +654,189 @@
             </root>
         </mxGraphModel>
     </diagram>
+    <diagram id="next-steps-v6" name="Version 6 - Operational Considerations">
+        <mxGraphModel dx="711" dy="679" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="700" math="0" shadow="0">
+            <root>
+                <mxCell id="v6-0"/>
+                <mxCell id="v6-1" parent="v6-0"/>
+                <mxCell id="v6-title" value="FUTURE CONSIDERATIONS: OPERATIONAL MODES" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="200" y="15" width="800" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-subtitle" value="Execution patterns orthogonal to 4-layer model and 3-stage maturity" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="200" y="45" width="800" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#CCCCCC;strokeWidth=2;" parent="v6-1" vertex="1">
+                    <mxGeometry x="30" y="80" width="270" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current-header" value="CURRENT STATE" style="text;html=1;strokeColor=none;fillColor=#CCCCCC;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="30" y="80" width="270" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current1" value="Full Refresh Mode" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="115" width="240" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current1a" value="• Process ALL cohorts every run" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="135" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current1b" value="• Overwrite entire output" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="153" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current1c" value="• Single CSV file" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="171" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current2" value="Interactive Execution" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="200" width="240" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current2a" value="• Manual Jupyter notebook run" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="220" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current2b" value="• User session credentials" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="238" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current2c" value="• Browser download output" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="256" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-current2d" value="• Print statement logging" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="274" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-arrow1" value="" style="endArrow=classic;html=1;strokeColor=#003168;strokeWidth=3;" parent="v6-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="300" y="220" as="sourcePoint"/>
+                        <mxPoint x="330" y="220" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v6-delta-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#07AFBF;strokeWidth=2;" parent="v6-1" vertex="1">
+                    <mxGeometry x="330" y="80" width="270" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta-header" value="DELTA PROCESSING" style="text;html=1;strokeColor=none;fillColor=#07AFBF;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="v6-1" vertex="1">
+                    <mxGeometry x="330" y="80" width="270" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta1" value="Incremental Mode" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="345" y="115" width="240" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta1a" value="• Process only ACTIVE cohorts" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="345" y="135" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta1b" value="• Append/merge to existing output" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="345" y="153" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta1c" value="• Partitioned storage (by cohort)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="345" y="171" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta2" value="Cohort Lifecycle" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="345" y="200" width="240" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta2a" value="• ACTIVE: window still open" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="345" y="220" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta2b" value="• COMPLETE: window closed" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="345" y="238" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta2c" value="• Re-run active cohorts each cycle" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="345" y="256" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-delta3" value="New columns: RUN_DATE, COHORT_STATUS" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=2;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="345" y="285" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-arrow2" value="" style="endArrow=classic;html=1;strokeColor=#003168;strokeWidth=3;" parent="v6-1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="600" y="220" as="sourcePoint"/>
+                        <mxPoint x="630" y="220" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="v6-sched-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FCA311;strokeWidth=2;" parent="v6-1" vertex="1">
+                    <mxGeometry x="630" y="80" width="270" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched-header" value="SCHEDULED AUTOMATION" style="text;html=1;strokeColor=none;fillColor=#FCA311;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="v6-1" vertex="1">
+                    <mxGeometry x="630" y="80" width="270" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched1" value="Unattended Execution" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="115" width="240" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched1a" value="• Scheduled job (weekly/monthly)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="135" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched1b" value="• Service account credentials" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="153" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched1c" value="• Direct write to storage" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="171" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched1d" value="• Structured logging + alerts" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="189" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched2" value="Platform Options" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="215" width="240" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched2a" value="• Airflow / Oozie / Control-M" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="235" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched2b" value="• Databricks Jobs" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="253" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched2c" value="• Depends on existing infrastructure" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="271" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-sched3" value="TBD: Platform choice pending" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=2;fontColor=#666666;" parent="v6-1" vertex="1">
+                    <mxGeometry x="645" y="300" width="240" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-benefit-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#003168;strokeWidth=2;" parent="v6-1" vertex="1">
+                    <mxGeometry x="920" y="80" width="250" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-benefit-header" value="COMBINED BENEFIT" style="text;html=1;strokeColor=none;fillColor=#003168;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="v6-1" vertex="1">
+                    <mxGeometry x="920" y="80" width="250" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-benefit1" value="Weekly scheduled runs that" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="935" y="120" width="220" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-benefit2" value="process only new/active data" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="935" y="140" width="220" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-benefit3" value="↓" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="1010" y="165" width="50" height="25" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-benefit4" value="✓ Fast execution" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="955" y="195" width="200" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-benefit5" value="✓ Reliable delivery" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="955" y="215" width="200" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-benefit6" value="✓ No manual intervention" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="955" y="235" width="200" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-benefit7" value="✓ Dashboard always current" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="955" y="255" width="200" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-note-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;strokeWidth=1;" parent="v6-1" vertex="1">
+                    <mxGeometry x="30" y="380" width="570" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-note-header" value="KEY INSIGHT" style="text;html=1;strokeColor=none;fillColor=#4CAF50;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontStyle=1;fontColor=#FFFFFF;" parent="v6-1" vertex="1">
+                    <mxGeometry x="30" y="380" width="100" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-note1" value="These operational modes are ORTHOGONAL to the 3-stage maturity model." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="405" width="540" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-note2" value="You can have Delta + Scheduled at Stage 1, Stage 2, or Stage 3." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="425" width="540" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-note3" value="They describe HOW the engine runs, not WHAT it calculates. Architecture unchanged." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="45" y="445" width="540" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-decision-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#E53935;strokeWidth=1;" parent="v6-1" vertex="1">
+                    <mxGeometry x="615" y="380" width="555" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-decision-header" value="DECISIONS NEEDED" style="text;html=1;strokeColor=none;fillColor=#E53935;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=10;fontStyle=1;fontColor=#FFFFFF;" parent="v6-1" vertex="1">
+                    <mxGeometry x="615" y="380" width="130" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-decision1" value="• Output format: Partitioned Parquet vs Hive table vs other?" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="630" y="405" width="525" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-decision2" value="• Scheduling platform: What infrastructure exists? (Airflow, Oozie, Databricks?)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="630" y="425" width="525" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="v6-decision3" value="• Dashboard coordination: How does dashboard consume partitioned data?" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#003168;" parent="v6-1" vertex="1">
+                    <mxGeometry x="630" y="445" width="525" height="18" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
 </mxfile>

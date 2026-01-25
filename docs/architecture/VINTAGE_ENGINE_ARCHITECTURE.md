@@ -2,7 +2,7 @@
 
 ## Document Purpose
 
-This is the **single source of truth** for the Vintage Engine architecture. It describes the vision, the 4-layer framework, the 3 maturity stages, and the path from current state to end game.
+This is the **single source of truth** for the Vintage Engine architecture. It describes the vision, the 4-layer framework, the 3 maturity stages, and the path from current state to target state.
 
 **Key principle:** This document describes the ARCHITECTURE and VISION, not a specific version. Engine versions (v2.3, v2.4, etc.) are iterations within the current stage. The architecture remains stable across versions.
 
@@ -35,7 +35,7 @@ STAGE 1                STAGE 2                    STAGE 3
 |         |           |   Library   |           |              |
 +---------+           +-------------+           +--------------+
 
-<- WE ARE HERE          Near-term                  End Game
+<- WE ARE HERE          Near-term                  Target State
   (all v2.x)
 ```
 
@@ -66,7 +66,7 @@ STAGE 1                STAGE 2                    STAGE 3
 
 **What changes:** Hardcoded dicts become dynamic queries. Engine functions remain the same.
 
-### Stage 3: Curated Data Sets (End Game)
+### Stage 3: Curated Data Sets (Target State)
 
 **Trigger:** Data engineering builds curated semantic layers.
 
@@ -512,7 +512,7 @@ Campaign 6 (VAW):
 
 ---
 
-## End Game User Experience
+## Target State User Experience
 
 When fully realized (Stage 2+):
 
@@ -654,3 +654,72 @@ All diagrams in `docs/architecture/` folder. Open in Draw.io (diagrams.net).
 **Archived sources:** `archive/docs/VINTAGE_ENGINE_ARCHITECTURE_OLD.md`, `archive/docs/LAYER_VIEW_DOCUMENTATION_OLD.md`
 
 **Purpose:** Single source of truth for Vintage Engine architecture and vision
+
+---
+
+## Future Considerations
+
+Items under evaluation for future implementation. These are operational enhancements that do not change the core 4-layer model or 3-stage maturity path.
+
+### Near-Term: Operational Modes
+
+#### Delta/Incremental Processing
+
+**Current state:** Each engine run processes the entire campaign history (all cohorts).
+
+**Future state:** Run only recent/active cohorts and append to existing output.
+
+| Mode | Behavior | Use Case |
+|------|----------|----------|
+| Full refresh | Process all cohorts, overwrite output | Initial run, major logic changes |
+| Delta/Incremental | Process only active cohorts, append to output | Regular updates, scheduled runs |
+
+**Key consideration:** Cohort lifecycle - cohorts remain "active" until their measurement window closes. A cohort started 2 weeks ago still needs Day 14, 21, 28 data calculated on subsequent runs.
+
+**Output implications:**
+- Move from single CSV to partitioned storage (by cohort)
+- Add metadata columns: `RUN_DATE`, `COHORT_STATUS`
+- Dashboard must consume partitioned data
+
+#### Scheduled Automation
+
+**Current state:** Manual execution in Jupyter notebooks.
+
+**Future state:** Unattended runs on schedule (weekly/monthly).
+
+| Aspect | Interactive (Current) | Scheduled (Future) |
+|--------|----------------------|-------------------|
+| Trigger | Manual notebook execution | Scheduled job (Airflow, Oozie, etc.) |
+| Spark context | Notebook-managed | Explicit creation |
+| Credentials | User session | Service account |
+| Output | Browser download | Direct to storage |
+| Logging | Print statements | Structured logging |
+
+**Key consideration:** Scheduling platform depends on existing infrastructure. Decision required: Airflow, Oozie, Databricks Jobs, or other.
+
+### Longer-Term Considerations
+
+| Item | Description | Dependency |
+|------|-------------|------------|
+| Multi-channel engagement | Mobile, ONB, ONO engagement tracking | Channel data source availability |
+| Vintage Type 2 | Monthly aggregation view | Business requirements clarification |
+| Real-time refresh | Near-real-time curve updates | Platform capability |
+
+---
+
+## Relationship to Stages
+
+These operational modes are **orthogonal** to the 3-stage maturity model:
+
+```
+                    Stage 1         Stage 2         Stage 3
+                   (Hardcoded)    (Libraries)     (Curated)
+
+Full Refresh          ✓              ✓               ✓
+Delta Processing      ✓              ✓               ✓
+Scheduled             ✓              ✓               ✓
+```
+
+You can implement delta processing or scheduling at any stage. They are execution patterns, not architectural changes.
+
+However, **scheduled automation becomes more valuable** as you move to Stage 2+, when multiple consumers depend on reliable, regular data updates.

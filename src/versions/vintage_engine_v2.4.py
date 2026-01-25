@@ -1,20 +1,17 @@
 """
-Vintage Engine v2.5
+Vintage Engine v2.3
 ===================
 
-Changes from v2.4:
-- ADDED: EMAIL_SENT metric (denominator = clients targeted with email channel)
-- ADDED: EMAIL_UNSUB metric (unsubscribe rate)
-- UPDATED: Engagement metrics now include all 4: EMAIL_SENT, EMAIL_OPEN, EMAIL_CLICK, EMAIL_UNSUB
+Changes from v2.2:
+- REMOVED: METRIC_TYPES constant (unused, not modular)
 
-Engagement metric denominators:
-- EMAIL_SENT: all clients with email channel (targeted)
-- EMAIL_OPEN: clients who received email (EMAIL_SENT = 1)
-- EMAIL_CLICK: clients who received email (EMAIL_SENT = 1)
-- EMAIL_UNSUB: clients who received email (EMAIL_SENT = 1)
-
-Changes from v2.3 (carried forward):
-- Split PATHS into HIVE_PATHS and EDW_TABLES for clarity
+Changes from v2.1 (carried forward):
+- NEW OUTPUT SCHEMA: TST_GRP_CD x RPT_GRP_CD x METRIC x DAY (raw codes, no TEST/CONTROL mapping)
+- REMOVED: Lift calculation (dashboard handles this now)
+- REMOVED: generate_summary(), calculate_ci() (dashboard handles this)
+- ADDED: METRIC column (PRIMARY, SECONDARY, EMAIL_OPEN, EMAIL_CLICK)
+- ADDED: Secondary metrics support (e.g., card_usage for VAW/VUI)
+- FOLDED: Engagement metrics into main vintage_curves output
 
 Architecture: SuperFact 4-Layer Framework
 - Layer 1: Experiment Metadata (tactic_evnt_hist) - "Who is in test?"
@@ -79,27 +76,13 @@ OUTPUT_SCHEMA = {
 YEARS_TO_INCLUDE = [2025, 2026]
 
 # =============================================================================
-# HIVE_PATHS - File system paths for Hive/Parquet tables
-# Usage: spark.read.parquet(f"{HIVE_PATHS['tactic_events']}{year}*")
+# PATHS - Data Source Locations
 # =============================================================================
 
-HIVE_PATHS = {
-    "tactic_events": "/prod/sz/tsz/00150/cc/DTZTA_T_TACTIC_EVNT_HIST/",
-    "visa_debit_card": "/prod/sz/tsz/00050/data/DDWTA_VISA_DR_CRD/PartitionColumn=Latest/CAPTR_DT=",
-    "pos_transactions": "/prod/sz/tsz/00050/data/DDWTA_T_PT_OF_SALE_TXN/SNAP_DT=",
-}
-
-# =============================================================================
-# EDW_TABLES - Enterprise Data Warehouse table references
-# Usage: f"SELECT ... FROM {EDW_TABLES['feedback_master']} WHERE ..."
-# Note: These are schema.table names, not file paths
-# =============================================================================
-
-EDW_TABLES = {
-    "feedback_master": "DTZV01.VENDOR_FEEDBACK_MASTER",
-    "feedback_event": "DTZV01.VENDOR_FEEDBACK_EVENT",
-    "pos_log": "DDWV05.CLNT_CRD_POS_LOG",
-    "token_list": "DL_DECMAN.TOKEN_LIST",
+PATHS = {
+    "tactic_base_path": "/prod/sz/tsz/00150/cc/DTZTA_T_TACTIC_EVNT_HIST/",
+    "visa_dr_crd": "/prod/sz/tsz/00050/data/DDWTA_VISA_DR_CRD/PartitionColumn=Latest/CAPTR_DT=",
+    "pos_txn": "/prod/sz/tsz/00050/data/DDWTA_T_PT_OF_SALE_TXN/SNAP_DT=",
 }
 
 # =============================================================================
@@ -154,7 +137,7 @@ SUCCESS_DEFINITIONS = {
         "description": "Client acquired a new VVD card",
         "version": "1.0",
         "source": "HIVE",
-        "table_path": HIVE_PATHS["visa_debit_card"],
+        "table_path": PATHS["visa_dr_crd"],
         "date_field": "ISS_DT",
         "client_field": "CLNT_NO",
         "filters": {
@@ -168,7 +151,7 @@ SUCCESS_DEFINITIONS = {
         "description": "Client activated their VVD card",
         "version": "1.0",
         "source": "HIVE",
-        "table_path": HIVE_PATHS["visa_debit_card"],
+        "table_path": PATHS["visa_dr_crd"],
         "date_field": "ACTV_DT",
         "client_field": "CLNT_NO",
         "filters": {
@@ -182,7 +165,7 @@ SUCCESS_DEFINITIONS = {
         "description": "Client used their VVD card for a transaction",
         "version": "1.0",
         "source": "HIVE",
-        "table_path": HIVE_PATHS["pos_transactions"],
+        "table_path": PATHS["pos_txn"],
         "date_field": "TXN_DT",
         "client_field": "CLNT_NO",
         "filters": {
@@ -265,7 +248,7 @@ def load_tactic(spark, mne):
     v2.2: Returns raw TST_GRP_CD and RPT_GRP_CD (no TEST/CONTROL mapping).
     """
     years = [str(y) for y in YEARS_TO_INCLUDE]
-    base_path = HIVE_PATHS["tactic_events"]
+    base_path = PATHS["tactic_base_path"]
     paths = [f"{base_path}EVNT_STRT_DT={year}*" for year in years]
 
     print(f"    [Layer 1] Loading experiment data from partitions: {years}")
@@ -348,15 +331,13 @@ def _load_email_engagement(spark, treatment_ids):
         MAX(CASE WHEN disposition_cd = 1 THEN 1 ELSE 0 END) AS SENT,
         MAX(CASE WHEN disposition_cd = 2 THEN 1 ELSE 0 END) AS OPENED,
         MAX(CASE WHEN disposition_cd = 3 THEN 1 ELSE 0 END) AS CLICKED,
-        MAX(CASE WHEN disposition_cd = 4 THEN 1 ELSE 0 END) AS UNSUBSCRIBED,
 
         MAX(CASE WHEN disposition_cd = 1 THEN CAST(disposition_dt_tm AS DATE) END) AS SENT_DT,
         MAX(CASE WHEN disposition_cd = 2 THEN CAST(disposition_dt_tm AS DATE) END) AS OPENED_DT,
-        MAX(CASE WHEN disposition_cd = 3 THEN CAST(disposition_dt_tm AS DATE) END) AS CLICKED_DT,
-        MAX(CASE WHEN disposition_cd = 4 THEN CAST(disposition_dt_tm AS DATE) END) AS UNSUBSCRIBED_DT
+        MAX(CASE WHEN disposition_cd = 3 THEN CAST(disposition_dt_tm AS DATE) END) AS CLICKED_DT
 
-    FROM {EDW_TABLES['feedback_master']} FEEDBACK_MASTER
-    INNER JOIN {EDW_TABLES['feedback_event']} FEEDBACK_EVENT
+    FROM DTZV01.VENDOR_FEEDBACK_MASTER FEEDBACK_MASTER
+    INNER JOIN DTZV01.VENDOR_FEEDBACK_EVENT FEEDBACK_EVENT
         ON FEEDBACK_MASTER.consumer_id_hashed = FEEDBACK_EVENT.consumer_id_hashed
         AND FEEDBACK_MASTER.TREATMENT_ID = FEEDBACK_EVENT.TREATMENT_ID
     WHERE FEEDBACK_MASTER.TREATMENT_ID IN ('{treatment_id_list}')
@@ -391,12 +372,12 @@ def _load_email_engagement(spark, treatment_ids):
 
 def load_token_from_edw():
     """Layer 4: Load token/provisioning data from EDW."""
-    query = f"""
+    query = """
     SELECT DISTINCT
         CAST(SUBSTR(B.CLNT_CRD_NO, 7, 9) AS INTEGER) AS CLNT_NO,
         B.TXN_DT
-    FROM {EDW_TABLES['pos_log']} AS B
-    INNER JOIN {EDW_TABLES['token_list']} C
+    FROM DDWV05.CLNT_CRD_POS_LOG AS B
+    INNER JOIN DL_DECMAN.TOKEN_LIST C
         ON B.TOKN_REQSTR_ID = C.TOKEN_ID
     WHERE B.AMT1 = 0
         AND SUBSTR(B.CLNT_CRD_NO, 1, 5) = '45190'
@@ -512,11 +493,9 @@ def enrich_with_engagement(success_df, engagement_df):
                 F.col("SENT").alias("EMAIL_SENT"),
                 F.col("OPENED").alias("EMAIL_OPENED"),
                 F.col("CLICKED").alias("EMAIL_CLICKED"),
-                F.col("UNSUBSCRIBED").alias("EMAIL_UNSUBSCRIBED"),
                 F.col("SENT_DT").alias("EMAIL_SENT_DT"),
                 F.col("OPENED_DT").alias("EMAIL_OPENED_DT"),
-                F.col("CLICKED_DT").alias("EMAIL_CLICKED_DT"),
-                F.col("UNSUBSCRIBED_DT").alias("EMAIL_UNSUBSCRIBED_DT")
+                F.col("CLICKED_DT").alias("EMAIL_CLICKED_DT")
             )
         else:
             engagement_select = engagement_df.select(
@@ -524,11 +503,9 @@ def enrich_with_engagement(success_df, engagement_df):
                 F.col("EMAIL_SENT"),
                 F.col("EMAIL_OPENED"),
                 F.col("EMAIL_CLICKED"),
-                F.col("EMAIL_UNSUBSCRIBED"),
                 F.col("EMAIL_SENT_DT"),
                 F.col("EMAIL_OPENED_DT"),
-                F.col("EMAIL_CLICKED_DT"),
-                F.col("EMAIL_UNSUBSCRIBED_DT")
+                F.col("EMAIL_CLICKED_DT")
             )
 
         result = result.join(
@@ -537,7 +514,7 @@ def enrich_with_engagement(success_df, engagement_df):
             how="left"
         ).drop("ENG_CLNT_NO")
 
-        for col in ["EMAIL_SENT", "EMAIL_OPENED", "EMAIL_CLICKED", "EMAIL_UNSUBSCRIBED"]:
+        for col in ["EMAIL_SENT", "EMAIL_OPENED", "EMAIL_CLICKED"]:
             if col in result.columns:
                 result = result.withColumn(col, F.coalesce(F.col(col), F.lit(0)))
 
@@ -619,57 +596,21 @@ def build_vintage_curves(success_df, mne, metric_type="PRIMARY"):
     return result
 
 
-def build_engagement_curves(success_df, mne, email_channel_df=None):
+def build_engagement_curves(success_df, mne):
     """
-    Build engagement vintage curves.
+    Build engagement vintage curves (EMAIL_OPEN, EMAIL_CLICK).
 
-    Metrics and denominators:
-    - EMAIL_SENT: denominator = all clients targeted with email channel
-    - EMAIL_OPEN: denominator = clients who received email (EMAIL_SENT = 1)
-    - EMAIL_CLICK: denominator = clients who received email (EMAIL_SENT = 1)
-    - EMAIL_UNSUB: denominator = clients who received email (EMAIL_SENT = 1)
-
-    Args:
-        success_df: Success DataFrame enriched with engagement data
-        mne: Campaign mnemonic
-        email_channel_df: DataFrame of all clients targeted with email channel (for EMAIL_SENT denominator)
+    Denominator = clients who received email (EMAIL_SENT = 1)
     """
     columns = success_df.columns
 
     if "EMAIL_SENT" not in columns:
         return pd.DataFrame()
 
-    all_curves = []
-
-    # EMAIL_SENT curve - denominator is all email channel clients
-    if email_channel_df is not None:
-        # Add DAYS_TO_SENT based on when email was sent
-        sent_df = email_channel_df.join(
-            success_df.filter(F.col("EMAIL_SENT") == 1).select(
-                F.col("CLNT_NO").alias("SENT_CLNT_NO"),
-                F.col("EMAIL_SENT_DT")
-            ),
-            email_channel_df["CLNT_NO"] == F.col("SENT_CLNT_NO"),
-            how="left"
-        ).drop("SENT_CLNT_NO")
-
-        sent_df = sent_df.withColumn(
-            "EMAIL_SENT_FLAG",
-            F.when(F.col("EMAIL_SENT_DT").isNotNull(), 1).otherwise(0)
-        ).withColumn(
-            "DAYS_TO_SENT",
-            F.when(F.col("EMAIL_SENT_DT").isNotNull(),
-                   F.datediff(F.col("EMAIL_SENT_DT"), F.col("TREATMT_STRT_DT"))).otherwise(None)
-        )
-
-        sent_curve = _build_engagement_metric_curve(sent_df, mne, "DAYS_TO_SENT", "EMAIL_SENT_FLAG", "EMAIL_SENT")
-        if not sent_curve.empty:
-            all_curves.append(sent_curve)
-
-    # Filter to email recipients only for open/click/unsub curves
+    # Filter to email recipients only
     email_df = success_df.filter(F.col("EMAIL_SENT") == 1)
 
-    # Add days to open/click/unsub
+    # Add days to open/click
     email_df = email_df.withColumn(
         "DAYS_TO_OPEN",
         F.when(F.col("EMAIL_OPENED") == 1,
@@ -678,11 +619,9 @@ def build_engagement_curves(success_df, mne, email_channel_df=None):
         "DAYS_TO_CLICK",
         F.when(F.col("EMAIL_CLICKED") == 1,
                F.datediff(F.col("EMAIL_CLICKED_DT"), F.col("TREATMT_STRT_DT"))).otherwise(None)
-    ).withColumn(
-        "DAYS_TO_UNSUB",
-        F.when(F.col("EMAIL_UNSUBSCRIBED") == 1,
-               F.datediff(F.col("EMAIL_UNSUBSCRIBED_DT"), F.col("TREATMT_STRT_DT"))).otherwise(None)
     )
+
+    all_curves = []
 
     # EMAIL_OPEN curve
     open_curve = _build_engagement_metric_curve(email_df, mne, "DAYS_TO_OPEN", "EMAIL_OPENED", "EMAIL_OPEN")
@@ -693,11 +632,6 @@ def build_engagement_curves(success_df, mne, email_channel_df=None):
     click_curve = _build_engagement_metric_curve(email_df, mne, "DAYS_TO_CLICK", "EMAIL_CLICKED", "EMAIL_CLICK")
     if not click_curve.empty:
         all_curves.append(click_curve)
-
-    # EMAIL_UNSUB curve
-    unsub_curve = _build_engagement_metric_curve(email_df, mne, "DAYS_TO_UNSUB", "EMAIL_UNSUBSCRIBED", "EMAIL_UNSUB")
-    if not unsub_curve.empty:
-        all_curves.append(unsub_curve)
 
     if not all_curves:
         return pd.DataFrame()
@@ -803,7 +737,7 @@ def run_vintage_analysis(spark, mne, verbose=True, include_engagement=True):
             print(msg)
 
     log(f"\n{'='*60}")
-    log(f"VINTAGE ANALYSIS v2.5: {mne}")
+    log(f"VINTAGE ANALYSIS v2.3: {mne}")
     log(f"{'='*60}")
 
     # Layer 2: Get campaign metadata
@@ -841,12 +775,11 @@ def run_vintage_analysis(spark, mne, verbose=True, include_engagement=True):
 
     # Load engagement data
     engagement_df = None
-    email_channel_df = None  # All clients targeted with email channel (for EMAIL_SENT denominator)
     if include_engagement:
         email_client_count = sum(count for ch, count in channels_in_data.items() if ch and "EM" in ch)
         if email_client_count > 0:
-            email_channel_df = tactic_df.filter(F.trim(F.col("TACTIC_CELL_CD")).contains("EM"))
-            email_tactic_ids = [row.TACTIC_ID for row in email_channel_df.select("TACTIC_ID").distinct().collect()]
+            email_clients = tactic_df.filter(F.trim(F.col("TACTIC_CELL_CD")).contains("EM"))
+            email_tactic_ids = [row.TACTIC_ID for row in email_clients.select("TACTIC_ID").distinct().collect()]
             engagement_df = load_channel_engagement(spark, email_tactic_ids, "EMAIL")
 
     # Process PRIMARY metric
@@ -870,7 +803,7 @@ def run_vintage_analysis(spark, mne, verbose=True, include_engagement=True):
     engagement_curves = pd.DataFrame()
     if include_engagement and "EMAIL_SENT" in success_df_primary.columns:
         log("[Engine] Building engagement curves...")
-        engagement_curves = build_engagement_curves(success_df_primary, mne, email_channel_df)
+        engagement_curves = build_engagement_curves(success_df_primary, mne)
         log(f"[Engine] Engagement curves: {len(engagement_curves)} rows")
 
     # Build channel breakdown
@@ -1025,20 +958,21 @@ def download_results(results, mne=None):
 # SETUP & USAGE
 # =============================================================================
 
-spark = SparkSession.builder.appName("Vintage Engine v2.5").getOrCreate()
+spark = SparkSession.builder.appName("Vintage Engine v2.3").getOrCreate()
 
 print("""
 ===============================================================================
-                          VINTAGE ENGINE v2.4
+                          VINTAGE ENGINE v2.3
 ===============================================================================
 
 OUTPUT SCHEMA:
   MNE | COHORT | TST_GRP_CD | RPT_GRP_CD | METRIC | DAY | WINDOW_DAYS | CLIENT_CNT | SUCCESS_CNT | RATE
 
-CHANGES FROM v2.4:
-  - Added EMAIL_SENT metric (denominator = all email channel clients)
-  - Added EMAIL_UNSUB metric (unsubscribe rate)
-  - Engagement metrics: EMAIL_SENT, EMAIL_OPEN, EMAIL_CLICK, EMAIL_UNSUB
+CHANGES FROM v2.1:
+  - Raw TST_GRP_CD and RPT_GRP_CD (no TEST/CONTROL mapping)
+  - METRIC column (PRIMARY, SECONDARY, EMAIL_OPEN, EMAIL_CLICK)
+  - No lift calculation (dashboard handles this)
+  - Engagement metrics folded into main output
 
 Available campaigns: """ + ", ".join(ALL_MNES) + """
 

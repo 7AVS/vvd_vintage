@@ -4,6 +4,21 @@ All notable changes to the Vintage Engine will be documented in this file.
 
 ---
 
+## [v2.5] - 2026-01-25
+
+### Added
+- `EMAIL_SENT` engagement metric (sent rate vs clients targeted with email channel)
+- `EMAIL_UNSUB` engagement metric (unsubscribe rate)
+- `UNSUBSCRIBED` and `UNSUBSCRIBED_DT` fields from EDW feedback query
+
+### Changed
+- `build_engagement_curves()` now accepts `email_channel_df` parameter for EMAIL_SENT denominator
+- Engagement metrics now use correct denominators:
+  - EMAIL_SENT: clients with email channel (targeted)
+  - EMAIL_OPEN, EMAIL_CLICK, EMAIL_UNSUB: clients who received email
+
+---
+
 ## [v2.4] - 2026-01-25
 
 ### Changed

@@ -1,0 +1,323 @@
+# How to Pull Updates from a Specific Folder in a Git Repository
+
+## What This Tutorial Does
+
+This tutorial shows you how to update a **specific folder** from a remote Git repository (like GitHub) **without deleting or changing your other local files**.
+
+**Use case:** You have a cloned repo on your local machine. The repo has multiple folders. You only want to pull updates from one folder (e.g., `reports/`). You have your own local files and folders that are NOT in the repo, and you want to keep them safe.
+
+---
+
+## Before You Start: Checklist
+
+### 1. Do you have Git installed?
+
+Open PowerShell and type:
+
+```powershell
+git --version
+```
+
+If you see a version number (e.g., `git version 2.40.0`), you're good. If you get an error, you need to install Git first from https://git-scm.com/downloads
+
+### 2. Have you already cloned the repository?
+
+If **YES** → Skip to the "The Commands" section below.
+
+If **NO** → You need to clone first. See "First-Time Setup: Cloning the Repo" below.
+
+### 3. Do you know the path to your local repo folder?
+
+You need the full path to where the repo lives on your computer. For example:
+
+```
+C:\Users\YourName\Projects\my_repo
+```
+
+Or on a network drive:
+
+```
+\\server.company.com\data\Team\my_repo
+```
+
+**Important:** If your path contains special characters like `&` (ampersand), you must use `Set-Location -LiteralPath` with quotes. More on this below.
+
+---
+
+## First-Time Setup: Cloning the Repo (Only If You Haven't Already)
+
+If you've never cloned the repo, do this once:
+
+### Step 1: Navigate to where you want the repo to live
+
+This should be the **parent folder** - the repo will create its own subfolder inside.
+
+```powershell
+Set-Location -LiteralPath "C:\Users\YourName\Projects"
+```
+
+### Step 2: Clone the repository
+
+```powershell
+git clone https://github.com/USERNAME/REPO_NAME.git
+```
+
+Replace `USERNAME` and `REPO_NAME` with the actual values. For example:
+
+```powershell
+git clone https://github.com/7AVS/vvd_vintage.git
+```
+
+This creates a folder called `vvd_vintage` inside your current location.
+
+### Step 3: (Optional) Block pushes to the remote
+
+If you never want to accidentally push local changes to the remote repo:
+
+```powershell
+cd vvd_vintage
+git remote set-url --push origin no_push
+```
+
+Now your setup is complete.
+
+---
+
+## The Commands: Pulling Updates from a Specific Folder
+
+### What These Commands Do
+
+1. **Navigate** to your local repo folder
+2. **Fetch** all updates from the remote (downloads to a hidden staging area - does NOT touch your files)
+3. **Checkout** only the specific folder you want (applies updates ONLY to that folder)
+
+**Your other files and folders remain completely untouched.**
+
+---
+
+### The Template (Copy This)
+
+```powershell
+Set-Location -LiteralPath "PATH_TO_YOUR_REPO"
+
+git fetch origin
+
+git checkout origin/main -- FOLDER_NAME/
+```
+
+---
+
+### Step-by-Step Explanation
+
+#### Line 1: Navigate to Your Repo
+
+```powershell
+Set-Location -LiteralPath "PATH_TO_YOUR_REPO"
+```
+
+**What it does:** Moves PowerShell into your repo folder.
+
+**Why `-LiteralPath`:** If your path has special characters like `&`, this ensures it works correctly.
+
+**Example:**
+
+```powershell
+Set-Location -LiteralPath "\\maple.fg.rbc.com\data\Toronto\wrkgrp\wrkgrp16\Marketing & Analytics\vvd_vintage"
+```
+
+**Common errors:**
+- "Path not found" → Double-check the path is correct. Make sure you're pointing to the repo folder itself, not a parent or child folder.
+- Command does nothing → You might already be in that folder. Type `pwd` to see where you are.
+
+---
+
+#### Line 2: Fetch Updates from Remote
+
+```powershell
+git fetch origin
+```
+
+**What it does:** Downloads all the latest changes from the remote repository (GitHub) but stores them in a hidden area inside the `.git` folder. 
+
+**THIS DOES NOT CHANGE ANY OF YOUR LOCAL FILES.** It's completely safe.
+
+**What is `origin`?** It's the nickname for the remote repository URL. When you clone a repo, Git automatically names the remote "origin".
+
+**Common errors:**
+- "fatal: 'origin' does not appear to be a git repository" → You're not inside a git repo folder. Use `Set-Location` to navigate to the correct folder.
+- "Could not resolve host" → Network issue. Check your internet connection or VPN.
+
+---
+
+#### Line 3: Checkout Only the Folder You Want
+
+```powershell
+git checkout origin/main -- FOLDER_NAME/
+```
+
+**What it does:** Takes the specific folder from the fetched updates and applies it to your local files.
+
+**What happens:**
+- New files in that folder on remote → Added to your local
+- Changed files in that folder → Updated to match remote
+- Deleted files in that folder (on remote) → Deleted from your local
+- **Everything else on your local → UNTOUCHED**
+
+**What is `origin/main`?** This refers to the `main` branch on the remote. Some repos use `master` instead of `main`. 
+
+**The `--` is important:** It tells Git "everything after this is a file/folder path, not a branch name."
+
+**The trailing `/` is important:** `reports/` means the folder. Without it, Git might look for a file called `reports`.
+
+**Example:**
+
+```powershell
+git checkout origin/main -- reports/
+```
+
+**Common errors:**
+- "error: pathspec 'FOLDER_NAME/' did not match any file(s)" → The folder doesn't exist in the repo, or you spelled it wrong. Check the repo on GitHub to confirm the folder name.
+- "error: Your local changes would be overwritten" → You have uncommitted changes. See troubleshooting below.
+
+---
+
+## Full Example
+
+You want to pull updates from the `reports` folder in the `vvd_vintage` repo:
+
+```powershell
+Set-Location -LiteralPath "\\maple.fg.rbc.com\data\Toronto\wrkgrp\wrkgrp16\Marketing & Analytics\vvd_vintage"
+
+git fetch origin
+
+git checkout origin/main -- reports/
+```
+
+Run each line, press Enter, then run the next.
+
+---
+
+## Pulling Multiple Folders at Once
+
+You can list multiple folders:
+
+```powershell
+git checkout origin/main -- reports/ catalog/ docs/
+```
+
+This updates all three folders in one command.
+
+---
+
+## Troubleshooting
+
+### "I'm not sure if I'm in a Git repo"
+
+Run:
+
+```powershell
+git status
+```
+
+If you see information about branches and files, you're in a repo. If you see "fatal: not a git repository", you're in the wrong folder.
+
+### "I don't know what my remote is called"
+
+Run:
+
+```powershell
+git remote -v
+```
+
+This shows your remotes. Usually it's `origin`.
+
+### "I don't know if my branch is `main` or `master`"
+
+Run:
+
+```powershell
+git branch -r
+```
+
+This lists remote branches. Look for `origin/main` or `origin/master`.
+
+### "error: Your local changes would be overwritten"
+
+You made changes to files that are also in the repo. Options:
+
+1. **Discard your local changes** (if you don't need them):
+   ```powershell
+   git checkout -- FOLDER_NAME/
+   git checkout origin/main -- FOLDER_NAME/
+   ```
+
+2. **Save your changes first:**
+   Make a backup copy of your files manually, then run the checkout.
+
+### "The path has special characters and nothing works"
+
+Always use:
+```powershell
+Set-Location -LiteralPath "your path here"
+```
+
+With the full path in double quotes.
+
+---
+
+## Quick Reference Card
+
+**One-time clone (if needed):**
+```powershell
+Set-Location -LiteralPath "PARENT_FOLDER_PATH"
+git clone https://github.com/USERNAME/REPO_NAME.git
+```
+
+**Pull updates from one folder (use this every time):**
+```powershell
+Set-Location -LiteralPath "PATH_TO_YOUR_REPO"
+git fetch origin
+git checkout origin/main -- FOLDER_NAME/
+```
+
+**Check where you are:**
+```powershell
+pwd
+```
+
+**Check if you're in a Git repo:**
+```powershell
+git status
+```
+
+**See your remotes:**
+```powershell
+git remote -v
+```
+
+**See remote branches:**
+```powershell
+git branch -r
+```
+
+---
+
+## What NOT to Do
+
+**DO NOT use `git sparse-checkout set FOLDER_NAME`** if you want to keep your other local files. This command DELETES everything except the folder you specify. It's destructive.
+
+**DO NOT use `git pull`** if you only want to update one folder. This pulls everything.
+
+---
+
+## Summary
+
+To safely update one folder from a repo without touching anything else:
+
+```powershell
+Set-Location -LiteralPath "PATH_TO_YOUR_REPO"
+git fetch origin
+git checkout origin/main -- FOLDER_NAME/
+```
+
+That's it. Three commands. Safe and targeted.

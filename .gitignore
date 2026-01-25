@@ -55,3 +55,30 @@ image/
 *.jpg
 *.jpeg
 *.gif
+
+# =============================================================================
+# AGENT / CONTEXT MANAGEMENT (do not push to repo)
+# =============================================================================
+
+# Claude Code configuration and commands
+.claude/
+
+# Context files (all CLAUDE.md files in any folder)
+CLAUDE.md
+**/CLAUDE.md
+
+# Session state files
+SESSION_STATE.md
+**/SESSION_STATE.md
+
+# Session logs (historical records)
+session_logs/
+**/session_logs/
+
+# Context management playbook/templates
+CONTEXT_MANAGEMENT_PLAYBOOK.md
+**/CONTEXT_MANAGEMENT_PLAYBOOK.md
+
+# Any .local variants (personal context)
+*.local.md
+**/*.local.md

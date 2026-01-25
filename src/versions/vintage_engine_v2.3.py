@@ -1,15 +1,17 @@
 """
-Vintage Engine v2.4
+Vintage Engine v2.3
 ===================
 
-Changes from v2.3:
-- REFACTORED: Split PATHS into HIVE_PATHS and EDW_TABLES for clarity
-- CENTRALIZED: All EDW table references now in EDW_TABLES dict
-- No functional changes - same behavior, better organization
-
-Changes from v2.2 (carried forward):
+Changes from v2.2:
 - REMOVED: METRIC_TYPES constant (unused, not modular)
-- REMOVED: SUPPORTED_CHANNELS dict (redundant)
+
+Changes from v2.1 (carried forward):
+- NEW OUTPUT SCHEMA: TST_GRP_CD x RPT_GRP_CD x METRIC x DAY (raw codes, no TEST/CONTROL mapping)
+- REMOVED: Lift calculation (dashboard handles this now)
+- REMOVED: generate_summary(), calculate_ci() (dashboard handles this)
+- ADDED: METRIC column (PRIMARY, SECONDARY, EMAIL_OPEN, EMAIL_CLICK)
+- ADDED: Secondary metrics support (e.g., card_usage for VAW/VUI)
+- FOLDED: Engagement metrics into main vintage_curves output
 
 Architecture: SuperFact 4-Layer Framework
 - Layer 1: Experiment Metadata (tactic_evnt_hist) - "Who is in test?"
@@ -74,27 +76,13 @@ OUTPUT_SCHEMA = {
 YEARS_TO_INCLUDE = [2025, 2026]
 
 # =============================================================================
-# HIVE_PATHS - File system paths for Hive/Parquet tables
-# Usage: spark.read.parquet(f"{HIVE_PATHS['tactic_events']}{year}*")
+# PATHS - Data Source Locations
 # =============================================================================
 
-HIVE_PATHS = {
-    "tactic_events": "/prod/sz/tsz/00150/cc/DTZTA_T_TACTIC_EVNT_HIST/",
-    "visa_debit_card": "/prod/sz/tsz/00050/data/DDWTA_VISA_DR_CRD/PartitionColumn=Latest/CAPTR_DT=",
-    "pos_transactions": "/prod/sz/tsz/00050/data/DDWTA_T_PT_OF_SALE_TXN/SNAP_DT=",
-}
-
-# =============================================================================
-# EDW_TABLES - Enterprise Data Warehouse table references
-# Usage: f"SELECT ... FROM {EDW_TABLES['feedback_master']} WHERE ..."
-# Note: These are schema.table names, not file paths
-# =============================================================================
-
-EDW_TABLES = {
-    "feedback_master": "DTZV01.VENDOR_FEEDBACK_MASTER",
-    "feedback_event": "DTZV01.VENDOR_FEEDBACK_EVENT",
-    "pos_log": "DDWV05.CLNT_CRD_POS_LOG",
-    "token_list": "DL_DECMAN.TOKEN_LIST",
+PATHS = {
+    "tactic_base_path": "/prod/sz/tsz/00150/cc/DTZTA_T_TACTIC_EVNT_HIST/",
+    "visa_dr_crd": "/prod/sz/tsz/00050/data/DDWTA_VISA_DR_CRD/PartitionColumn=Latest/CAPTR_DT=",
+    "pos_txn": "/prod/sz/tsz/00050/data/DDWTA_T_PT_OF_SALE_TXN/SNAP_DT=",
 }
 
 # =============================================================================
@@ -149,7 +137,7 @@ SUCCESS_DEFINITIONS = {
         "description": "Client acquired a new VVD card",
         "version": "1.0",
         "source": "HIVE",
-        "table_path": HIVE_PATHS["visa_debit_card"],
+        "table_path": PATHS["visa_dr_crd"],
         "date_field": "ISS_DT",
         "client_field": "CLNT_NO",
         "filters": {
@@ -163,7 +151,7 @@ SUCCESS_DEFINITIONS = {
         "description": "Client activated their VVD card",
         "version": "1.0",
         "source": "HIVE",
-        "table_path": HIVE_PATHS["visa_debit_card"],
+        "table_path": PATHS["visa_dr_crd"],
         "date_field": "ACTV_DT",
         "client_field": "CLNT_NO",
         "filters": {
@@ -177,7 +165,7 @@ SUCCESS_DEFINITIONS = {
         "description": "Client used their VVD card for a transaction",
         "version": "1.0",
         "source": "HIVE",
-        "table_path": HIVE_PATHS["pos_transactions"],
+        "table_path": PATHS["pos_txn"],
         "date_field": "TXN_DT",
         "client_field": "CLNT_NO",
         "filters": {
@@ -260,7 +248,7 @@ def load_tactic(spark, mne):
     v2.2: Returns raw TST_GRP_CD and RPT_GRP_CD (no TEST/CONTROL mapping).
     """
     years = [str(y) for y in YEARS_TO_INCLUDE]
-    base_path = HIVE_PATHS["tactic_events"]
+    base_path = PATHS["tactic_base_path"]
     paths = [f"{base_path}EVNT_STRT_DT={year}*" for year in years]
 
     print(f"    [Layer 1] Loading experiment data from partitions: {years}")
@@ -348,8 +336,8 @@ def _load_email_engagement(spark, treatment_ids):
         MAX(CASE WHEN disposition_cd = 2 THEN CAST(disposition_dt_tm AS DATE) END) AS OPENED_DT,
         MAX(CASE WHEN disposition_cd = 3 THEN CAST(disposition_dt_tm AS DATE) END) AS CLICKED_DT
 
-    FROM {EDW_TABLES['feedback_master']} FEEDBACK_MASTER
-    INNER JOIN {EDW_TABLES['feedback_event']} FEEDBACK_EVENT
+    FROM DTZV01.VENDOR_FEEDBACK_MASTER FEEDBACK_MASTER
+    INNER JOIN DTZV01.VENDOR_FEEDBACK_EVENT FEEDBACK_EVENT
         ON FEEDBACK_MASTER.consumer_id_hashed = FEEDBACK_EVENT.consumer_id_hashed
         AND FEEDBACK_MASTER.TREATMENT_ID = FEEDBACK_EVENT.TREATMENT_ID
     WHERE FEEDBACK_MASTER.TREATMENT_ID IN ('{treatment_id_list}')
@@ -384,12 +372,12 @@ def _load_email_engagement(spark, treatment_ids):
 
 def load_token_from_edw():
     """Layer 4: Load token/provisioning data from EDW."""
-    query = f"""
+    query = """
     SELECT DISTINCT
         CAST(SUBSTR(B.CLNT_CRD_NO, 7, 9) AS INTEGER) AS CLNT_NO,
         B.TXN_DT
-    FROM {EDW_TABLES['pos_log']} AS B
-    INNER JOIN {EDW_TABLES['token_list']} C
+    FROM DDWV05.CLNT_CRD_POS_LOG AS B
+    INNER JOIN DL_DECMAN.TOKEN_LIST C
         ON B.TOKN_REQSTR_ID = C.TOKEN_ID
     WHERE B.AMT1 = 0
         AND SUBSTR(B.CLNT_CRD_NO, 1, 5) = '45190'
@@ -749,7 +737,7 @@ def run_vintage_analysis(spark, mne, verbose=True, include_engagement=True):
             print(msg)
 
     log(f"\n{'='*60}")
-    log(f"VINTAGE ANALYSIS v2.4: {mne}")
+    log(f"VINTAGE ANALYSIS v2.3: {mne}")
     log(f"{'='*60}")
 
     # Layer 2: Get campaign metadata
@@ -970,19 +958,21 @@ def download_results(results, mne=None):
 # SETUP & USAGE
 # =============================================================================
 
-spark = SparkSession.builder.appName("Vintage Engine v2.4").getOrCreate()
+spark = SparkSession.builder.appName("Vintage Engine v2.3").getOrCreate()
 
 print("""
 ===============================================================================
-                          VINTAGE ENGINE v2.4
+                          VINTAGE ENGINE v2.3
 ===============================================================================
 
 OUTPUT SCHEMA:
   MNE | COHORT | TST_GRP_CD | RPT_GRP_CD | METRIC | DAY | WINDOW_DAYS | CLIENT_CNT | SUCCESS_CNT | RATE
 
-CHANGES FROM v2.3:
-  - Split PATHS into HIVE_PATHS and EDW_TABLES for clarity
-  - All data source references now centralized
+CHANGES FROM v2.1:
+  - Raw TST_GRP_CD and RPT_GRP_CD (no TEST/CONTROL mapping)
+  - METRIC column (PRIMARY, SECONDARY, EMAIL_OPEN, EMAIL_CLICK)
+  - No lift calculation (dashboard handles this)
+  - Engagement metrics folded into main output
 
 Available campaigns: """ + ", ".join(ALL_MNES) + """
 

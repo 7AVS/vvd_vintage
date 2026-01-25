@@ -4,6 +4,25 @@ All notable changes to the Vintage Engine will be documented in this file.
 
 ---
 
+## [v2.4] - 2026-01-25
+
+### Changed
+- Split `PATHS` dict into `HIVE_PATHS` and `EDW_TABLES` for clarity
+- `HIVE_PATHS`: File system paths for Hive/Parquet tables (tactic_events, visa_debit_card, pos_transactions)
+- `EDW_TABLES`: Database schema.table references (feedback_master, feedback_event, pos_log, token_list)
+- Updated all SQL queries to reference `EDW_TABLES` instead of hardcoded strings
+- Updated `SUCCESS_DEFINITIONS` to reference `HIVE_PATHS`
+
+### Why
+- Hive paths and EDW tables behave differently (paths get date suffixes, tables go into SQL as-is)
+- Centralizing all data source references improves maintainability and auditability
+- Separation prevents accidental misuse (e.g., appending dates to a table name)
+
+### No Functional Changes
+- Same behavior, better organization
+
+---
+
 ## [v2.3] - 2026-01-23
 
 ### Removed
@@ -12,9 +31,6 @@ All notable changes to the Vintage Engine will be documented in this file.
 
 ### Changed
 - Simplified load_channel_engagement() - routes directly based on channel name, no dict lookup
-
-### Review Notes (candidates for next version)
-- PATHS vs EDW paths: inconsistent location (some in PATHS dict, some in SQL queries)
 
 ---
 
@@ -61,9 +77,4 @@ All notable changes to the Vintage Engine will be documented in this file.
 - Channel-agnostic engagement loading pattern
 - Enrichment placeholder
 
----
-
-## Code Review Notes (v2.3 candidates)
-
-<!-- Add findings from code review session here -->
 

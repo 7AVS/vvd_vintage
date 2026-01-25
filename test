@@ -1,7 +1,24 @@
-import base64
-  from IPython.display import HTML
+I can see what's happening here, Andre. The sparse-checkout created a nested mess. Let me give you the clean way to do this.
+The issue: You likely ran clone commands that created vvd_vintage inside an existing vvd_vintage folder, and the sparse-checkout got tangled up.
+Clean fix - start fresh:
+# 1. Go to your working directory (one level ABOVE where you want vvd_vintage)
+cd \\maple.fg.rbc.com\data\Toronto\wrkgrp\wrkgrp16\Marketing
 
-  csv_data = results['vintage_df'].to_csv(index=False)
-  b64 = base64.b64encode(csv_data.encode()).decode()
-  html = f'<a download="vintage_curves.csv" href="data:text/csv;base64,{b64}">Click to download vintage_curves.csv</a>'
-  display(HTML(html))
+# 2. Delete the messed up folder
+Remove-Item -Recurse -Force vvd_vintage
+
+# 3. Clone with sparse checkout from the start
+git clone --filter=blob:none --sparse https://github.com/7AVS/vvd_vintage.git
+
+# 4. Enter the repo
+cd vvd_vintage
+
+# 5. Tell git you only want the reports folder
+git sparse-checkout set reports
+
+# Done. Now you only have /reports
+To update later (pull new changes):
+cd \\maple.fg.rbc.com\data\Toronto\wrkgrp\wrkgrp16\Marketing\vvd_vintage
+git pull
+That's it. The key mistake was probably running git clone while already inside a vvd_vintage folder, which created the nesting. The --filter=blob:none --sparse flags on clone set everything up correctly from the start so you don't need the separate init --cone step.
+Does that path look right for where you want the repo to live?

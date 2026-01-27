@@ -1,6 +1,6 @@
 # Campaign Structure Reference
 
-**Purpose:** Document how marketing campaigns are structured, using SLC as a real-world example.
+**Purpose:** Document how marketing campaigns are structured, using  as a real-world example.
 **Source:** Technical specification screenshots from campaign documentation.
 **Created:** 2026-01-23
 

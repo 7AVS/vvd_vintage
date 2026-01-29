@@ -1,0 +1,297 @@
+<mxfile host="app.diagrams.net" modified="2026-01-28T00:00:00.000Z" agent="Claude" version="21.0.0" type="device">
+  <diagram id="current-state" name="Current State - Coupling Issues">
+    <mxGraphModel dx="1200" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TITLE -->
+        <mxCell id="title1" value="&lt;b&gt;CURRENT STATE: Module Coupling Issues&lt;/b&gt;&lt;br&gt;&lt;i&gt;Layer 3 logic is scattered across the file&lt;/i&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="800" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- MNE INPUT -->
+        <mxCell id="mne-input" value="&lt;b&gt;MNE INPUT&lt;/b&gt;&lt;br&gt;e.g. &quot;VAW&quot;" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#003168;fontColor=#FFFFFF;strokeColor=#003168;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="460" y="90" width="280" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: MNE to Layer 1 -->
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="mne-input" target="layer1-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- LAYER 1: EXPERIMENT -->
+        <mxCell id="layer1-box" value="&lt;b&gt;MODULE 1: EXPERIMENT METADATA&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;&quot;Who is in the test?&quot;&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;load_tactic(spark, mne)&lt;/font&gt;&lt;br&gt;&lt;br&gt;&#10;&#8226; Reads tactic_evnt_hist&lt;br&gt;&#8226; Extracts MNE, CLNT_NO, COHORT&lt;br&gt;&#8226; Output: tactic_df" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F3FF;strokeColor=#0091DA;strokeWidth=2;align=left;spacingLeft=15;spacingRight=15;verticalAlign=top;spacingTop=10;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="330" y="170" width="540" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="l1-badge" value="L1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0091DA;fontColor=#FFFFFF;strokeColor=#0091DA;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="330" y="170" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="l1-status" value="CLEAN" style="text;html=1;fillColor=#4CAF50;fontColor=#FFFFFF;align=center;verticalAlign=middle;rounded=1;fontSize=10;fontStyle=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="810" y="175" width="55" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: Layer 1 to Layer 2 -->
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="layer1-box" target="layer2-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- LAYER 2: CAMPAIGN METADATA -->
+        <mxCell id="layer2-box" value="&lt;b&gt;MODULE 2: CAMPAIGN METADATA&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;&quot;What to measure?&quot;&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;CAMPAIGN_METADATA dict (lines 109-146)&lt;br&gt;get_campaign_config(mne)&lt;/font&gt;&lt;br&gt;&lt;br&gt;&#10;&#8226; 6 campaigns defined&lt;br&gt;&#8226; Returns: primary_metric, secondary_metric" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFC72C;strokeWidth=2;align=left;spacingLeft=15;spacingRight=15;verticalAlign=top;spacingTop=10;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="330" y="360" width="540" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="l2-badge" value="L2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFC72C;fontColor=#003168;strokeColor=#FFC72C;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="330" y="360" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="l2-status" value="MOSTLY OK" style="text;html=1;fillColor=#FFC72C;fontColor=#003168;align=center;verticalAlign=middle;rounded=1;fontSize=10;fontStyle=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="790" y="365" width="75" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- COUPLING POINT: get_full_config -->
+        <mxCell id="coupling1" value="&lt;b&gt;COUPLING POINT 1&lt;/b&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;get_full_config()&lt;/font&gt;&lt;br&gt;Directly accesses BOTH dicts&lt;br&gt;(lines 229-254)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#D32F2F;strokeWidth=2;dashed=1;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="430" width="250" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="coup1-arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#D32F2F;strokeWidth=2;dashed=1;endArrow=block;" edge="1" source="coupling1" target="layer2-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="coup1-arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#D32F2F;strokeWidth=2;dashed=1;endArrow=block;" edge="1" source="coupling1" target="layer3-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: Layer 2 to Layer 3 -->
+        <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="layer2-box" target="layer3-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- LAYER 3: SUCCESS DEFINITIONS (DICT ONLY) -->
+        <mxCell id="layer3-box" value="&lt;b&gt;MODULE 3: SUCCESS DEFINITIONS (INCOMPLETE)&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;&quot;How to calculate?&quot;&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;SUCCESS_DEFINITIONS dict (lines 152-210)&lt;br&gt;get_success_definition(metric_name)&lt;/font&gt;&lt;br&gt;&lt;br&gt;&#10;&#8226; Defines: source, table_path, date_field, filters&lt;br&gt;&#8226; wallet_provisioning has &lt;b&gt;filters: None&lt;/b&gt; (lie!)&lt;br&gt;&#8226; &lt;font color=&quot;#D32F2F&quot;&gt;&lt;b&gt;Filter INTERPRETATION logic is NOT here!&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFC72C;strokeWidth=2;align=left;spacingLeft=15;spacingRight=15;verticalAlign=top;spacingTop=10;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="330" y="540" width="540" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="l3-badge" value="L3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFC72C;fontColor=#003168;strokeColor=#FFC72C;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="330" y="540" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="l3-status" value="SCATTERED" style="text;html=1;fillColor=#D32F2F;fontColor=#FFFFFF;align=center;verticalAlign=middle;rounded=1;fontSize=10;fontStyle=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="790" y="545" width="75" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: Layer 3 to Layer 4 -->
+        <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="layer3-box" target="layer4-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- LAYER 4: CLIENT JOURNEY -->
+        <mxCell id="layer4-box" value="&lt;b&gt;MODULE 4: CLIENT JOURNEY&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;&quot;What actually happened?&quot;&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;load_success_outcome(spark, config) — lines 419-454&lt;br&gt;load_token_from_edw() — lines 392-416&lt;/font&gt;&lt;br&gt;&lt;br&gt;&#10;&lt;font color=&quot;#D32F2F&quot;&gt;&lt;b&gt;CONTAINS Layer 3 filter logic!&lt;/b&gt;&lt;br&gt;&#8226; if &quot;STS_CD&quot;... if &quot;TXN_TYPES&quot;... (lines 434-452)&lt;br&gt;&#8226; load_token_from_edw() has hardcoded SQL&lt;br&gt;  that BYPASSES SUCCESS_DEFINITIONS entirely&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F3FF;strokeColor=#0091DA;strokeWidth=2;align=left;spacingLeft=15;spacingRight=15;verticalAlign=top;spacingTop=10;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="330" y="750" width="540" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="l4-badge" value="L4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0091DA;fontColor=#FFFFFF;strokeColor=#0091DA;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="330" y="750" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="l4-status" value="CONTAMINATED" style="text;html=1;fillColor=#D32F2F;fontColor=#FFFFFF;align=center;verticalAlign=middle;rounded=1;fontSize=10;fontStyle=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="775" y="755" width="95" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- COUPLING POINT 2: Scattered filter logic -->
+        <mxCell id="coupling2" value="&lt;b&gt;COUPLING POINT 2&lt;/b&gt;&lt;br&gt;Filter interpretation logic&lt;br&gt;(STS_CD, TXN_TYPES, etc.)&lt;br&gt;belongs in Layer 3 but&lt;br&gt;lives in Layer 4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#D32F2F;strokeWidth=2;dashed=1;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="620" width="250" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="coup2-arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#D32F2F;strokeWidth=2;dashed=1;endArrow=block;exitX=1;exitY=0.3;exitDx=0;exitDy=0;" edge="1" source="coupling2" target="layer3-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="coup2-arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#D32F2F;strokeWidth=2;dashed=1;endArrow=block;exitX=1;exitY=0.7;exitDx=0;exitDy=0;" edge="1" source="coupling2" target="layer4-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- COUPLING POINT 3: EDW bypass -->
+        <mxCell id="coupling3" value="&lt;b&gt;COUPLING POINT 3&lt;/b&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;load_token_from_edw()&lt;/font&gt;&lt;br&gt;Hardcoded SQL completely&lt;br&gt;bypasses SUCCESS_DEFINITIONS&lt;br&gt;&lt;i&gt;filters: None (but there ARE filters!)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#D32F2F;strokeWidth=2;dashed=1;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="910" y="620" width="260" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="coup3-arrow" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#D32F2F;strokeWidth=2;dashed=1;endArrow=block;" edge="1" source="coupling3" target="layer4-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: Layer 4 to Engine -->
+        <mxCell id="a5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="layer4-box" target="engine-box" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ENGINE CORE -->
+        <mxCell id="engine-box" value="&lt;b&gt;VINTAGE ENGINE (Layer-Agnostic)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;detect_success() → build_vintage_curves() → output&lt;/font&gt;&lt;br&gt;&lt;br&gt;Does NOT change. Only cares about standardized fields." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#003168;strokeWidth=3;align=center;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="370" y="970" width="460" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="engine-status" value="STABLE" style="text;html=1;fillColor=#4CAF50;fontColor=#FFFFFF;align=center;verticalAlign=middle;rounded=1;fontSize=10;fontStyle=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="1">
+          <mxGeometry x="775" y="975" width="55" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- LEGEND -->
+        <mxCell id="legend-title" value="&lt;b&gt;STATUS&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=11;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1000" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-clean" value="CLEAN — Module is self-contained" style="text;html=1;fillColor=#4CAF50;fontColor=#FFFFFF;align=left;verticalAlign=middle;rounded=1;fontSize=10;spacingLeft=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1025" width="250" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-scattered" value="SCATTERED — Logic split across locations" style="text;html=1;fillColor=#D32F2F;fontColor=#FFFFFF;align=left;verticalAlign=middle;rounded=1;fontSize=10;spacingLeft=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1052" width="250" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-coupling" value="Red dashed — Coupling point (design debt)" style="text;html=1;fillColor=#FFEBEE;strokeColor=#D32F2F;strokeWidth=1;align=left;verticalAlign=middle;rounded=1;fontSize=10;dashed=1;spacingLeft=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1079" width="250" height="22" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="target-state" name="Target State - Hybrid Asset Pipeline">
+    <mxGraphModel dx="1200" dy="1800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TITLE -->
+        <mxCell id="t-title" value="&lt;b&gt;TARGET STATE: Hybrid Asset Pipeline&lt;/b&gt;&lt;br&gt;&lt;i&gt;Each module is self-contained. MNE triggers the pipeline.&lt;/i&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=16;fontColor=#003168;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="800" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- MNE INPUT -->
+        <mxCell id="t-mne" value="&lt;b&gt;MNE INPUT&lt;/b&gt;&lt;br&gt;e.g. &quot;VAW&quot; + Date Range" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#003168;fontColor=#FFFFFF;strokeColor=#003168;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="420" y="90" width="360" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: MNE to Module 1 -->
+        <mxCell id="ta1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="t-mne" target="t-mod1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- MODULE 1: EXPERIMENT -->
+        <mxCell id="t-mod1" value="&lt;b&gt;MODULE 1: EXPERIMENT METADATA&lt;/b&gt;   &lt;font color=&quot;#666666&quot;&gt;&quot;Who is in the test?&quot;&lt;/font&gt;&lt;br&gt;&lt;br&gt;&#10;Input: MNE + Date Range&lt;br&gt;&#10;Process: Read tactic_evnt_hist → filter by MNE → extract clients&lt;br&gt;&#10;&lt;b&gt;Output: tactic_df&lt;/b&gt; (CLNT_NO, TST_GRP_CD, RPT_GRP_CD, COHORT, dates)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F3FF;strokeColor=#0091DA;strokeWidth=2;align=left;spacingLeft=15;spacingRight=15;verticalAlign=middle;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="250" y="170" width="700" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="t-l1" value="M1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0091DA;fontColor=#FFFFFF;strokeColor=#0091DA;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="250" y="170" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: Module 1 to Module 2 -->
+        <mxCell id="ta2" value="&lt;font style=&quot;font-size:10px&quot;&gt;passes client list +&lt;br&gt;treatment dates&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;labelBackgroundColor=#FFFFFF;" edge="1" source="t-mod1" target="t-mod2" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- MODULE 2: CAMPAIGN METADATA -->
+        <mxCell id="t-mod2" value="&lt;b&gt;MODULE 2: CAMPAIGN METADATA&lt;/b&gt;   &lt;font color=&quot;#666666&quot;&gt;&quot;What to measure?&quot;&lt;/font&gt;&lt;br&gt;&lt;br&gt;&#10;Input: MNE&lt;br&gt;&#10;Looks up: What metrics does this mnemonic need?&lt;br&gt;&#10;&lt;b&gt;Output: primary_metric, secondary_metric, campaign_name, success_type&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFC72C;strokeWidth=2;align=left;spacingLeft=15;spacingRight=15;verticalAlign=middle;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="250" y="310" width="700" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="t-l2" value="M2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFC72C;fontColor=#003168;strokeColor=#FFC72C;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="250" y="310" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: Module 2 to Module 3 -->
+        <mxCell id="ta3" value="&lt;font style=&quot;font-size:10px&quot;&gt;passes metric_name&lt;br&gt;(e.g. &quot;wallet_provisioning&quot;)&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;labelBackgroundColor=#FFFFFF;" edge="1" source="t-mod2" target="t-mod3-outer" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- MODULE 3: SUCCESS DEFINITION — THE COMPLETE DATA ASSET -->
+        <mxCell id="t-mod3-outer" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFC72C;strokeWidth=3;verticalAlign=top;spacingTop=5;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="140" y="450" width="920" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="t-l3" value="M3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFC72C;fontColor=#003168;strokeColor=#FFC72C;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="140" y="450" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="t-mod3-title" value="&lt;b style=&quot;font-size:14px&quot;&gt;MODULE 3: SUCCESS DEFINITION — COMPLETE DATA ASSET&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#666666&quot;&gt;&quot;How to calculate success?&quot; — Everything needed is HERE&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="200" y="458" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ASSET IDENTITY -->
+        <mxCell id="t-asset-id" value="&lt;b&gt;ASSET IDENTITY&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;metric_id: &quot;wallet_provisioning&quot;&lt;br&gt;description: &quot;Digital wallet provisioning&quot;&lt;br&gt;owner: &quot;marketing_analytics&quot;&lt;br&gt;source: &quot;EDW&quot;  |  &quot;HIVE&quot;  |  &quot;DUAL&quot;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#B58500;strokeWidth=1;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="180" y="510" width="340" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- OUTPUT CONTRACT -->
+        <mxCell id="t-contract" value="&lt;b&gt;OUTPUT CONTRACT&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#D32F2F&quot;&gt;(enforced by engine)&lt;/font&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;client_key: CLNT_NO&lt;br&gt;date_key:   SUCCESS_DT&lt;br&gt;deduplicate: True&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#003168;strokeWidth=2;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="560" y="510" width="340" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- SOURCE ROUTER -->
+        <mxCell id="t-router" value="&lt;b&gt;SOURCE ROUTER&lt;/b&gt;&lt;br&gt;Reads &lt;font face=&quot;Courier New&quot;&gt;source&lt;/font&gt; flag → activates the right path" style="rhombus;whiteSpace=wrap;html=1;fillColor=#003168;fontColor=#FFFFFF;strokeColor=#003168;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="440" y="650" width="320" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow from identity to router -->
+        <mxCell id="ta-id-router" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=1;" edge="1" source="t-asset-id" target="t-router" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- HIVE PATH -->
+        <mxCell id="t-hive-path" value="&lt;b&gt;HIVE PATH&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:10px&quot;&gt;table_path: /prod/sz/...&lt;br&gt;filters: {STS_CD, SRVC_ID...}&lt;br&gt;apply_success_filters(df)&lt;/font&gt;&lt;br&gt;&lt;br&gt;&#10;&#8226; Read parquet via Spark&lt;br&gt;&#8226; Apply PySpark filters&lt;br&gt;&#8226; Extract client key" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;strokeWidth=2;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="180" y="760" width="310" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="t-hive-label" value="source = &quot;HIVE&quot;" style="text;html=1;fillColor=#4CAF50;fontColor=#FFFFFF;align=center;verticalAlign=middle;rounded=1;fontSize=10;fontStyle=1;spacingLeft=6;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="270" y="740" width="110" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- EDW PATH -->
+        <mxCell id="t-edw-path" value="&lt;b&gt;EDW PATH (Teradata)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:10px&quot;&gt;tables: [pos_log, token_list]&lt;br&gt;query: &quot;SELECT ... JOIN ... WHERE&quot;&lt;br&gt;business_rules: [...]&lt;/font&gt;&lt;br&gt;&lt;br&gt;&#10;&#8226; Execute SQL via EDW cursor&lt;br&gt;&#8226; Full query IN the asset&lt;br&gt;&#8226; Rules documented alongside" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;strokeWidth=2;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="710" y="760" width="310" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="t-edw-label" value="source = &quot;EDW&quot;" style="text;html=1;fillColor=#1565C0;fontColor=#FFFFFF;align=center;verticalAlign=middle;rounded=1;fontSize=10;fontStyle=1;spacingLeft=6;spacingRight=6;" vertex="1" parent="1">
+          <mxGeometry x="810" y="740" width="110" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- Router arrows to paths -->
+        <mxCell id="ta-router-hive" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#4CAF50;strokeWidth=2;" edge="1" source="t-router" target="t-hive-path" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ta-router-edw" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1565C0;strokeWidth=2;" edge="1" source="t-router" target="t-edw-path" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- STANDARDIZED OUTPUT -->
+        <mxCell id="t-std-output" value="&lt;b&gt;STANDARDIZED OUTPUT&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:12px&quot;&gt;CLNT_NO  |  SUCCESS_DT&lt;/font&gt;&lt;br&gt;&lt;br&gt;Same contract regardless of source.&lt;br&gt;This is what Module 4 and the Engine receive." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#003168;fontColor=#FFFFFF;strokeColor=#003168;strokeWidth=2;align=center;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="355" y="940" width="490" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Paths to standardized output -->
+        <mxCell id="ta-hive-out" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="t-hive-path" target="t-std-output" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ta-edw-out" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="t-edw-path" target="t-std-output" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: Module 3 to Module 4 -->
+        <mxCell id="ta5" value="&lt;font style=&quot;font-size:10px&quot;&gt;passes success_df&lt;br&gt;(CLNT_NO + SUCCESS_DT)&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;labelBackgroundColor=#FFFFFF;" edge="1" source="t-std-output" target="t-mod4" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- MODULE 4: CLIENT JOURNEY (CLEAN) -->
+        <mxCell id="t-mod4" value="&lt;b&gt;MODULE 4: CLIENT JOURNEY&lt;/b&gt;   &lt;font color=&quot;#666666&quot;&gt;&quot;What actually happened?&quot;&lt;/font&gt;&lt;br&gt;&lt;br&gt;&#10;&#8226; Joins experiment (M1) + success (M3) → &lt;font face=&quot;Courier New&quot;&gt;detect_success()&lt;/font&gt;&lt;br&gt;&#10;&#8226; Enriches with engagement data (email opens/clicks)&lt;br&gt;&#10;&lt;b&gt;Output: enriched success_df&lt;/b&gt; (standardized fields for engine)&lt;br&gt;&lt;br&gt;&#10;&lt;font color=&quot;#4CAF50&quot;&gt;&lt;b&gt;NOW CLEAN — no more Layer 3 logic here&lt;/b&gt;&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F3FF;strokeColor=#0091DA;strokeWidth=2;align=left;spacingLeft=15;spacingRight=15;verticalAlign=middle;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="250" y="1080" width="700" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="t-l4" value="M4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#0091DA;fontColor=#FFFFFF;strokeColor=#0091DA;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="250" y="1080" width="40" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ARROW: Module 4 to Engine -->
+        <mxCell id="ta6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="t-mod4" target="t-engine" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ENGINE CORE -->
+        <mxCell id="t-engine" value="&lt;b&gt;VINTAGE ENGINE (Unchanged)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:11px&quot;&gt;build_vintage_curves() → build_engagement_curves() → output&lt;/font&gt;&lt;br&gt;&lt;br&gt;Receives standardized DataFrames. Does not know or care about sources." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#003168;strokeWidth=3;align=center;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="320" y="1240" width="560" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- OUTPUT -->
+        <mxCell id="ta7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#003168;strokeWidth=2;" edge="1" source="t-engine" target="t-output" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="t-output" value="&lt;b&gt;VINTAGE CURVES OUTPUT&lt;/b&gt;&lt;br&gt;&lt;font face=&quot;Courier New&quot; style=&quot;font-size:10px&quot;&gt;MNE | COHORT | TST_GRP_CD | RPT_GRP_CD | METRIC | DAY | RATE&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#003168;fontColor=#FFFFFF;strokeColor=#003168;align=center;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="370" y="1380" width="460" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- KEY INSIGHT BOX -->
+        <mxCell id="t-insight" value="&lt;b&gt;KEY PRINCIPLE&lt;/b&gt;&lt;br&gt;&lt;br&gt;The MNE triggers the pipeline. Each module looks up what it needs for that mnemonic.&lt;br&gt;&lt;br&gt;Module 3 detects the source type (HIVE / EDW) and activates the right protocol.&lt;br&gt;If it has no EDW config → EDW path does not activate.&lt;br&gt;If it has no HIVE config → HIVE path does not activate.&lt;br&gt;&lt;br&gt;The output contract is always the same: &lt;font face=&quot;Courier New&quot;&gt;CLNT_NO + SUCCESS_DT&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F7FA;strokeColor=#07AFBF;strokeWidth=2;align=left;spacingLeft=15;spacingRight=15;verticalAlign=top;spacingTop=10;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1080" width="200" height="260" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,7 +1,7 @@
-You are the DRAWIO READ AGENT.
+You are the DRAWIO PARSER AGENT.
 
 ## Purpose
-Parse DrawIO XML and extract element data. Be fast and precise.
+Parse DrawIO XML and extract element data into structured JSON. Be fast and precise.
 
 ## Input
 DrawIO file at: {{DRAWIO_FILE_PATH}}
@@ -35,7 +35,7 @@ Extract ALL mxCell elements with geometry into JSON.
 - legend: grouped items explaining colors
 
 ## Output
-Save to: {{OUTPUT_PATH}}/read_output.json
+Save to: {{OUTPUT_PATH}}/parsed_output.json
 
 ```json
 {
